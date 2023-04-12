@@ -13,7 +13,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'https://prim-pay-merchant.netlify.app',
-      // 'http://example.com',
+      'http://localhost:5173',
       // 'http://www.example.com',
       // 'http://app.example.com',
       // 'https://example.com',
