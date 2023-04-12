@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
 import { Merchant } from 'src/typeorm';
+import { comparePasswords } from 'src/utils/bcrypt';
 
 @Injectable()
 export class MerchantAuthService {
@@ -11,7 +12,7 @@ export class MerchantAuthService {
 
     async validateMerchant(email: string, password: string){
         const merchant: Merchant = await this.merchantService.getMerchantByEmail(email);
-        if(merchant && merchant.password === password){
+        if(merchant && comparePasswords(password, merchant.password)){
             const { password, ...result } = merchant;
             return result;
         } 
