@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
-import { CreateMerchantDto } from 'src/merchants/dto/CreateMErchant.dto';
-import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
+import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
+import { MerchantsService } from '../../services/merchants/merchants.service';
 
 @Controller('merchants')
 export class MerchantsController {

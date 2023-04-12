@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateMerchantDto } from 'src/merchants/dto/CreateMErchant.dto';
+import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
 import { Merchant as MerchantEntity } from 'src/typeorm';
 import { encodePassword } from '../../../utils/bcrypt';
 import { Repository } from 'typeorm';

@@ -6,7 +6,7 @@ import { MerchantsModule } from './merchants/merchants.module';
 import { AuthModule } from './auth/auth.module';
 import { MerchantTransactionModule } from './merchant-transaction/merchant-transaction.module';
 import { MerchantCustomerModule } from './merchant-customer/merchant-customer.module';
-import entities from './typeorm';
+import { TypeOrmConfigService } from './config/TypeOrmConfig';
 
 @Module({
   imports: [
@@ -14,16 +14,7 @@ import entities from './typeorm';
     MerchantsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('POSTGRES_HOST'),
-        port: +configService.get<number>('POSTGRES_PORT'),
-        username: configService.get('POSTGRES_USER'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        database: configService.get('POSTGRES_DB'),
-        entities: entities,
-        synchronize: true,
-      }),
+      useClass: TypeOrmConfigService,
       inject: [ConfigService],
     }),
     AuthModule,
