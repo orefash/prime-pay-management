@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsEmail, IsNotEmpty, isNotEmpty, IsNotEmptyObject, IsNumber, isNumber, IsOptional, IsString, length, Length, MinLength, ValidateNested } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Length, MinLength } from "class-validator";
 import { CreateBankDto } from "./CreateBankDetails.dto";
 
 export class CreateMerchantDto {

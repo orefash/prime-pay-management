@@ -4,11 +4,14 @@ import { TransactionController } from './controllers/transaction/transaction.con
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MerchantTransaction } from 'src/typeorm';
 import { MerchantCustomerModule } from 'src/merchant-customer/merchant-customer.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     MerchantCustomerModule,
     TypeOrmModule.forFeature([MerchantTransaction]),
+    
   ],
   providers: [
   

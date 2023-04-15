@@ -1,6 +1,8 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import JwtAuthenticationGuard from '../../../auth/utils/JWTAuthGuard';
 import { CreateTransactionDto } from 'src/merchant-transaction/dto/CreateTransaction.dto';
 import { TransactionService } from 'src/merchant-transaction/services/transaction/transaction.service';
+import RequestWithMerchant from 'src/auth/types/requestWithMerchant.interface';
 
 @Controller('transactions')
 export class TransactionController {
@@ -24,17 +26,21 @@ export class TransactionController {
     }
 
     @Get('')
-    getAllTransactions() {
+    @UseGuards(JwtAuthenticationGuard)
+    getAllTransactions(@Req() request: RequestWithMerchant) {
+
         return this.transactionService.getAllTransactions();
     }
 
 
     @Get('merchant/:mid')
+    @UseGuards(JwtAuthenticationGuard)
     getMerchantTransactions(@Param('mid') mid: string) {
         return this.transactionService.getMerchantTransactions(mid);
     }
 
     @Get(':tid')
+    @UseGuards(JwtAuthenticationGuard)
     getTransactionById(@Param('tid') tid: string) {
         return this.transactionService.getTransactionById(tid);
     }

@@ -1,0 +1,4 @@
+
+interface TokenPayload {
+    merchantId: string;
+}
