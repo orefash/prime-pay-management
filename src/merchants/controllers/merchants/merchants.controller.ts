@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { EditMerchantDto } from 'src/merchants/dto/UpdateMerchant.dto';
 import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
 import { MerchantsService } from '../../services/merchants/merchants.service';
 
@@ -19,6 +20,12 @@ export class MerchantsController {
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
         
+    }
+
+    @Patch('profile/:id')
+    @UsePipes(ValidationPipe)
+    async updateMerchant(@Param('id') merchantId: string, @Body() editMerchantDto: EditMerchantDto){
+        return this.merchantService.updateMerchantProfile(merchantId, editMerchantDto);
     }
 
     @Get('')
