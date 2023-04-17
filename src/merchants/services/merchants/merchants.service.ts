@@ -31,7 +31,7 @@ export class MerchantsService {
         if (updatedMerchant) {
           return updatedMerchant
         }
-        throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
     async getAllMerchants(): Promise<MerchantEntity[]>{
@@ -53,4 +53,6 @@ export class MerchantsService {
             }
         });
     }
+
+
 }

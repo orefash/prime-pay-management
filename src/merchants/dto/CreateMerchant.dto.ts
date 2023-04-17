@@ -57,4 +57,8 @@ export class CreateMerchantDto {
     @MinLength(2)
     bankCode: string;
 
+    @IsNotEmpty()
+    @IsString()
+    bankName: string;
+
 }

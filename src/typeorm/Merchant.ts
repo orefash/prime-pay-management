@@ -72,6 +72,11 @@ export class Merchant {
     @Column({
         nullable: true,
     })
+    promoterIdType: string;
+
+    @Column({
+        nullable: true,
+    })
     promoterIdUrl: string;
 
     @Column({
@@ -124,6 +129,11 @@ export class Merchant {
         nullable: false,
     })
     bankCode: string;
+
+    @Column({
+        nullable: false,
+    })
+    bankName: string;
 
     @Column({
         type: 'jsonb',

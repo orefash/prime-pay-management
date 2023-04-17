@@ -10,6 +10,10 @@ export class CreateBankDto {
 
     @IsString()
     @IsNotEmpty()
+    bankName: string;
+
+    @IsString()
+    @IsNotEmpty()
     @MinLength(3)
     @MaxLength(3)
     bankCode: string;

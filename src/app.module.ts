@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { MerchantTransactionModule } from './merchant-transaction/merchant-transaction.module';
 import { MerchantCustomerModule } from './merchant-customer/merchant-customer.module';
 import { TypeOrmConfigService } from './config/TypeOrmConfig';
+import { ThirdPartyDataModule } from './third-party-data/third-party-data.module';
+import { StaticsModule } from './statics/statics.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { TypeOrmConfigService } from './config/TypeOrmConfig';
     AuthModule,
     MerchantTransactionModule,
     MerchantCustomerModule,
+    ThirdPartyDataModule,
+    StaticsModule,
   ],
 })
 export class AppModule {}
