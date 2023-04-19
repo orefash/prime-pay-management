@@ -12,4 +12,6 @@ export class ThirdPartyDataController {
         return await this.tdService.getBankList();
     }
 
+    
+
 }

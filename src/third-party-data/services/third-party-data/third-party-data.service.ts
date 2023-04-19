@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { catchError, map } from 'rxjs';
+import { catchError, lastValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class ThirdPartyDataService {
@@ -11,31 +11,35 @@ export class ThirdPartyDataService {
     ) { }
 
     async getBankList() {
-        return this.http
+        const bankResponse = await lastValueFrom(
+            this.http
             .post(
-                'https://prime-pay.africa/cba/webservices/merch.php',  
+                'https://prime-pay.africa/cba/webservices/merch.php',
                 {
-                    "vser":[
+                    "vser": [
                         {
-                            "merchID":"vendor",
-                            "key":"NT9YkqNCZOlUlXcW8YNyenUhw6kd9Zl5W6xEUB02zEQ",
-                            "reqType":"get_bank"
+                            "merchID": "vendor",
+                            "key": "NT9YkqNCZOlUlXcW8YNyenUhw6kd9Zl5W6xEUB02zEQ",
+                            "reqType": "get_bank"
                         }
                     ]
                 }
             )
             .pipe(
-                map((res) => res.data?.bpi),
-                map((bpi) => bpi?.USD),
-                map((usd) => {
-                    return usd?.rate;
+                map((res) => res.data?.Stat),
+                map((stat) => {
+                    return stat;
                 }),
             )
             .pipe(
                 catchError(() => {
                     throw new ForbiddenException('API not available');
                 }),
-            );
+            )
+        );
+
+        // console.log(bankResponse)
+        return bankResponse;
     }
 
 }

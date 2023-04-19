@@ -9,6 +9,7 @@ import { MerchantCustomerModule } from './merchant-customer/merchant-customer.mo
 import { TypeOrmConfigService } from './config/TypeOrmConfig';
 import { ThirdPartyDataModule } from './third-party-data/third-party-data.module';
 import { StaticsModule } from './statics/statics.module';
+import { OverviewModule } from './overview/overview.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { StaticsModule } from './statics/statics.module';
     MerchantCustomerModule,
     ThirdPartyDataModule,
     StaticsModule,
+    OverviewModule,
   ],
 })
 export class AppModule {}

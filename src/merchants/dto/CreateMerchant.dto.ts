@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Length, MinLength } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Length, MinLength } from "class-validator";
 import { CreateBankDto } from "./CreateBankDetails.dto";
 
 export class CreateMerchantDto {
@@ -24,6 +24,14 @@ export class CreateMerchantDto {
     @IsString()
     @IsOptional()
     businessType: string;
+
+    @IsUrl()
+    @IsOptional()
+    websiteUrl: string;
+
+    @IsString()
+    @IsOptional()
+    cacUrl: string;
 
     @IsBoolean()
     @IsNotEmpty()

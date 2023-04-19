@@ -25,6 +25,30 @@ export class TransactionController {
         
     }
 
+    @Post(':id/toggle-delivered')
+    async toggleTransactionDelivered(@Param('id') id: string) {
+        try {
+            return await this.transactionService.toggleTransactionDelivered(id);
+        } catch (error) {
+            console.log('toggle transaction error')
+            console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+        
+    }
+
+    @Post(':id/toggle-confirmed')
+    async toggleTransactionConfirmed(@Param('id') id: string) {
+        try {
+            return await this.transactionService.toggleTransactionConfirmed(id);
+        } catch (error) {
+            console.log('toggle transaction error')
+            console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+        
+    }
+
     @Get('')
     @UseGuards(JwtAuthenticationGuard)
     getAllTransactions(@Req() request: RequestWithMerchant) {
