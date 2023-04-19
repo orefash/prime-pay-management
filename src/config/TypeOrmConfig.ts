@@ -21,7 +21,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             password: isDevelopment? this.configService.get('POSTGRES_PASSWORD_DEV') : this.configService.get('POSTGRES_PASSWORD'),
             database: isDevelopment? this.configService.get('POSTGRES_DB_DEV') : this.configService.get('POSTGRES_DB'),
             entities: entities,
-            synchronize: true //isDevelopment? true : false,
+            synchronize: this.configService.get<boolean>('DB_SYNC'),
         }
     }
 }
