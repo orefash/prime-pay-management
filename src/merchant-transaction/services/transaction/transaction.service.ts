@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerService } from 'src/merchant-customer/services/customer/customer.service';
 import { CreateTransactionDto, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
-import { MerchantTransaction as TransactionEntity } from 'src/typeorm'; 
+import { MerchantTransaction as TransactionEntity } from 'src/typeorm';
 import { mCustomer } from 'src/types/mCustomer.interface';
 import { mTransaction } from 'src/types/mTransaction.interface';
 import { Repository } from 'typeorm';
@@ -10,12 +10,12 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class TransactionService {
     constructor
-    (
-        @InjectRepository(TransactionEntity)
-        private readonly transactionRepository: Repository<TransactionEntity>,
-        @Inject(CustomerService)
-        private readonly customerService: CustomerService
-    ){}
+        (
+            @InjectRepository(TransactionEntity)
+            private readonly transactionRepository: Repository<TransactionEntity>,
+            @Inject(CustomerService)
+            private readonly customerService: CustomerService
+        ) { }
 
     async createTransaction(createTransactionDto: CreateTransactionDto) {
 
@@ -32,7 +32,7 @@ export class TransactionService {
             amount: createTransactionDto.amount,
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
-            mid: '1',
+            mid: '2',
             customer: savedCustomer
         }
 
@@ -42,7 +42,7 @@ export class TransactionService {
         return this.transactionRepository.save(newTransaction);
     }
 
-    async getAllTransactions(): Promise<TransactionEntity[]>{
+    async getAllTransactions(): Promise<TransactionEntity[]> {
         return this.transactionRepository.find({
             relations: {
                 customer: true
@@ -50,7 +50,7 @@ export class TransactionService {
         });
     }
 
-    async getMerchantTransactions(mid: string): Promise<TransactionEntity[]>{
+    async getMerchantTransactions(mid: string): Promise<TransactionEntity[]> {
         return this.transactionRepository.find({
             where: {
                 mid: mid
@@ -58,10 +58,13 @@ export class TransactionService {
             relations: {
                 customer: true
             },
+            order: {
+                orderDate: 'DESC'
+            }
         });
     }
 
-    async getTransactionById(tid: string): Promise<TransactionEntity>{
+    async getTransactionById(tid: string): Promise<TransactionEntity> {
         return this.transactionRepository.findOne({
             where: {
                 id: tid
@@ -72,7 +75,7 @@ export class TransactionService {
         });
     }
 
-    async toggleTransactionDelivered(tid: string){
+    async toggleTransactionDelivered(tid: string) {
 
         await this.transactionRepository.update(tid, {
             status: TransactionStatus.DELIVERED
@@ -83,13 +86,13 @@ export class TransactionService {
             }
         });
         if (updatedTransaction) {
-          return updatedTransaction
+            return updatedTransaction
         }
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
 
     }
 
-    async toggleTransactionConfirmed(tid: string){
+    async toggleTransactionConfirmed(tid: string) {
 
         await this.transactionRepository.update(tid, {
             status: TransactionStatus.CONFIRMED
@@ -100,7 +103,7 @@ export class TransactionService {
             }
         });
         if (updatedTransaction) {
-          return updatedTransaction
+            return updatedTransaction
         }
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
 

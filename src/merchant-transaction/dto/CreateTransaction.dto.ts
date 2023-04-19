@@ -2,17 +2,17 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from "clas
 
 
 export enum TransactionStatus {
-    PENDING = 'PENDING',
-    DELIVERED = 'DELIVERED',
-    CONFIRMED = 'CONFIRMED'
+    PENDING = 'Pending',
+    DELIVERED = 'Delivered',
+    CONFIRMED = 'Confirmed'
 }
 
 
 export enum OrderChannel {
-    WEB = 'WEB',
-    FACEBOOK = 'FACEBOOK',
-    WHATSAPP = 'WHATSAPP',
-    INSTAGRAM = 'INSTAGRAM',
+    WEB = 'Web',
+    FACEBOOK = 'Facebook',
+    WHATSAPP = 'Whatsapp',
+    INSTAGRAM = 'Instagram',
     USSD = 'USSD'
 }
 
