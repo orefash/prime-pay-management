@@ -19,7 +19,6 @@ export class MerchantsController {
             console.log('create error')
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        
     }
 
     @Patch('profile/:id')
@@ -33,13 +32,12 @@ export class MerchantsController {
         return this.merchantService.getAllMerchants();
     }
 
-
     @Get(':merchantId')
     getMerchantById(@Param('merchantId') merchantId: string) {
         return this.merchantService.getMerchantById(merchantId);
     }
 
-
+    
     // @Get(':email')
     // getUsers(@Param('merchantId') merchantId: string) {
     //     return this.merchantService.getMerchantById(merchantId);

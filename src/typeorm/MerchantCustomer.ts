@@ -1,5 +1,5 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Merchant } from "./Merchant";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
+
 import { MerchantTransaction } from "./MerchantTransaction";
 
 
@@ -33,6 +33,12 @@ export class MerchantCustomer {
         nullable: true,
     })
     ippis: number;
+
+    @CreateDateColumn({
+        nullable: false,
+    })
+    orderDate: Date;
+
 
     @OneToMany( type => MerchantTransaction , transaction => transaction.mid)
     transactions: MerchantTransaction[];

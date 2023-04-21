@@ -1,7 +1,7 @@
 import { Address } from "src/types/address.interface";
 import { BankDetails } from "src/types/bank_details.interface";
 import { Socials } from "src/types/socials.interface";
-import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { MerchantCustomer } from "./MerchantCustomer";
 import { MerchantTransaction } from "./MerchantTransaction";
 
@@ -140,6 +140,12 @@ export class Merchant {
         name: 'socials'
     })
     socials: Socials;
+
+    @CreateDateColumn({
+        nullable: false,
+    })
+    orderDate: Date;
+
 
     // @OneToMany( type => MerchantTransaction , transaction => transaction.merchant)
     // transactions: MerchantTransaction[];

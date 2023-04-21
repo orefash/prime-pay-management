@@ -1,6 +1,8 @@
-import { Controller, Get, HttpCode, Inject, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { RequestPasswordResetDto } from 'src/auth/dto/RequestPasswordReset.dto';
+import { ResetPasswordDto } from 'src/auth/dto/ResetPassword.dto';
 import { MerchantAuthService } from 'src/auth/services/merchant-auth/merchant-auth.service';
 import RequestWithMerchant from '../../types/requestWithMerchant.interface';
 import JwtAuthenticationGuard from '../../utils/JWTAuthGuard';
@@ -40,6 +42,30 @@ export class MerchantAuthController {
         // console.log('User: ', request.user)
         response.setHeader('Set-Cookie', this.merchantAuthService.getCookieForLogOut());
         return response.sendStatus(200);
+    }
+
+
+    // @UseGuards(JwtAuthenticationGuard)
+    @Post('request-password-reset')
+    async requestPasswordReset(@Body() requestPasswordDto: RequestPasswordResetDto) {
+        try {
+            return await this.merchantAuthService.requestPasswordReset(requestPasswordDto)
+        } catch (error) {
+            console.log('request Password Reset error')
+            console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Post('reset-password')
+    async resetPassword(@Body() resetPassword: ResetPasswordDto) {
+        try {
+            return await this.merchantAuthService.resetPassword(resetPassword)
+        } catch (error) {
+            console.log('Password Reset error')
+            console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
