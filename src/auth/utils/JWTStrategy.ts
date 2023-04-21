@@ -10,7 +10,8 @@ import { MerchantsService } from '../../merchants/services/merchants/merchants.s
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    @Inject('MERCHANTS_SERVICE') private readonly merchantService: MerchantsService,
+    // @Inject('MERCHANTS_SERVICE') 
+    private readonly merchantService: MerchantsService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {

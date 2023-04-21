@@ -29,6 +29,11 @@ export class MerchantCustomer {
     })
     email: string;
 
+    @Column({
+        nullable: true,
+    })
+    ippis: number;
+
     @OneToMany( type => MerchantTransaction , transaction => transaction.mid)
     transactions: MerchantTransaction[];
     

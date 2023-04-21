@@ -33,10 +33,11 @@ import { MerchantLocalStrategy } from './utils/MerchantLocalStrategy';
       provide: 'MERCHANT_AUTH_SERVICE',
       useClass: MerchantAuthService
     },
-    {
-      provide: 'MERCHANTS_SERVICE',
-      useClass: MerchantsService
-    },
+    // {
+    //   provide: 'MERCHANTS_SERVICE',
+    //   useClass: MerchantsService
+    // },
+    // MerchantsService,
     MerchantLocalStrategy,
     JwtStrategy
   ],

@@ -35,8 +35,9 @@ export class OverviewService {
 
             // console.log('trd: ', transactionData);
 
+
             overviewdata.salesCount = transactionData.count;
-            overviewdata.transactionValue = '₦'+transactionData.totalAmount;
+            overviewdata.transactionValue = transactionData.totalAmount == null ? '₦0' : '₦'+transactionData.totalAmount;
             overviewdata.payoutBalance = '₦0';
             overviewdata.customers = transactionData.customerCount;
 

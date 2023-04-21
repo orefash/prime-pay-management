@@ -7,4 +7,6 @@ export interface mCustomer {
     phone: string;
 
     email?: string;
+
+    ippis?: number;
 }

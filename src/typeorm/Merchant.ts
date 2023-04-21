@@ -14,9 +14,8 @@ export class Merchant {
 
     @Column({
         nullable: false,
-        default: '23'
     })
-    systemId: string;
+    systemId: number;
 
     @Column({
         nullable: false,

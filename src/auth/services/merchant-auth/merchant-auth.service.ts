@@ -8,8 +8,11 @@ import { comparePasswords } from 'src/utils/bcrypt';
 @Injectable()
 export class MerchantAuthService {
     constructor(
-        @Inject('MERCHANTS_SERVICE') private readonly merchantService: MerchantsService,
+        @Inject(MerchantsService) 
+        private readonly merchantService: MerchantsService,
+        @Inject(JwtService)
         private readonly jwtService: JwtService,
+        @Inject(ConfigService)
         private readonly configService: ConfigService
     ) { }
 

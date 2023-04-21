@@ -25,6 +25,19 @@ export class TransactionController {
         
     }
 
+    @Post('create-demo')
+    @UsePipes(ValidationPipe)
+    async createDemoTransaction(@Body() createTransactionDto: CreateTransactionDto) {
+        try {
+            return await this.transactionService.createDemoTransaction(createTransactionDto);
+        } catch (error) {
+            console.log('create transaction error')
+            console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+        
+    }
+
     @Post(':id/toggle-delivered')
     @UseGuards(JwtAuthenticationGuard)
     async toggleTransactionDelivered(@Param('id') id: string) {
@@ -60,7 +73,7 @@ export class TransactionController {
 
     @Get('merchant/:mid')
     @UseGuards(JwtAuthenticationGuard)
-    getMerchantTransactions(@Param('mid') mid: string) {
+    getMerchantTransactions(@Param('mid') mid: number) {
         return this.transactionService.getMerchantTransactions(mid);
     }
 

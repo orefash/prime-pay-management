@@ -54,6 +54,10 @@ export class CreateMerchantDto {
     @IsOptional()
     avgMonthlySales: number;
 
+    @IsNumber()
+    @IsOptional()
+    systemId: number;
+
     
     @IsNotEmpty()
     @IsString()

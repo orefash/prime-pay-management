@@ -6,7 +6,7 @@ import { MerchantsService } from '../../services/merchants/merchants.service';
 @Controller('merchants')
 export class MerchantsController {
     constructor(
-        @Inject('MERCHANT_SERVICE')
+        // @Inject('MERCHANT_SERVICE')
         private readonly merchantService: MerchantsService
     ){}
 

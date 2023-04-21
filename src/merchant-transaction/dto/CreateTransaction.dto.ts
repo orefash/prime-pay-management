@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Length } from "class-validator";
 
 
 export enum TransactionStatus {
@@ -36,9 +36,17 @@ export class CreateTransactionDto {
     @IsNotEmpty()
     description: string;
 
-    @IsString()
+    @IsNumberString()
     @IsNotEmpty()
-    ippis: string;
+    ippis: number;
+
+    @IsNumberString()
+    @IsNotEmpty()
+    mid: number;
+
+    @IsNumber()
+    @IsOptional()
+    loanTenor: number;
 
     @IsString()
     @IsNotEmpty()

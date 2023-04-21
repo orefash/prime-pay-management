@@ -6,6 +6,7 @@ import { ThirdPartyDataController } from './controllers/third-party-data/third-p
 @Module({
   imports: [ HttpModule ],
   providers: [ThirdPartyDataService],
-  controllers: [ThirdPartyDataController]
+  controllers: [ThirdPartyDataController],
+  exports: [ThirdPartyDataService]
 })
 export class ThirdPartyDataModule {}

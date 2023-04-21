@@ -45,7 +45,12 @@ export class MerchantTransaction {
     @Column({
         nullable: false,
     })
-    mid: string;
+    mid: number;
+
+    @Column({
+        nullable: true,
+    })
+    loanTenor: number;
 
     @ManyToOne(type => MerchantCustomer, customer => customer.transactions)
     customer: MerchantCustomer;

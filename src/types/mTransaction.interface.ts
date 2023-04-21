@@ -9,8 +9,10 @@ export interface mTransaction {
 
     description: string;
 
-    mid: string;
+    mid: number;
 
     customer: any;
+
+    loanTenor?: number;
 
 }

@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerService } from 'src/merchant-customer/services/customer/customer.service';
 import { CreateTransactionDto, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
+import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { MerchantTransaction as TransactionEntity } from 'src/typeorm';
 import { mCustomer } from 'src/types/mCustomer.interface';
 import { mTransaction } from 'src/types/mTransaction.interface';
@@ -14,14 +15,22 @@ export class TransactionService {
             @InjectRepository(TransactionEntity)
             private readonly transactionRepository: Repository<TransactionEntity>,
             @Inject(CustomerService)
-            private readonly customerService: CustomerService
+            private readonly customerService: CustomerService,
+            @Inject(ThirdPartyDataService)
+            private readonly thirdPartyService: ThirdPartyDataService
         ) { }
 
     async createTransaction(createTransactionDto: CreateTransactionDto) {
 
+        let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
+
+        if(!payMerchantResponse)
+            throw new Error('Not eligible for Loan')
+
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
-            phone: createTransactionDto.customerPhone
+            phone: createTransactionDto.customerPhone,
+            ippis: createTransactionDto.ippis
         }
 
         const savedCustomer = await this.customerService.createCustomer(customerData);
@@ -32,8 +41,41 @@ export class TransactionService {
             amount: createTransactionDto.amount,
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
-            mid: '2',
-            customer: savedCustomer
+            mid: createTransactionDto.mid,
+            customer: savedCustomer,
+            loanTenor: createTransactionDto.loanTenor
+        }
+
+        console.log('ts: ', transactionData)
+
+        const newTransaction = await this.transactionRepository.create(transactionData);
+        return this.transactionRepository.save(newTransaction);
+    }
+
+    async createDemoTransaction(createTransactionDto: CreateTransactionDto) {
+
+        // let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
+
+        // if(!payMerchantResponse)
+        //     throw new Error('Not eligible for Loan')
+
+        const customerData: mCustomer = {
+            name: createTransactionDto.customerName,
+            phone: createTransactionDto.customerPhone,
+            ippis: createTransactionDto.ippis
+        }
+
+        const savedCustomer = await this.customerService.createCustomer(customerData);
+
+        console.log('in tr: ', savedCustomer)
+
+        const transactionData: mTransaction = {
+            amount: createTransactionDto.amount,
+            orderChannel: createTransactionDto.orderChannel,
+            description: createTransactionDto.description,
+            mid: createTransactionDto.mid,
+            customer: savedCustomer,
+            loanTenor: createTransactionDto.loanTenor
         }
 
         console.log('ts: ', transactionData)
@@ -50,7 +92,7 @@ export class TransactionService {
         });
     }
 
-    async getMerchantTransactions(mid: string): Promise<TransactionEntity[]> {
+    async getMerchantTransactions(mid: number): Promise<TransactionEntity[]> {
         return this.transactionRepository.find({
             where: {
                 mid: mid
