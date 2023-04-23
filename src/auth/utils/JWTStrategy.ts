@@ -11,6 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
     // @Inject('MERCHANTS_SERVICE') 
+    @Inject(MerchantsService)
     private readonly merchantService: MerchantsService,
   ) {
     super({

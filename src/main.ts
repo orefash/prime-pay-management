@@ -16,11 +16,6 @@ async function bootstrap() {
     origin: [
       'https://prim-pay-merchant.netlify.app',
       'http://localhost:5173',
-      // 'http://www.example.com',
-      // 'http://app.example.com',
-      // 'https://example.com',
-      // 'https://www.example.com',
-      // 'https://app.example.com',
     ],
     // methods: ["GET", "POST"],
     credentials: true,

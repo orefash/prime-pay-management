@@ -85,8 +85,8 @@ export class MerchantAuthService {
             throw new Error("Invalid or expired password reset token");
         }
 
-        console.log("token: ", token)
-        console.log("rp: ", resetPassword)
+        // console.log("token: ", token)
+        // console.log("rp: ", resetPassword)
 
 
         const isValid = await comparePasswords(resetPassword.token, token.token);

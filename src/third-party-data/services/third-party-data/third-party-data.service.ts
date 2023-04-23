@@ -40,13 +40,13 @@ export class ThirdPartyDataService {
                 )
         );
 
-        console.log('in reg merchat: ', data)
+        console.log('in reg merchant: ', data)
 
         if (data.Desc == "Merchant Registered" && data.Merchant_ID)
             return data.Merchant_ID;
 
 
-        throw new BadRequestException('Register Merchant error');
+        throw new BadRequestException(data.Desc);
     }
 
 

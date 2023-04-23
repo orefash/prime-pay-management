@@ -51,8 +51,8 @@ export class MerchantAuthController {
         try {
             return await this.merchantAuthService.requestPasswordReset(requestPasswordDto)
         } catch (error) {
-            console.log('request Password Reset error')
-            console.log(error)
+            // console.log('request Password Reset error')
+            // console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
@@ -62,8 +62,8 @@ export class MerchantAuthController {
         try {
             return await this.merchantAuthService.resetPassword(resetPassword)
         } catch (error) {
-            console.log('Password Reset error')
-            console.log(error)
+            // console.log('Password Reset error')
+            // console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }

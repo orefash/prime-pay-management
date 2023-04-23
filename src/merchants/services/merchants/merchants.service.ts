@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { EditMerchantDto } from 'src/merchants/dto/UpdateMerchant.dto';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { RegisterMerchantDto } from 'src/third-party-data/dto/RegisterMerchant.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MerchantsService {
@@ -17,13 +18,33 @@ export class MerchantsService {
         private readonly merchantRepository: Repository<MerchantEntity>,
         @Inject(ThirdPartyDataService)
         private readonly thirdPartDataService: ThirdPartyDataService,
+        @Inject(ConfigService)
+        private readonly configService: ConfigService
     ){}
 
     async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity>{
-        // const regData: RegisterMerchantDto
-        const merchantId = await this.thirdPartDataService.registerMerchant(createMerchantDto);
+        
+        const merchant = await this.merchantRepository.findOne({
+            where: {
+                email: createMerchantDto.email
+            }
+        });
 
-        createMerchantDto.systemId = merchantId;
+        if(merchant) throw new Error ("Merchant with Email already Exists")
+
+        let PPAY_STATUS = this.configService.get<number>('PPAY');
+
+        console.log("pp", PPAY_STATUS)
+
+        if(PPAY_STATUS == 0){
+            const merchantId = await this.thirdPartDataService.registerMerchant(createMerchantDto);
+
+            createMerchantDto.systemId = merchantId;
+        }else{
+            createMerchantDto.systemId = 11;
+        }
+
+        
         
         const password =  encodePassword(createMerchantDto.password);
         const newMerchant = this.merchantRepository.create({ ...createMerchantDto, password });

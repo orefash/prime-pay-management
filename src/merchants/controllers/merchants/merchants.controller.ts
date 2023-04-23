@@ -16,7 +16,7 @@ export class MerchantsController {
         try {
             return await this.merchantService.createMerchant(createMerchantDto);
         } catch (error) {
-            console.log('create error')
+            console.log('create error: ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
@@ -37,7 +37,7 @@ export class MerchantsController {
         return this.merchantService.getMerchantById(merchantId);
     }
 
-    
+
     // @Get(':email')
     // getUsers(@Param('merchantId') merchantId: string) {
     //     return this.merchantService.getMerchantById(merchantId);
