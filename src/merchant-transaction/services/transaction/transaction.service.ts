@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerService } from 'src/merchant-customer/services/customer/customer.service';
 import { CreateTransactionDto, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
@@ -17,15 +18,23 @@ export class TransactionService {
             @Inject(CustomerService)
             private readonly customerService: CustomerService,
             @Inject(ThirdPartyDataService)
-            private readonly thirdPartyService: ThirdPartyDataService
+            private readonly thirdPartyService: ThirdPartyDataService,
+            @Inject(ConfigService)
+            private readonly configService: ConfigService
         ) { }
 
     async createTransaction(createTransactionDto: CreateTransactionDto) {
 
-        let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
+        let PPAY_STATUS = this.configService.get<number>('PPAY');
 
-        if(!payMerchantResponse)
-            throw new Error('Not eligible for Loan')
+        // console.log("pp", PPAY_STATUS)
+
+        if(PPAY_STATUS == 0){
+            let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
+
+            if(!payMerchantResponse)
+                throw new Error('Not eligible for Loan')
+        }
 
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
@@ -54,11 +63,6 @@ export class TransactionService {
 
     async createDemoTransaction(createTransactionDto: CreateTransactionDto) {
 
-        // let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
-
-        // if(!payMerchantResponse)
-        //     throw new Error('Not eligible for Loan')
-
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
             phone: createTransactionDto.customerPhone,
@@ -80,8 +84,8 @@ export class TransactionService {
 
         console.log('ts: ', transactionData)
 
-        const newTransaction = await this.transactionRepository.create(transactionData);
-        return this.transactionRepository.save(newTransaction);
+        const newTransaction = this.transactionRepository.create(transactionData);
+        return await this.transactionRepository.save(newTransaction);
     }
 
     async getAllTransactions(): Promise<TransactionEntity[]> {
@@ -89,6 +93,9 @@ export class TransactionService {
             relations: {
                 customer: true
             },
+            order: {
+                orderDate: 'DESC'
+            }
         });
     }
 
@@ -122,14 +129,17 @@ export class TransactionService {
         await this.transactionRepository.update(tid, {
             status: TransactionStatus.DELIVERED
         });
+
         const updatedTransaction = await this.transactionRepository.findOne({
             where: {
                 id: tid
             }
         });
+
         if (updatedTransaction) {
             return updatedTransaction
         }
+
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
 
     }
@@ -139,14 +149,17 @@ export class TransactionService {
         await this.transactionRepository.update(tid, {
             status: TransactionStatus.CONFIRMED
         });
+
         const updatedTransaction = await this.transactionRepository.findOne({
             where: {
                 id: tid
             }
         });
+
         if (updatedTransaction) {
             return updatedTransaction
         }
+        
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
 
     }

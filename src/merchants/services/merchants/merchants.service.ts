@@ -34,7 +34,7 @@ export class MerchantsService {
 
         let PPAY_STATUS = this.configService.get<number>('PPAY');
 
-        console.log("pp", PPAY_STATUS)
+        // console.log("pp", PPAY_STATUS)
 
         if(PPAY_STATUS == 0){
             const merchantId = await this.thirdPartDataService.registerMerchant(createMerchantDto);
