@@ -1,5 +1,5 @@
 
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Length } from "class-validator";
 
 export class EditMerchantDto {
 
@@ -11,12 +11,73 @@ export class EditMerchantDto {
     @IsNotEmpty()
     promoterLname: string;
 
+    @IsString()
+    @Length(10)
+    @IsOptional()
+    bvn: string;
+
+    @IsString()
+    @IsNotEmpty()
+    businessType: string;
+
+    @IsUrl()
+    @IsOptional()
+    websiteUrl: string;
+
+    @IsString()
+    @IsOptional()
+    cacUrl: string;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    isRegistered: boolean;
+
+
     @IsEmail()
     @IsNotEmpty()
     email: string;
 
+
     @IsNotEmpty()
     @IsString()
     phone: string;
+
+
+    @IsNumber()
+    @IsNotEmpty()
+    streetNo: number;
+
+    @IsNotEmpty()
+    @IsString()
+    street: string;
+
+    @IsOptional()
+    @IsString()
+    landmark: string;
+
+    @IsNotEmpty()
+    @IsString()
+    state: string;
+
+    @IsNotEmpty()
+    @IsString()
+    lga: string;
+
+    @IsNotEmpty()
+    @IsString()
+    country: string;
+
+
+    @IsOptional()
+    @IsString()
+    instagram: string;
+
+    @IsOptional()
+    @IsString()
+    twitter: string;
+
+    @IsOptional()
+    @IsString()
+    facebook: string;
 
 }

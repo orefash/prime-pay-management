@@ -14,6 +14,7 @@ export class Merchant {
 
     @Column({
         nullable: false,
+        default: -99
     })
     systemId: number;
 
@@ -144,7 +145,7 @@ export class Merchant {
     @CreateDateColumn({
         nullable: false,
     })
-    orderDate: Date;
+    regDate: Date;
 
 
     // @OneToMany( type => MerchantTransaction , transaction => transaction.merchant)

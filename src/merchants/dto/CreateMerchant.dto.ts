@@ -22,7 +22,7 @@ export class CreateMerchantDto {
     bvn: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     businessType: string;
 
     @IsUrl()
@@ -73,4 +73,27 @@ export class CreateMerchantDto {
     @IsString()
     bankName: string;
 
+    @IsNumber()
+    @IsNotEmpty()
+    streetNo: number;
+
+    @IsNotEmpty()
+    @IsString()
+    street: string;
+
+    @IsOptional()
+    @IsString()
+    landmark: string;
+
+    @IsNotEmpty()
+    @IsString()
+    state: string;
+
+    @IsNotEmpty()
+    @IsString()
+    lga: string;
+
+    @IsNotEmpty()
+    @IsString()
+    country: string;
 }

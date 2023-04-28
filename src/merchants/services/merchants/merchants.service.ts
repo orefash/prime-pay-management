@@ -8,6 +8,7 @@ import { EditMerchantDto } from 'src/merchants/dto/UpdateMerchant.dto';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { RegisterMerchantDto } from 'src/third-party-data/dto/RegisterMerchant.dto';
 import { ConfigService } from '@nestjs/config';
+import { UpdateMerchantBankDto } from 'src/merchants/dto/UpdateMerchantBank.dto';
 
 @Injectable()
 export class MerchantsService {
@@ -36,13 +37,13 @@ export class MerchantsService {
 
         // console.log("pp", PPAY_STATUS)
 
-        if(PPAY_STATUS == 0){
-            const merchantId = await this.thirdPartDataService.registerMerchant(createMerchantDto);
+        // if(PPAY_STATUS == 0){
+        //     const merchantId = await this.thirdPartDataService.registerMerchant(createMerchantDto);
 
-            createMerchantDto.systemId = merchantId;
-        }else{
-            createMerchantDto.systemId = 11;
-        }
+        //     createMerchantDto.systemId = merchantId;
+        // }else{
+        //     createMerchantDto.systemId = 11;
+        // }
 
         
         
@@ -61,6 +62,68 @@ export class MerchantsService {
         if (updatedMerchant) {
           return updatedMerchant
         }
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+    async updateMerchantBank(id: string, editMerchantBankDto: UpdateMerchantBankDto): Promise<MerchantEntity> {
+        await this.merchantRepository.update(id, editMerchantBankDto);
+        const updatedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+        if (updatedMerchant) {
+          return updatedMerchant
+        }
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+    async setMerchantActive(id: string): Promise<MerchantEntity> {
+       
+
+        const fetchedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        console.log('Fetched Merchant: ', fetchedMerchant);
+
+        if(fetchedMerchant){
+            
+            let PPAY_STATUS = this.configService.get<number>('PPAY');
+
+            console.log("in merchant activate pp", PPAY_STATUS)
+
+            let mid = 11;
+    
+            if(PPAY_STATUS == 0){
+                let regMerchantData: RegisterMerchantDto = {
+                    name: fetchedMerchant.name,
+                    accountNo: fetchedMerchant.accountNo,
+                    bankCode: fetchedMerchant.bankCode
+                }
+                const merchantId = await this.thirdPartDataService.registerMerchant(regMerchantData);
+    
+                mid = merchantId;
+            }
+
+            let merchant = await this.merchantRepository.update(id, {
+                isActive: true,
+                systemId: mid
+            });
+
+            const updatedMerchant = await this.merchantRepository.findOne({
+                where: {
+                    id: id
+                }
+            });
+            
+            if(updatedMerchant) {
+              return updatedMerchant
+            };
+        }
+
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 

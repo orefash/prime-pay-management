@@ -8,7 +8,8 @@ const SERVICETYPES = [
     "HealthCare",
     "Fashion",
     "Groceries",
-    "Agriculture"
+    "Agriculture",
+    "Others"
 ];
 
 export default SERVICETYPES;

@@ -21,4 +21,9 @@ export class StaticsController {
     async getNigeriaStatesData() {
         return await this.staticsService.getNigeriaStatesData();
     }
+
+    @Get('country-codes')
+    async getCountryCodes() {
+        return await this.staticsService.getCountryCodes();
+    }
 }

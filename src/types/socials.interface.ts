@@ -2,6 +2,6 @@
 export interface Socials {
 
     instagram?: string,
-    whatsapp?: string,
+    twitter?: string,
     facebook?: string
 }
