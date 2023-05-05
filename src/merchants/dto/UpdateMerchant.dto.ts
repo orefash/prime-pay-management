@@ -1,5 +1,7 @@
 
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Length } from "class-validator";
+import { Address } from "src/types/address.interface";
+import { Socials } from "src/types/socials.interface";
 
 export class EditMerchantDto {
 
@@ -24,18 +26,15 @@ export class EditMerchantDto {
     @IsOptional()
     websiteUrl: string;
 
-    @IsString()
-    @IsOptional()
-    cacUrl: string;
 
     @IsBoolean()
     @IsNotEmpty()
     isRegistered: boolean;
 
 
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
+    // @IsEmail()
+    // @IsNotEmpty()
+    // email: string;
 
 
     @IsNotEmpty()
@@ -79,5 +78,11 @@ export class EditMerchantDto {
     @IsOptional()
     @IsString()
     facebook: string;
+
+    @IsOptional()
+    socials: Socials;
+
+    @IsOptional()
+    address: Address;
 
 }

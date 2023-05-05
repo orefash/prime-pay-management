@@ -9,26 +9,27 @@ import { ThirdPartyDataModule } from 'src/third-party-data/third-party-data.modu
 import { Merchant } from 'src/typeorm';
 import { MerchantsController } from './controllers/merchants/merchants.controller';
 import { MerchantsService } from './services/merchants/merchants.service';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Merchant]),
     HttpModule,
-    ThirdPartyDataModule
+    ThirdPartyDataModule,
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './uploads',
+      }),
+    }),
   ],
   exports: [MerchantsService],
   controllers: [MerchantsController],
   providers: [
-    // {
-    //   provide: 'MERCHANT_SERVICE',
-    //   useClass: MerchantsService,
-    // },
-    // {
-    //   provide: 'THIRD_PARTY_SERVICE',
-    //   useClass: ThirdPartyDataService,
-    // },
-    // ThirdPartyDataService
-    MerchantsService
+    MerchantsService,
+    
   ]
+
+  
 })
 export class MerchantsModule {}

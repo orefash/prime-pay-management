@@ -20,6 +20,7 @@ async function bootstrap() {
     // methods: ["GET", "POST"],
     credentials: true,
   });
+  // app.useGlobalFilters(false)
 
   app.use(passport.initialize())
   await app.listen(configService.get<number>('PORT') || 3500);

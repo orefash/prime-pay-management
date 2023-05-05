@@ -1,6 +1,10 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Length, MinLength } from "class-validator";
-import { CreateBankDto } from "./CreateBankDetails.dto";
+
+
+import { IsArray, IsBoolean, IsBooleanString, IsEmail, IsIn, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl, Length, MinLength } from "class-validator";
+import { IDTYPES } from "src/statics/types/IDTypes";
+import SERVICETYPES from "src/statics/types/ServiceTypes";
+import { Address } from "src/types/address.interface";
+
 
 export class CreateMerchantDto {
 
@@ -16,26 +20,41 @@ export class CreateMerchantDto {
     @IsNotEmpty()
     promoterLname: string;
 
+
+    @IsString()
+    @IsNotEmpty()
+    @IsIn(SERVICETYPES)
+    businessType: string;
+
+    @IsBooleanString()
+    @IsNotEmpty()
+    isRegistered: boolean;
+
     @IsString()
     @Length(10)
     @IsOptional()
     bvn: string;
 
-    @IsString()
     @IsNotEmpty()
-    businessType: string;
+    @IsString()
+    @IsIn(IDTYPES)
+    promoterIdType: string;
+
+    // @IsNotEmpty()
+    @IsString()
+    @IsOptional()
+    promoterId?: string;
 
     @IsUrl()
     @IsOptional()
     websiteUrl: string;
 
-    @IsString()
-    @IsOptional()
-    cacUrl: string;
+    // @IsArray()
+    // @IsString({ each: true })
+    // @IsOptional()
+    // cacDocs: string[];
 
-    @IsBoolean()
-    @IsNotEmpty()
-    isRegistered: boolean;
+    
 
     @IsEmail()
     @IsNotEmpty()
@@ -50,32 +69,12 @@ export class CreateMerchantDto {
     @MinLength(3)
     password: string;
 
-    @IsNumber()
     @IsOptional()
-    avgMonthlySales: number;
-
-    @IsNumber()
-    @IsOptional()
-    systemId: number;
-
-    
+    address: Address;
+ 
     @IsNotEmpty()
-    @IsString()
-    @Length(10)
-    accountNo: string;
-
-    @IsNotEmpty()
-    @IsString()
-    @MinLength(2)
-    bankCode: string;
-
-    @IsNotEmpty()
-    @IsString()
-    bankName: string;
-
-    @IsNumber()
-    @IsNotEmpty()
-    streetNo: number;
+    @IsNumberString()
+    streetNo: string;
 
     @IsNotEmpty()
     @IsString()
@@ -96,4 +95,29 @@ export class CreateMerchantDto {
     @IsNotEmpty()
     @IsString()
     country: string;
+
+    
+    @IsNumberString()
+    @IsOptional()
+    avgMonthlySales: number;
+
+    @IsNumber()
+    @IsOptional()
+    systemId: number;
+
+
+    @IsNotEmpty()
+    @IsString()
+    @Length(10)
+    accountNo: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(2)
+    bankCode: string;
+
+    @IsNotEmpty()
+    @IsString()
+    bankName: string;
+
 }

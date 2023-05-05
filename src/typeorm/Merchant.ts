@@ -1,12 +1,13 @@
 import { Address } from "src/types/address.interface";
 import { BankDetails } from "src/types/bank_details.interface";
 import { Socials } from "src/types/socials.interface";
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { MerchantCustomer } from "./MerchantCustomer";
 import { MerchantTransaction } from "./MerchantTransaction";
+import { Exclude } from "class-transformer";
 
 @Entity()
-@Unique(['email', 'accountNo', ])
+@Unique(['email', 'accountNo',])
 export class Merchant {
 
     @PrimaryGeneratedColumn("uuid")
@@ -82,12 +83,23 @@ export class Merchant {
     @Column({
         nullable: true,
     })
+    promoterId: string;
+
+    @Column({
+        nullable: true,
+    })
     websiteUrl: string;
 
     @Column({
         nullable: true,
     })
     cacUrl: string;
+
+    @Column("text", {
+        nullable: true,
+        array: true
+    })
+    cacDocs: string[];
 
     @Index({ unique: true })
     @Column({
@@ -104,6 +116,7 @@ export class Merchant {
     @Column({
         nullable: false,
     })
+    @Exclude()
     password: string;
 
 
@@ -118,7 +131,7 @@ export class Merchant {
         nullable: true
     })
     avgMonthlySales: number;
-    
+
 
     @Column({
         nullable: false,
@@ -147,6 +160,10 @@ export class Merchant {
     })
     regDate: Date;
 
+    @UpdateDateColumn({
+        nullable: false,
+    })
+    modifiedDate: Date;
 
     // @OneToMany( type => MerchantTransaction , transaction => transaction.merchant)
     // transactions: MerchantTransaction[];
