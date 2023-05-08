@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseFilters, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-
+import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseFilters, UseInterceptors, UsePipes, ValidationPipe, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { EditMerchantDto } from 'src/merchants/dto/UpdateMerchant.dto';
 import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
 import { MerchantsService } from '../../services/merchants/merchants.service';
@@ -9,50 +9,49 @@ import { diskStorage } from 'multer';
 import { CreateProductDto } from 'src/merchants/dto/Upload.dto';
 import { unlinkSync } from 'fs';
 import { Address } from 'src/types/address.interface';
-// import { CreateUploadsFolderMiddleware } from 'src/middleware/create-upload-folder.middleware';
+import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dto copy';
+import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
+import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
+// import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
+import { ConfigService } from '@nestjs/config';
+import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
 
 
 @Controller('merchants')
 export class MerchantsController {
+    private uploadPath: string;
     constructor(
         private readonly merchantService: MerchantsService,
-    ) { }
+        private readonly configService: ConfigService,
+        
+    ) {
+        this.uploadPath = configService.get<string>('UPLOADED_FILES_DESTINATION');
+
+     }
+
+
 
     @Post('create')
     @UseInterceptors(
-        FileInterceptor('promoterIdDoc', {
-            storage: diskStorage({
-                destination: './uploads',
-                filename: (req, file, callback) => {
-                    // generate a unique filename with the original extension
-                    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-                    const originalName = file.originalname.split('.').slice(0, -1).join('.');
-                    const extension = file.originalname.split('.').pop();
-                    callback(null, `${originalName}-${uniqueSuffix}.${extension}`);
-                },
-            }),
-            fileFilter: (req, file, callback) => {
-                const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-                if (allowedMimeTypes.includes(file.mimetype)) {
-                    callback(null, true);
-                } else {
-                    callback(new Error('File type not allowed'), false);
-                }
-            },
-            limits: {
-                fileSize: 1024 * 1024 * 3, // 1MB
-            },
-        }))
+        
+        CustomFileInterceptor(
+          
+            'promoterIdDoc',
+            ['image/jpeg', 'image/png', 'application/pdf']
+        ),
+    )
     @UsePipes(ValidationPipe)
     async createMerchantTest(@Body() createMerchantDto: CreateMerchantDto, @UploadedFile() promoterIdDoc: Express.Multer.File,) {
-       
+
         if (!promoterIdDoc)
             throw new HttpException("Means of ID not uploaded", HttpStatus.BAD_REQUEST);
 
+        console.log('Promoter Doc: ', promoterIdDoc)
         const filepath = promoterIdDoc.path;
         try {
 
             createMerchantDto.promoterId = filepath;
+            createMerchantDto.promoterIdMime = promoterIdDoc.mimetype;
 
             let address: Address = {
                 street: createMerchantDto.street,
@@ -66,7 +65,7 @@ export class MerchantsController {
             createMerchantDto.address = address;
 
             return await this.merchantService.createMerchant(createMerchantDto);
-            
+
         } catch (error) {
             console.log('create error: ', error)
             unlinkSync(filepath);
@@ -74,7 +73,7 @@ export class MerchantsController {
         }
     }
 
-    
+
 
     @Post('activate-merchant/:id')
     async activateMerchant(@Param('id') merchantId: string) {
@@ -106,7 +105,7 @@ export class MerchantsController {
     @Get('')
     getAllMerchants() {
         return this.merchantService.getAllMerchants(
-            
+
         );
     }
 
@@ -115,10 +114,163 @@ export class MerchantsController {
         return this.merchantService.getMerchantById(merchantId);
     }
 
+    @Get(':merchantId/id-card')
+    async getMerchantIdentification(@Param('merchantId') merchantId: string, @Res() res: Response) {
+        let fileData = await this.merchantService.getMerchantIdentification(merchantId);
+        res.attachment(fileData.fileName);
+        res.setHeader('Content-Type', fileData.contentType);
 
-    // @Get(':email')
-    // getUsers(@Param('merchantId') merchantId: string) {
-    //     return this.merchantService.getMerchantById(merchantId);
-    // }
+        // Send the file
+        res.sendFile(fileData.filePath);
+    }
+
+    @Get(':merchantId/logo')
+    async getMerchantLogo(@Param('merchantId') merchantId: string, @Res() res: Response) {
+        let fileData = await this.merchantService.getMerchantLogo(merchantId);
+        res.attachment(fileData.fileName);
+        res.setHeader('Content-Type', fileData.contentType);
+
+        // Send the file
+        res.sendFile(fileData.filePath);
+    }
+
+    @Get(':merchantId/cac')
+    async getMerchantCAC(@Param('merchantId') merchantId: string, @Res() res: Response) {
+        let fileData = await this.merchantService.getMerchantCAC(merchantId);
+        res.attachment(fileData.fileName);
+        res.setHeader('Content-Type', fileData.contentType);
+
+        // Send the file
+        res.sendFile(fileData.filePath);
+    }
+
+
+    @Post(':merchantId/set-id-card')
+    @UseInterceptors(
+        CustomFileInterceptor(
+            'promoterIdDoc',
+            ['image/jpeg', 'image/png', 'application/pdf']
+        ),
+    )
+    async setMerchantIdentification(
+        @Req() req,
+        @Body() setMerchantID: SetMerchantIdDTO,
+        @UploadedFile() promoterIdDoc: Express.Multer.File,
+        @Param('merchantId') merchantId: string,
+    ) {
+        if (!promoterIdDoc) {
+            throw new HttpException('Means of ID not uploaded', HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            setMerchantID.promoterId = promoterIdDoc.filename;
+            setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
+
+            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card`;
+
+            // console.log('du: ', downloadUrl)
+            // Save the merchant identification data to the database
+            await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
+
+            // Return the download URL to the client
+            return {
+                message: "Merchant ID Set Successfully",
+                downloadUrl,
+            };
+        } catch (error) {
+            console.log('create error: ', error);
+            // Delete the uploaded file if there is an error
+            unlinkSync(promoterIdDoc.path);
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @Post(':merchantId/set-cac')
+    @UseInterceptors(
+        CustomFileInterceptor(
+            'cacDoc',
+            ['image/jpeg', 'image/png', 'application/pdf']
+        ),
+    )
+    async setMerchantCAC(
+        @Req() req,
+        @UploadedFile() cacDoc: Express.Multer.File,
+        @Param('merchantId') merchantId: string,
+    ) {
+        if (!cacDoc) {
+            throw new HttpException('CAC Doc not uploaded', HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            let cacDto: SetCACDto = {
+                cacPath: cacDoc.filename,
+                cacMime: cacDoc.mimetype
+            }
+
+            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/cac`;
+
+            // console.log('du: ', downloadUrl)
+            // Save the merchant identification data to the database
+            await this.merchantService.setMerchantCAC(merchantId, cacDto);
+
+            // Return the download URL to the client
+            return {
+                message: "Merchant CAC Set Successfully",
+                downloadUrl,
+            };
+        } catch (error) {
+            console.log('create error: ', error);
+            // Delete the uploaded file if there is an error
+            unlinkSync(cacDoc.path);
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @Post(':merchantId/set-logo')
+    @UseInterceptors(
+        CustomFileInterceptor(
+            'logoDoc',
+            ['image/jpeg', 'image/png',]
+        ),
+
+    )
+    async setMerchantLogo(
+        @Req() req,
+        @UploadedFile() logoDoc: Express.Multer.File,
+        @Param('merchantId') merchantId: string,
+    ) {
+        if (!logoDoc) {
+            throw new HttpException('Logo not uploaded', HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            let setLogoDto: SetMerchantLogoDto = {
+                logoPath: logoDoc.filename,
+                logoMime: logoDoc.mimetype
+            }
+
+            console.log('logodto: ', setLogoDto)
+
+            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
+
+            // console.log('du: ', downloadUrl)
+            // Save the merchant identification data to the database
+            await this.merchantService.setMerchantLogo(merchantId, setLogoDto);
+
+            // Return the download URL to the client
+            return {
+                message: "Merchant Logo Set Successfully",
+                downloadUrl,
+            };
+        } catch (error) {
+            console.log('create error: ', error);
+            // Delete the uploaded file if there is an error
+            unlinkSync(logoDoc.path);
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
 
