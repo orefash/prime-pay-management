@@ -31,6 +31,27 @@ export class Merchant {
     logoUrl: string;
 
     @Column({
+        nullable: true,
+        name: 'logo_doc'
+    })
+    logoPath: string;
+
+    @Column({
+        nullable: true,
+    })
+    logoMime: string;
+
+    @Column({
+        nullable: true,
+    })
+    cacPath: string;
+
+    @Column({
+        nullable: true,
+    })
+    cacMime: string;
+
+    @Column({
         nullable: false,
         name: 'promoter_fname'
     })
@@ -88,6 +109,11 @@ export class Merchant {
     @Column({
         nullable: true,
     })
+    promoterIdMime: string;
+
+    @Column({
+        nullable: true,
+    })
     websiteUrl: string;
 
     @Column({
@@ -116,7 +142,7 @@ export class Merchant {
     @Column({
         nullable: false,
     })
-    @Exclude()
+    // @Exclude()
     password: string;
 
 

@@ -11,16 +11,9 @@ import { ThirdPartyDataModule } from './third-party-data/third-party-data.module
 import { StaticsModule } from './statics/statics.module';
 import { OverviewModule } from './overview/overview.module';
 import { MerchantPayoutModule } from './merchant-payout/merchant-payout.module';
-import { MulterModule, MulterModuleOptions } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 
 
-const multerOptions: MulterModuleOptions = {
-  storage: diskStorage({
-    destination: './uploads',
-    
-  }),
-};
+
 
 @Module({
   imports: [
@@ -38,15 +31,7 @@ const multerOptions: MulterModuleOptions = {
     StaticsModule,
     OverviewModule,
     MerchantPayoutModule,
-    MulterModule.register({
-      dest: './uploads',
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          cb(null, `${file.originalname}`);
-        },
-      }),
-    }),
+ 
   ],
 })
 export class AppModule {}

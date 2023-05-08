@@ -11,23 +11,20 @@ import { MerchantsController } from './controllers/merchants/merchants.controlle
 import { MerchantsService } from './services/merchants/merchants.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+// import { CustomFileInterceptor } from 'src/interceptors/file-upload.interceptor';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Merchant]),
     HttpModule,
     ThirdPartyDataModule,
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './uploads',
-      }),
-    }),
+    ConfigModule
   ],
   exports: [MerchantsService],
   controllers: [MerchantsController],
   providers: [
     MerchantsService,
-    
+    // CustomFileInterceptor
   ]
 
   

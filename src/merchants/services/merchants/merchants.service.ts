@@ -12,6 +12,11 @@ import { ConfigService } from '@nestjs/config';
 import { UpdateMerchantBankDto } from 'src/merchants/dto/UpdateMerchantBank.dto';
 import { Socials } from 'src/types/socials.interface';
 import { Address } from 'src/types/address.interface';
+import * as path from 'path';
+import * as mime from 'mime';
+import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dto copy';
+import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
+import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
 
 @Injectable()
 export class MerchantsService {
@@ -25,6 +30,11 @@ export class MerchantsService {
             @Inject(ConfigService)
             private readonly configService: ConfigService
         ) { }
+
+    // createFileInterceptor(fieldName: string, mimeTypes: string[]) {
+
+
+    // }
 
     async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity> {
 
@@ -80,6 +90,70 @@ export class MerchantsService {
         if (updatedMerchant) {
             const { password, ...merchant } = updatedMerchant;
             return merchant;
+        }
+
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+    async setMerchantIdentification(id: string, editMerchantID: SetMerchantIdDTO) {
+
+
+        await this.merchantRepository.update(id, editMerchantID);
+        const updatedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (updatedMerchant) {
+            const { password, ...merchant } = updatedMerchant;
+            return {
+                id: merchant.id,
+                message: "Merchant Identification Set"
+            };
+        }
+
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+
+    async setMerchantLogo(id: string, setLogo: SetMerchantLogoDto) {
+
+
+        await this.merchantRepository.update(id, setLogo);
+        const updatedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (updatedMerchant) {
+            const { password, ...merchant } = updatedMerchant;
+            return {
+                id: merchant.id,
+                message: "Merchant Logo Set"
+            };
+        }
+
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+    async setMerchantCAC(id: string, setCAC: SetCACDto) {
+
+
+        await this.merchantRepository.update(id, setCAC);
+        const updatedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (updatedMerchant) {
+            const { password, ...merchant } = updatedMerchant;
+            return {
+                id: merchant.id,
+                message: "Merchant CAC Set"
+            };
         }
 
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
@@ -168,12 +242,84 @@ export class MerchantsService {
         });
     }
 
+    async getMerchantIdentification(merchantId: string) {
+        const docs = await this.merchantRepository.findOne({
+            where: {
+                id: merchantId
+            },
+            select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime' ],         
+        });
+
+        // console.log('pID: ', docs);
+        if(docs?.promoterId){
+            
+            const fileName = path.basename(docs.promoterId);
+            // console.log('d: ', __dirname)
+            const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
+
+            const contentType = docs.promoterIdMime;
+            return { fileName, contentType, filePath: filePath }
+        }
+
+        
+        throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
+    }
+
+    async getMerchantLogo(merchantId: string){
+        const docs = await this.merchantRepository.findOne({
+            where: {
+                id: merchantId
+            },
+            select: ['id', 'logoUrl', 'logoMime', 'logoPath' ], 
+              
+        });
+
+        if(docs?.logoPath){
+            
+            const fileName = path.basename(docs.logoPath);
+            // console.log('d: ', __dirname)
+            const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
+
+            const contentType = docs.logoMime;
+            return { fileName, contentType, filePath: filePath }
+        }
+
+        
+        throw new HttpException('Merchant Logo not found', HttpStatus.NOT_FOUND);
+
+    }
+
+    async getMerchantCAC(merchantId: string){
+        const docs = await this.merchantRepository.findOne({
+            where: {
+                id: merchantId
+            },
+            select: ['id', 'cacPath', 'cacMime'], 
+              
+        });
+
+        if(docs?.cacPath){
+            
+            const fileName = path.basename(docs.cacPath);
+            // console.log('d: ', __dirname)
+            const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
+
+            const contentType = docs.cacMime;
+            return { fileName, contentType, filePath: filePath }
+        }
+
+        
+        throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
+
+    }
+
+
     async getMerchantByEmail(email: string): Promise<MerchantEntity> {
         return this.merchantRepository.findOne({
             where: {
                 email: email
             },
-            select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
+            select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate', 'password'], // Select all fields except 'password'
             
         });
     }

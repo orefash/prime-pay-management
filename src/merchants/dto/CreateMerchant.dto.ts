@@ -45,6 +45,10 @@ export class CreateMerchantDto {
     @IsOptional()
     promoterId?: string;
 
+    @IsString()
+    @IsOptional()
+    promoterIdMime?:string;
+
     @IsUrl()
     @IsOptional()
     websiteUrl: string;
