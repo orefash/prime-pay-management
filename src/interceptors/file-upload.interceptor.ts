@@ -1,17 +1,17 @@
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import { ConfigModule, ConfigService } from '@nestjs/config';
-
-
+// import { ConfigModule, ConfigService } from '@nestjs/config';
+import { config } from 'dotenv';
+config();
 
 let CustomFileInterceptor = ( fieldName: string, mimeTypes: string[]) => {
     
-    // const myUploadDirectory = process.env.UPLOADED_FILES_DESTINATION;
+    const myUploadDirectory = process.env.UPLOADED_FILES_DESTINATION;
     // console.log('dd: ', myUploadDirectory)
     
     return FileInterceptor(fieldName, {
         storage: diskStorage({
-            destination: './uploads',
+            destination: myUploadDirectory,
             filename: (req, file, callback) => {
                 // generate a unique filename with the original extension
                 const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;

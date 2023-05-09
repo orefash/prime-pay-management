@@ -31,10 +31,7 @@ export class MerchantsService {
             private readonly configService: ConfigService
         ) { }
 
-    // createFileInterceptor(fieldName: string, mimeTypes: string[]) {
 
-
-    // }
 
     async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity> {
 
@@ -58,7 +55,7 @@ export class MerchantsService {
 
     async updateMerchantProfile(id: string, editMerchantDto: EditMerchantDto): Promise<Partial<MerchantEntity>> {
 
-        let { facebook, twitter, instagram, street, streetNo, country, state, landmark, lga, ...updateDto} = editMerchantDto;
+        let { facebook, twitter, instagram, street, streetNo, country, state, landmark, lga, ...updateDto } = editMerchantDto;
         let socials: Socials = {};
         if (facebook)
             socials.facebook = facebook
@@ -118,8 +115,6 @@ export class MerchantsService {
 
 
     async setMerchantLogo(id: string, setLogo: SetMerchantLogoDto) {
-
-
         await this.merchantRepository.update(id, setLogo);
         const updatedMerchant = await this.merchantRepository.findOne({
             where: {
@@ -228,7 +223,7 @@ export class MerchantsService {
         return this.merchantRepository.find({
             select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
             // select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'promoterIdUrl', 'promoterId', 'websiteUrl', 'cacUrl', 'cacDocs', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
-              
+
         });
     }
 
@@ -238,8 +233,25 @@ export class MerchantsService {
                 id: merchantId
             },
             select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
-              
+
         });
+    }
+
+    async fetchUploadPath(fileName: string) {
+        const isLocal = this.configService.get<boolean>('IS_LOCAL_STORAGE');
+        console.log('islocal: ', isLocal);
+
+        if (isLocal) {
+            const destination = this.configService.get<string>('UPLOADED_FILES_DESTINATION');
+
+            const filePath = path.join(__dirname, '..', '..', '..', '..', destination, fileName);
+            return filePath;
+        }
+
+        const destination = this.configService.get<string>('DOCKER_UPLOAD_DIR');
+
+        return path.join(destination, fileName);
+
     }
 
     async getMerchantIdentification(merchantId: string) {
@@ -247,35 +259,36 @@ export class MerchantsService {
             where: {
                 id: merchantId
             },
-            select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime' ],         
+            select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
         });
 
         // console.log('pID: ', docs);
-        if(docs?.promoterId){
-            
+        if (docs?.promoterId) {
+
             const fileName = path.basename(docs.promoterId);
-            // console.log('d: ', __dirname)
-            const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
 
             const contentType = docs.promoterIdMime;
+
+            const filePath = await this.fetchUploadPath(fileName);
+            console.log('fp: ', filePath)
             return { fileName, contentType, filePath: filePath }
         }
 
-        
+
         throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
     }
 
-    async getMerchantLogo(merchantId: string){
+    async getMerchantLogo(merchantId: string) {
         const docs = await this.merchantRepository.findOne({
             where: {
                 id: merchantId
             },
-            select: ['id', 'logoUrl', 'logoMime', 'logoPath' ], 
-              
+            select: ['id', 'logoUrl', 'logoMime', 'logoPath'],
+
         });
 
-        if(docs?.logoPath){
-            
+        if (docs?.logoPath) {
+
             const fileName = path.basename(docs.logoPath);
             // console.log('d: ', __dirname)
             const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
@@ -284,22 +297,22 @@ export class MerchantsService {
             return { fileName, contentType, filePath: filePath }
         }
 
-        
+
         throw new HttpException('Merchant Logo not found', HttpStatus.NOT_FOUND);
 
     }
 
-    async getMerchantCAC(merchantId: string){
+    async getMerchantCAC(merchantId: string) {
         const docs = await this.merchantRepository.findOne({
             where: {
                 id: merchantId
             },
-            select: ['id', 'cacPath', 'cacMime'], 
-              
+            select: ['id', 'cacPath', 'cacMime'],
+
         });
 
-        if(docs?.cacPath){
-            
+        if (docs?.cacPath) {
+
             const fileName = path.basename(docs.cacPath);
             // console.log('d: ', __dirname)
             const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
@@ -308,7 +321,7 @@ export class MerchantsService {
             return { fileName, contentType, filePath: filePath }
         }
 
-        
+
         throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
 
     }
@@ -320,7 +333,7 @@ export class MerchantsService {
                 email: email
             },
             select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate', 'password'], // Select all fields except 'password'
-            
+
         });
     }
 
