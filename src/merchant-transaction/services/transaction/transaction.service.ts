@@ -114,7 +114,7 @@ export class TransactionService {
     }
 
     async getTransactionById(tid: string): Promise<TransactionEntity> {
-        return this.transactionRepository.findOne({
+        const transaction = await this.transactionRepository.findOne({
             where: {
                 id: tid
             },
@@ -122,6 +122,10 @@ export class TransactionService {
                 customer: true
             },
         });
+
+        if(transaction) return transaction;
+
+        throw new HttpException('Transaction not found', HttpStatus.NOT_FOUND);
     }
 
     async toggleTransactionDelivered(tid: string) {

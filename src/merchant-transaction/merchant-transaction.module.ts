@@ -15,7 +15,6 @@ import { ThirdPartyDataModule } from 'src/third-party-data/third-party-data.modu
     ThirdPartyDataModule
   ],
   providers: [
-  
     {
       provide: 'TRANSACTION_SERVICE',
       useClass: TransactionService,

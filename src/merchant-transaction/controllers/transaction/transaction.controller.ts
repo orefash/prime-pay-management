@@ -52,6 +52,7 @@ export class TransactionController {
     }
 
     @Post(':id/toggle-confirmed')
+    @UseGuards(JwtAuthenticationGuard)
     async toggleTransactionConfirmed(@Param('id') id: string) {
         try {
             return await this.transactionService.toggleTransactionConfirmed(id);

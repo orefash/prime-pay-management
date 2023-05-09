@@ -29,11 +29,25 @@ export class MerchantAuthController {
         // const { merchant } = request;
         const merchant = request.user;
         // console.log('mc: ', merchant)
-        const cookie = this.merchantAuthService.getCookieWithJwtToken(merchant.id);
-        response.setHeader('Set-Cookie', cookie);
+        const token = this.merchantAuthService.getJwtToken(merchant.id);
         merchant.password = undefined;
-        return response.send(merchant);
+        
+        return response.send({ merchant, token });
     }
+
+    // @HttpCode(200)
+    // @UseGuards(AuthGuard('merchant-local'))
+    // @Post('login')
+    // async login(@Req() request: RequestWithMerchant, @Res() response: Response) {
+    //     // const { merchant } = request;
+    //     const merchant = request.user;
+    //     // console.log('mc: ', merchant)
+    //     const cookie = this.merchantAuthService.getCookieWithJwtToken(merchant.id);
+    //     response.setHeader('Set-Cookie', cookie);
+    //     merchant.password = undefined;
+        
+    //     return response.send({ merchant, token: });
+    // }
 
 
     @UseGuards(JwtAuthenticationGuard)

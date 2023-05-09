@@ -1,4 +1,5 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 
 @Controller('3d')
@@ -8,6 +9,7 @@ export class ThirdPartyDataController {
     ){}
 
     @Get('banks')
+    @UseGuards(JwtAuthenticationGuard)
     async getBankList(){
         return await this.tdService.getBankList();
     }

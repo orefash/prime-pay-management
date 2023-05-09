@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseFilters, UseInterceptors, UsePipes, ValidationPipe, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseFilters, UseInterceptors, UsePipes, ValidationPipe, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { EditMerchantDto } from 'src/merchants/dto/UpdateMerchant.dto';
 import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
@@ -15,6 +15,7 @@ import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
 // import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
 import { ConfigService } from '@nestjs/config';
 import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
+import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 
 
 @Controller('merchants')
@@ -33,7 +34,6 @@ export class MerchantsController {
 
     @Post('create')
     @UseInterceptors(
-        
         CustomFileInterceptor(
           
             'promoterIdDoc',
@@ -41,7 +41,7 @@ export class MerchantsController {
         ),
     )
     @UsePipes(ValidationPipe)
-    async createMerchantTest(@Body() createMerchantDto: CreateMerchantDto, @UploadedFile() promoterIdDoc: Express.Multer.File,) {
+    async createMerchant(@Body() createMerchantDto: CreateMerchantDto, @UploadedFile() promoterIdDoc: Express.Multer.File,) {
 
         if (!promoterIdDoc)
             throw new HttpException("Means of ID not uploaded", HttpStatus.BAD_REQUEST);
@@ -76,6 +76,7 @@ export class MerchantsController {
 
 
     @Post('activate-merchant/:id')
+    @UseGuards(JwtAuthenticationGuard)
     async activateMerchant(@Param('id') merchantId: string) {
         try {
             return await this.merchantService.setMerchantActive(merchantId);
@@ -86,6 +87,7 @@ export class MerchantsController {
     }
 
     @Patch('profile/:id')
+    @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)
     async updateMerchant(@Param('id') merchantId: string, @Body() editMerchantDto: EditMerchantDto) {
         try {
@@ -97,6 +99,7 @@ export class MerchantsController {
     }
 
     @Patch('bank-details/:id')
+    @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)
     async updateMerchantBank(@Param('id') merchantId: string, @Body() editMerchantBankDto: UpdateMerchantBankDto) {
         return this.merchantService.updateMerchantBank(merchantId, editMerchantBankDto);
@@ -110,11 +113,13 @@ export class MerchantsController {
     }
 
     @Get(':merchantId')
+    @UseGuards(JwtAuthenticationGuard)
     getMerchantById(@Param('merchantId') merchantId: string) {
         return this.merchantService.getMerchantById(merchantId);
     }
 
     @Get(':merchantId/id-card')
+    @UseGuards(JwtAuthenticationGuard)
     async getMerchantIdentification(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantIdentification(merchantId);
         res.attachment(fileData.fileName);
@@ -125,6 +130,7 @@ export class MerchantsController {
     }
 
     @Get(':merchantId/logo')
+    @UseGuards(JwtAuthenticationGuard)
     async getMerchantLogo(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantLogo(merchantId);
         res.attachment(fileData.fileName);
@@ -135,6 +141,7 @@ export class MerchantsController {
     }
 
     @Get(':merchantId/cac')
+    @UseGuards(JwtAuthenticationGuard)
     async getMerchantCAC(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantCAC(merchantId);
         res.attachment(fileData.fileName);
@@ -146,6 +153,7 @@ export class MerchantsController {
 
 
     @Post(':merchantId/set-id-card')
+    @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(
         CustomFileInterceptor(
             'promoterIdDoc',
@@ -187,6 +195,7 @@ export class MerchantsController {
 
 
     @Post(':merchantId/set-cac')
+    @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(
         CustomFileInterceptor(
             'cacDoc',
@@ -229,6 +238,7 @@ export class MerchantsController {
 
 
     @Post(':merchantId/set-logo')
+    @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(
         CustomFileInterceptor(
             'logoDoc',

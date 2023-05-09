@@ -1,4 +1,5 @@
-import { Controller, Get, HttpException, HttpStatus, Param } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, UseGuards } from '@nestjs/common';
+import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 import { CustomerService } from 'src/merchant-customer/services/customer/customer.service';
 
 @Controller('customers')
@@ -13,6 +14,7 @@ export class CustomerController {
     }
 
     @Get('/merchant/:mid')
+    @UseGuards(JwtAuthenticationGuard)
     async getAllCustomersByMid(@Param('mid') mid: number) {
         try {
             const customers = await this.customerService.getAllCustomersByMid(mid);

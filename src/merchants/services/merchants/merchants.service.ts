@@ -35,6 +35,9 @@ export class MerchantsService {
 
     async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity> {
 
+        createMerchantDto.password = createMerchantDto.password.trim();
+        createMerchantDto.email = createMerchantDto.email.trim();
+
         const merchant = await this.merchantRepository.findOne({
             where: {
                 email: createMerchantDto.email

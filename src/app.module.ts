@@ -11,6 +11,7 @@ import { ThirdPartyDataModule } from './third-party-data/third-party-data.module
 import { StaticsModule } from './statics/statics.module';
 import { OverviewModule } from './overview/overview.module';
 import { MerchantPayoutModule } from './merchant-payout/merchant-payout.module';
+import { KeysModule } from './keys/keys.module';
 
 
 
@@ -31,6 +32,7 @@ import { MerchantPayoutModule } from './merchant-payout/merchant-payout.module';
     StaticsModule,
     OverviewModule,
     MerchantPayoutModule,
+    KeysModule,
  
   ],
 })
