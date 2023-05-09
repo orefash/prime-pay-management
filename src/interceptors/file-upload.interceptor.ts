@@ -7,7 +7,7 @@ config();
 let CustomFileInterceptor = ( fieldName: string, mimeTypes: string[]) => {
     
     const myUploadDirectory = process.env.UPLOADED_FILES_DESTINATION;
-    // console.log('dd: ', myUploadDirectory)
+    console.log('dd: ', myUploadDirectory)
     
     return FileInterceptor(fieldName, {
         storage: diskStorage({

@@ -291,8 +291,8 @@ export class MerchantsService {
 
             const fileName = path.basename(docs.logoPath);
             // console.log('d: ', __dirname)
-            const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
-
+            const filePath = await this.fetchUploadPath(fileName);
+            
             const contentType = docs.logoMime;
             return { fileName, contentType, filePath: filePath }
         }
@@ -315,8 +315,8 @@ export class MerchantsService {
 
             const fileName = path.basename(docs.cacPath);
             // console.log('d: ', __dirname)
-            const filePath = path.join(__dirname, '..', '..', '..', '..', 'uploads', fileName);
-
+            const filePath = await this.fetchUploadPath(fileName);
+            
             const contentType = docs.cacMime;
             return { fileName, contentType, filePath: filePath }
         }
