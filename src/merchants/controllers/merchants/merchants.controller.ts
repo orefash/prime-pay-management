@@ -38,16 +38,16 @@ export class MerchantsController {
 
         try {
 
-            let address: Address = {
-                street: createMerchantDto.street,
-                no: parseInt(createMerchantDto.streetNo, 10),
-                country: createMerchantDto.country,
-                state: createMerchantDto.state,
-                landmark: createMerchantDto.landmark,
-                lga: createMerchantDto.lga
-            }
+            // let address: Address = {
+            //     street: createMerchantDto.street,
+            //     no: parseInt(createMerchantDto.streetNo, 10),
+            //     country: createMerchantDto.country,
+            //     state: createMerchantDto.state,
+            //     landmark: createMerchantDto.landmark,
+            //     lga: createMerchantDto.lga
+            // }
 
-            createMerchantDto.address = address;
+            // createMerchantDto.address = address;
 
             return await this.merchantService.createMerchant(createMerchantDto);
 

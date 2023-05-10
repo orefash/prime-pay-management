@@ -30,10 +30,10 @@ export class CreateMerchantDto {
     @IsNotEmpty()
     isRegistered: boolean;
 
-    // @IsString()
-    // @Length(10)
-    // @IsOptional()
-    // bvn: string;
+    @IsString()
+    @Length(10)
+    @IsOptional()
+    bvn: string;
 
     // @IsNotEmpty()
     // @IsString()
@@ -73,28 +73,28 @@ export class CreateMerchantDto {
     @MinLength(3)
     password: string;
 
-    @IsOptional()
-    address: Address;
+    // @IsOptional()
+    // address: Address;
  
-    @IsNotEmpty()
-    @IsNumber()
-    streetNo: string;
+    // @IsNotEmpty()
+    // @IsNumber()
+    // streetNo: string;
 
-    @IsNotEmpty()
-    @IsString()
-    street: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // street: string;
 
-    @IsOptional()
-    @IsString()
-    landmark: string;
+    // @IsOptional()
+    // @IsString()
+    // landmark: string;
 
-    @IsNotEmpty()
-    @IsString()
-    state: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // state: string;
 
-    @IsNotEmpty()
-    @IsString()
-    lga: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // lga: string;
 
     @IsNotEmpty()
     @IsString()
@@ -103,25 +103,25 @@ export class CreateMerchantDto {
     
     @IsNumber()
     @IsOptional()
-    avgMonthlySales: number;
+    // avgMonthlySales: number;
 
     // @IsNumber()
     // @IsOptional()
     // systemId: number;
 
 
-    // @IsNotEmpty()
-    // @IsString()
-    // @Length(10)
-    // accountNo: string;
+    @IsNotEmpty()
+    @IsString()
+    @Length(10)
+    accountNo: string;
 
-    // @IsNotEmpty()
-    // @IsString()
-    // @MinLength(2)
-    // bankCode: string;
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(2)
+    bankCode: string;
 
-    // @IsNotEmpty()
-    // @IsString()
-    // bankName: string;
+    @IsNotEmpty()
+    @IsString()
+    bankName: string;
 
 }
