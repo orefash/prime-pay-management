@@ -9,7 +9,7 @@ export class ThirdPartyDataController {
     ){}
 
     @Get('banks')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getBankList(){
         return await this.tdService.getBankList();
     }

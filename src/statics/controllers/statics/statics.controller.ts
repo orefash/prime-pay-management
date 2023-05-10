@@ -9,25 +9,25 @@ export class StaticsController {
     ){}
 
     @Get('id-types')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getIDTypes(){
         return await this.staticsService.getIDTypes();
     }
 
     @Get('service-types')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getServiceTypes() {
         return await this.staticsService.getServiceTypes();
     }
 
     @Get('nigeria-states')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getNigeriaStatesData() {
         return await this.staticsService.getNigeriaStatesData();
     }
 
     @Get('country-codes')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getCountryCodes() {
         return await this.staticsService.getCountryCodes();
     }

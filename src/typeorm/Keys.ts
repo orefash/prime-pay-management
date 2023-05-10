@@ -9,8 +9,6 @@ export class MerchantKey {
     })
     id: number;
 
-   
-
     @Column({
         nullable: false,
     })
@@ -20,6 +18,17 @@ export class MerchantKey {
         nullable: false,
     })
     live_private_key: string;
+   
+
+    @Column({
+        nullable: false,
+    })
+    test_public_key: string;
+
+    @Column({
+        nullable: false,
+    })
+    test_private_key: string;
 
     @OneToOne(() => Merchant)
     @JoinColumn()
