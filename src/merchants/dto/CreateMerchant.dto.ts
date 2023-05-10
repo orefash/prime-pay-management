@@ -26,32 +26,32 @@ export class CreateMerchantDto {
     @IsIn(SERVICETYPES)
     businessType: string;
 
-    @IsBooleanString()
+    @IsBoolean()
     @IsNotEmpty()
     isRegistered: boolean;
 
-    @IsString()
-    @Length(10)
-    @IsOptional()
-    bvn: string;
-
-    @IsNotEmpty()
-    @IsString()
-    @IsIn(IDTYPES)
-    promoterIdType: string;
+    // @IsString()
+    // @Length(10)
+    // @IsOptional()
+    // bvn: string;
 
     // @IsNotEmpty()
-    @IsString()
-    @IsOptional()
-    promoterId?: string;
+    // @IsString()
+    // @IsIn(IDTYPES)
+    // promoterIdType: string;
 
-    @IsString()
-    @IsOptional()
-    promoterIdMime?:string;
+    // // @IsNotEmpty()
+    // @IsString()
+    // @IsOptional()
+    // promoterId?: string;
 
-    @IsUrl()
-    @IsOptional()
-    websiteUrl: string;
+    // @IsString()
+    // @IsOptional()
+    // promoterIdMime?:string;
+
+    // @IsUrl()
+    // @IsOptional()
+    // websiteUrl: string;
 
     // @IsArray()
     // @IsString({ each: true })
@@ -77,7 +77,7 @@ export class CreateMerchantDto {
     address: Address;
  
     @IsNotEmpty()
-    @IsNumberString()
+    @IsNumber()
     streetNo: string;
 
     @IsNotEmpty()
@@ -101,27 +101,27 @@ export class CreateMerchantDto {
     country: string;
 
     
-    @IsNumberString()
+    @IsNumber()
     @IsOptional()
     avgMonthlySales: number;
 
-    @IsNumber()
-    @IsOptional()
-    systemId: number;
+    // @IsNumber()
+    // @IsOptional()
+    // systemId: number;
 
 
-    @IsNotEmpty()
-    @IsString()
-    @Length(10)
-    accountNo: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // @Length(10)
+    // accountNo: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @MinLength(2)
-    bankCode: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // @MinLength(2)
+    // bankCode: string;
 
-    @IsNotEmpty()
-    @IsString()
-    bankName: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // bankName: string;
 
 }

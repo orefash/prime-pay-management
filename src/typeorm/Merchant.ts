@@ -158,19 +158,18 @@ export class Merchant {
     })
     avgMonthlySales: number;
 
-
     @Column({
-        nullable: false,
+        nullable: true,
     })
     accountNo: string;
 
     @Column({
-        nullable: false,
+        nullable: true,
     })
     bankCode: string;
 
     @Column({
-        nullable: false,
+        nullable: true,
     })
     bankName: string;
 

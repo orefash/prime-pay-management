@@ -33,25 +33,10 @@ export class MerchantsController {
 
 
     @Post('create')
-    @UseInterceptors(
-        CustomFileInterceptor(
-          
-            'promoterIdDoc',
-            ['image/jpeg', 'image/png', 'application/pdf']
-        ),
-    )
     @UsePipes(ValidationPipe)
-    async createMerchant(@Body() createMerchantDto: CreateMerchantDto, @UploadedFile() promoterIdDoc: Express.Multer.File,) {
+    async createMerchant(@Body() createMerchantDto: CreateMerchantDto,) {
 
-        if (!promoterIdDoc)
-            throw new HttpException("Means of ID not uploaded", HttpStatus.BAD_REQUEST);
-
-        console.log('Promoter Doc: ', promoterIdDoc)
-        const filepath = promoterIdDoc.path;
         try {
-
-            createMerchantDto.promoterId = filepath;
-            createMerchantDto.promoterIdMime = promoterIdDoc.mimetype;
 
             let address: Address = {
                 street: createMerchantDto.street,
@@ -68,10 +53,51 @@ export class MerchantsController {
 
         } catch (error) {
             console.log('create error: ', error)
-            unlinkSync(filepath);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    // @Post('create')
+    // @UseInterceptors(
+    //     CustomFileInterceptor(
+          
+    //         'promoterIdDoc',
+    //         ['image/jpeg', 'image/png', 'application/pdf']
+    //     ),
+    // )
+    // @UsePipes(ValidationPipe)
+    // async createMerchant(@Body() createMerchantDto: CreateMerchantDto, @UploadedFile() promoterIdDoc: Express.Multer.File,) {
+
+    //     if (!promoterIdDoc)
+    //         throw new HttpException("Means of ID not uploaded", HttpStatus.BAD_REQUEST);
+
+    //     console.log('Promoter Doc: ', promoterIdDoc)
+    //     const filepath = promoterIdDoc.path;
+    //     try {
+
+    //         createMerchantDto.promoterId = filepath;
+    //         createMerchantDto.promoterIdMime = promoterIdDoc.mimetype;
+
+    //         let address: Address = {
+    //             street: createMerchantDto.street,
+    //             no: parseInt(createMerchantDto.streetNo, 10),
+    //             country: createMerchantDto.country,
+    //             state: createMerchantDto.state,
+    //             landmark: createMerchantDto.landmark,
+    //             lga: createMerchantDto.lga
+    //         }
+
+    //         createMerchantDto.address = address;
+
+    //         return await this.merchantService.createMerchant(createMerchantDto);
+
+    //     } catch (error) {
+    //         console.log('create error: ', error)
+    //         unlinkSync(filepath);
+    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
 
 
