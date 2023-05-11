@@ -32,9 +32,9 @@ export class CreateMerchantDto {
     isRegistered: boolean;
 
     @IsNumberString()
-    @Length(10)
-    @MaxLength(10)
-    @MinLength(10)
+    @Length(11)
+    @MaxLength(11)
+    @MinLength(11)
     @IsOptional()
     bvn: string;
 

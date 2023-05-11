@@ -66,7 +66,7 @@ export class Merchant {
     @Column({
         nullable: true,
         name: 'bvn',
-        length: 10
+        length: 11
     })
     bvn: string;
 
@@ -160,6 +160,7 @@ export class Merchant {
 
     @Column({
         nullable: true,
+        length: 10
     })
     accountNo: string;
 
