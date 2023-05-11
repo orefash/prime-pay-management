@@ -11,15 +11,30 @@ export class MerchantKey {
 
     @Column({
         nullable: false,
+        unique: true 
     })
     live_public_key: string;
 
     @Column({
         nullable: false,
+        unique: true 
     })
     live_private_key: string;
+
+    @Column({
+        nullable: false,
+        default: false
+    })
+    isLiveActive: boolean;
    
 
+    @Column({
+        nullable: false,
+        default: true
+    })
+    isTestActive: boolean;
+
+    
     @Column({
         nullable: false,
     })
@@ -27,6 +42,7 @@ export class MerchantKey {
 
     @Column({
         nullable: false,
+        
     })
     test_private_key: string;
 

@@ -30,7 +30,7 @@ export class CreateMerchantDto {
     @IsNotEmpty()
     isRegistered: boolean;
 
-    @IsString()
+    @IsNumberString()
     @Length(10)
     @IsOptional()
     bvn: string;
@@ -101,8 +101,8 @@ export class CreateMerchantDto {
     country: string;
 
     
-    @IsNumber()
-    @IsOptional()
+    // @IsNumber()
+    // @IsOptional()
     // avgMonthlySales: number;
 
     // @IsNumber()
@@ -111,7 +111,7 @@ export class CreateMerchantDto {
 
 
     @IsNotEmpty()
-    @IsString()
+    @IsNumberString()
     @Length(10)
     accountNo: string;
 
