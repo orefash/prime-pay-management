@@ -1,5 +1,5 @@
 
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Length } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl, Length } from "class-validator";
 import { Address } from "src/types/address.interface";
 import { Socials } from "src/types/socials.interface";
 
@@ -13,8 +13,8 @@ export class EditMerchantDto {
     @IsNotEmpty()
     promoterLname: string;
 
-    @IsString()
-    @Length(10)
+    @IsNumberString()
+    @Length(11)
     @IsOptional()
     bvn: string;
 
