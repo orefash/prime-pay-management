@@ -14,10 +14,29 @@ export class KeysService {
         private readonly merchantService: MerchantsService
     ) { }
 
-    generateKey():string {
-        const uniqueKey = uuidv4({ format: 'hex' });
+    generateKey(isLive: boolean, isPub: boolean):string {
+
+        // console.log(`islive: ${isLive} |  isPub: ${isPub}`)
+        let uniqueKey = uuidv4({ nodash: true }).replace(/-/g, '');
+
+        let init = 'prm';
+
+        if(isPub)
+            init = init + '_pubk';
+        else
+            init = init + '_prvk';
+
+        if(isLive)
+            init = init + '_live_'
+        else
+            init = init + '_test_'
+
+        uniqueKey = init + uniqueKey;
+
         return uniqueKey;
     }
+
+
 
     async create(merchantID: string): Promise<MerchantKey> {
         try {
@@ -28,10 +47,10 @@ export class KeysService {
 
             let merchantKeyData = {
                 merchant: merchant,
-                live_private_key: this.generateKey(),
-                live_public_key: this.generateKey(),
-                test_private_key: this.generateKey(),
-                test_public_key: this.generateKey()
+                live_private_key: this.generateKey(true, false),
+                live_public_key: this.generateKey(true, true),
+                test_private_key: this.generateKey(false, false),
+                test_public_key: this.generateKey(false, true)
             }
 
             return await this.merchantKeyRepository.save(merchantKeyData);
@@ -76,12 +95,60 @@ export class KeysService {
         }
     }
 
-    async update(id: number, merchantKey: MerchantKey): Promise<MerchantKey> {
+    // async update(id: number, merchantKey: MerchantKey): Promise<MerchantKey> {
+    //     try {
+    //         await this.merchantKeyRepository.update(id, merchantKey);
+    //         return await this.findOne(id);
+    //     } catch (err) {
+    //         throw new Error(`Error updating merchant key: ${err.message}`);
+    //     }
+    // }
+
+
+    async resetKeys(mid: string, isLive: boolean): Promise<MerchantKey> {
         try {
-            await this.merchantKeyRepository.update(id, merchantKey);
-            return await this.findOne(id);
+      
+            let updateData: Partial<MerchantKey> = {}
+            if(isLive === true){
+                updateData.live_private_key = this.generateKey(true, false);
+                updateData.live_public_key = this.generateKey(true, true);
+            }else{
+                updateData.test_private_key = this.generateKey(false, false);
+                updateData.test_public_key = this.generateKey(false, true);
+            }
+
+            // console.log(`reset:  isupd: ${JSON.stringify(updateData)} | islive: ${isLive}  | type: ${typeof(isLive)}`)
+           
+
+            // console.log('upd: ', updateData)
+            await this.merchantKeyRepository.update({
+                merchant: { id: mid }
+            }, updateData);
+            return await this.findByMerchant(mid);
         } catch (err) {
-            throw new Error(`Error updating merchant key: ${err.message}`);
+            throw new Error(`Error resetting key: ${err.message}`);
+        }
+    }
+
+    async toggleKeyState(mid: string, isLive: boolean): Promise<MerchantKey> {
+        try {
+            const keyData: MerchantKey = await this.findByMerchant(mid);
+            let updateData: Partial<MerchantKey> = {}
+            if(isLive == true){
+                // console.log('in islive')
+                updateData.isLiveActive = !keyData.isLiveActive;
+            }else{
+                updateData.isTestActive = !keyData.isTestActive;
+            }
+            
+            // console.log(`isupd: ${JSON.stringify(updateData)} | islive: ${isLive}  | type: ${typeof(isLive)}`)
+            
+            await this.merchantKeyRepository.update({
+                merchant: { id: mid }
+            }, updateData);
+            return await this.findByMerchant(mid);
+        } catch (err) {
+            throw new Error(`Error toggling key: ${err.message}`);
         }
     }
 
