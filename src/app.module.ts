@@ -12,6 +12,7 @@ import { StaticsModule } from './statics/statics.module';
 import { OverviewModule } from './overview/overview.module';
 import { MerchantPayoutModule } from './merchant-payout/merchant-payout.module';
 import { KeysModule } from './keys/keys.module';
+import { MerchantKeyCreatorModule } from './merchant-key-creator/merchant-key-creator.module';
 
 
 
@@ -33,6 +34,7 @@ import { KeysModule } from './keys/keys.module';
     OverviewModule,
     MerchantPayoutModule,
     KeysModule,
+    MerchantKeyCreatorModule,
  
   ],
 })

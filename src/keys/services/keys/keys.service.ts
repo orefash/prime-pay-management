@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
-import { MerchantKey } from 'src/typeorm';
+import { Merchant, MerchantKey } from 'src/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,8 +10,8 @@ export class KeysService {
     constructor(
         @InjectRepository(MerchantKey)
         private merchantKeyRepository: Repository<MerchantKey>,
-        @Inject(MerchantsService)
-        private readonly merchantService: MerchantsService
+        // @Inject(forwardRef(() => MerchantsService)) 
+        // private readonly merchantService: MerchantsService
     ) { }
 
     generateKey(isLive: boolean, isPub: boolean):string {
@@ -38,12 +38,8 @@ export class KeysService {
 
 
 
-    async create(merchantID: string): Promise<MerchantKey> {
+    async create(merchant: Merchant): Promise<MerchantKey> {
         try {
-            const merchant = await this.merchantService.getMerchantById(merchantID);
-            if (!merchant)
-                throw new Error('Merchant not found');
-
 
             let merchantKeyData = {
                 merchant: merchant,

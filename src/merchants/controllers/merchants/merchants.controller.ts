@@ -20,42 +20,40 @@ import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 
 @Controller('merchants')
 export class MerchantsController {
-    private uploadPath: string;
     constructor(
         private readonly merchantService: MerchantsService,
         private readonly configService: ConfigService,
         
     ) {
-        this.uploadPath = configService.get<string>('UPLOADED_FILES_DESTINATION');
-
+      
      }
 
 
 
-    @Post('create')
-    @UsePipes(ValidationPipe)
-    async createMerchant(@Body() createMerchantDto: CreateMerchantDto,) {
+    // @Post('create')
+    // @UsePipes(ValidationPipe)
+    // async createMerchant(@Body() createMerchantDto: CreateMerchantDto,) {
 
-        try {
+    //     try {
 
-            // let address: Address = {
-            //     street: createMerchantDto.street,
-            //     no: parseInt(createMerchantDto.streetNo, 10),
-            //     country: createMerchantDto.country,
-            //     state: createMerchantDto.state,
-            //     landmark: createMerchantDto.landmark,
-            //     lga: createMerchantDto.lga
-            // }
+    //         // let address: Address = {
+    //         //     street: createMerchantDto.street,
+    //         //     no: parseInt(createMerchantDto.streetNo, 10),
+    //         //     country: createMerchantDto.country,
+    //         //     state: createMerchantDto.state,
+    //         //     landmark: createMerchantDto.landmark,
+    //         //     lga: createMerchantDto.lga
+    //         // }
 
-            // createMerchantDto.address = address;
+    //         // createMerchantDto.address = address;
 
-            return await this.merchantService.createMerchant(createMerchantDto);
+    //         return await this.merchantService.createMerchant(createMerchantDto);
 
-        } catch (error) {
-            console.log('create error: ', error)
-            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-        }
-    }
+    //     } catch (error) {
+    //         console.log('create error: ', error)
+    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
 
     // @Post('create')

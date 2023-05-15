@@ -1,5 +1,5 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +11,7 @@ import { MerchantsController } from './controllers/merchants/merchants.controlle
 import { MerchantsService } from './services/merchants/merchants.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { KeysModule } from 'src/keys/keys.module';
 // import { CustomFileInterceptor } from 'src/interceptors/file-upload.interceptor';
 
 @Module({
@@ -18,7 +19,7 @@ import { diskStorage } from 'multer';
     TypeOrmModule.forFeature([Merchant]),
     HttpModule,
     ThirdPartyDataModule,
-    ConfigModule
+    ConfigModule,
   ],
   exports: [MerchantsService],
   controllers: [MerchantsController],

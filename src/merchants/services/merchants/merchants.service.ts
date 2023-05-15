@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
@@ -17,6 +17,7 @@ import * as mime from 'mime';
 import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dto copy';
 import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
 import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
+import { KeysService } from 'src/keys/services/keys/keys.service';
 
 @Injectable()
 export class MerchantsService {
@@ -28,33 +29,40 @@ export class MerchantsService {
             @Inject(ThirdPartyDataService)
             private readonly thirdPartDataService: ThirdPartyDataService,
             @Inject(ConfigService)
-            private readonly configService: ConfigService
+            private readonly configService: ConfigService,
+            // @Inject(forwardRef(() => KeysService))
+            // private readonly keyService: KeysService
         ) { }
 
 
 
-    async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity> {
+    // async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity> {
 
-        createMerchantDto.password = createMerchantDto.password.trim();
-        createMerchantDto.email = createMerchantDto.email.trim();
+    //     createMerchantDto.password = createMerchantDto.password.trim();
+    //     createMerchantDto.email = createMerchantDto.email.trim();
 
-        const merchant = await this.merchantRepository.findOne({
-            where: {
-                email: createMerchantDto.email
-            }
-        });
+    //     const merchant = await this.merchantRepository.findOne({
+    //         where: {
+    //             email: createMerchantDto.email
+    //         }
+    //     });
 
-        if (merchant) throw new Error("Merchant with Email already Exists")
+    //     if (merchant) throw new Error("Merchant with Email already Exists")
 
-        let PPAY_STATUS = this.configService.get<number>('PPAY');
+    //     let PPAY_STATUS = this.configService.get<number>('PPAY');
 
 
-        const password = encodePassword(createMerchantDto.password);
-        const newMerchant = this.merchantRepository.create({ ...createMerchantDto, password });
-        let saved = await this.merchantRepository.save(newMerchant);
-        delete saved.password
-        return saved;
-    }
+    //     const password = encodePassword(createMerchantDto.password);
+    //     const newMerchant = this.merchantRepository.create({ ...createMerchantDto, password });
+    //     let saved = await this.merchantRepository.save(newMerchant);
+
+    //     //creating keys
+    //     let createdKeys = await this.keyService.create(saved.id);
+    //     console.log(`createdkeys: ${JSON.stringify(createdKeys)}`)
+
+    //     delete saved.password
+    //     return saved;
+    // }
 
     async updateMerchantProfile(id: string, editMerchantDto: EditMerchantDto): Promise<Partial<MerchantEntity>> {
 

@@ -24,14 +24,14 @@ export class KeysController {
     }
   }
 
-  @Post('create/merchant/:id')
-  async create(@Param('id') id: string): Promise<MerchantKey> {
-    try {
-      return await this.keysService.create(id);
-    } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+//   @Post('create/merchant/:id')
+//   async create(@Param('id') id: string): Promise<MerchantKey> {
+//     try {
+//       return await this.keysService.create(id);
+//     } catch (err) {
+//       throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+//     }
+//   }
 
   @Patch('/merchant/:id/reset-keys/live/:isLive')
   async resetKeys(@Param('id') mid: string, @Param('isLive', ParseBoolPipe) isLive: boolean): Promise<MerchantKey> {
