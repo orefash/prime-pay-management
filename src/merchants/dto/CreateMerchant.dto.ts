@@ -1,7 +1,7 @@
 
 
 import { Transform } from "class-transformer";
-import { IsArray, IsBoolean, IsBooleanString, IsEmail, IsIn, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl, Length, MaxLength, MinLength } from "class-validator";
+import { IsArray, IsBoolean, IsBooleanString, IsEmail, IsIn, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl, Length, MaxLength, MinLength, ValidateIf } from "class-validator";
 import { IDTYPES } from "src/statics/types/IDTypes";
 import SERVICETYPES from "src/statics/types/ServiceTypes";
 import { Address } from "src/types/address.interface";
@@ -31,12 +31,13 @@ export class CreateMerchantDto {
     @IsNotEmpty()
     isRegistered: boolean;
 
+    @ValidateIf((object, value) => value.trim() !== '')
     @IsNumberString()
     @Length(11)
     @MaxLength(11)
     @MinLength(11)
     @IsOptional()
-    bvn: string;
+    bvn?: string;
 
     // @IsNotEmpty()
     // @IsString()
