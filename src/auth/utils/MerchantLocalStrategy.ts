@@ -22,7 +22,6 @@ export class MerchantLocalStrategy extends PassportStrategy(Strategy, 'merchant-
             throw new UnauthorizedException();
         }
         return merchant;
-
     }
 
 }

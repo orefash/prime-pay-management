@@ -103,6 +103,29 @@ export class MerchantsService {
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
+
+    async updateMerchantSystemId(id: string, systemId: number): Promise<Partial<MerchantEntity>> {
+
+        await this.merchantRepository.update(id, {
+            systemId
+        });
+        
+        const updatedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (updatedMerchant) {
+            const { password, ...merchant } = updatedMerchant;
+            return merchant;
+        }
+
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+
+
     async setMerchantIdentification(id: string, editMerchantID: SetMerchantIdDTO) {
 
 

@@ -122,6 +122,20 @@ export class MerchantsController {
         }
     }
 
+
+    @Patch(':id/systemId/:mid')
+    @UseGuards(JwtAuthenticationGuard)
+    @UsePipes(ValidationPipe)
+    async updateMerchantSystemId(@Param('id') id: string, @Param('mid') systemId: number) {
+        try {
+            return this.merchantService.updateMerchantSystemId(id, systemId);
+        } catch (error) {
+            console.log('update systemid error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
     @Patch('bank-details/:id')
     @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)

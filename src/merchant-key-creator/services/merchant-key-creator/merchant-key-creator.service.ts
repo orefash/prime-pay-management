@@ -23,8 +23,11 @@ export class MerchantKeyCreatorService {
 
     async createMerchantProfile(createMerchantDto: CreateMerchantDto): Promise<Merchant> {
 
+        console.log(`Merchant: ${JSON.stringify(createMerchantDto)}`);
+
         createMerchantDto.password = createMerchantDto.password.trim();
         createMerchantDto.email = createMerchantDto.email.trim();
+
 
         const merchant = await this.merchantRepository.findOne({
             where: {
