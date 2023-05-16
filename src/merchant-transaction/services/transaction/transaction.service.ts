@@ -55,7 +55,7 @@ export class TransactionService {
             loanTenor: createTransactionDto.loanTenor
         }
 
-        console.log('ts: ', transactionData)
+        // console.log('ts: ', transactionData)
 
         const newTransaction = await this.transactionRepository.create(transactionData);
         return this.transactionRepository.save(newTransaction);
