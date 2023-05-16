@@ -23,10 +23,10 @@ export class MerchantsController {
     constructor(
         private readonly merchantService: MerchantsService,
         private readonly configService: ConfigService,
-        
+
     ) {
-      
-     }
+
+    }
 
 
 
@@ -59,7 +59,7 @@ export class MerchantsController {
     // @Post('create')
     // @UseInterceptors(
     //     CustomFileInterceptor(
-          
+
     //         'promoterIdDoc',
     //         ['image/jpeg', 'image/png', 'application/pdf']
     //     ),

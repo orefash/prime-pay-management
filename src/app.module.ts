@@ -13,6 +13,7 @@ import { OverviewModule } from './overview/overview.module';
 import { MerchantPayoutModule } from './merchant-payout/merchant-payout.module';
 import { KeysModule } from './keys/keys.module';
 import { MerchantKeyCreatorModule } from './merchant-key-creator/merchant-key-creator.module';
+import { MerchantProductModule } from './merchant-product/merchant-product.module';
 
 
 
@@ -35,6 +36,7 @@ import { MerchantKeyCreatorModule } from './merchant-key-creator/merchant-key-cr
     MerchantPayoutModule,
     KeysModule,
     MerchantKeyCreatorModule,
+    MerchantProductModule,
  
   ],
 })

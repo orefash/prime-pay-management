@@ -1,10 +1,7 @@
 import { Address } from "src/types/address.interface";
-import { BankDetails } from "src/types/bank_details.interface";
 import { Socials } from "src/types/socials.interface";
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { MerchantCustomer } from "./MerchantCustomer";
-import { MerchantTransaction } from "./MerchantTransaction";
-import { Exclude } from "class-transformer";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { MerchantProduct } from "./MerchantProducts";
 
 @Entity()
 @Unique(['email', 'accountNo',])
@@ -180,6 +177,9 @@ export class Merchant {
         name: 'socials'
     })
     socials: Socials;
+
+    @OneToMany(() => MerchantProduct, product => product.merchant)
+    products: MerchantProduct[];
 
     @CreateDateColumn({
         nullable: false,
