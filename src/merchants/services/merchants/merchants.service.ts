@@ -96,6 +96,7 @@ export class MerchantsService {
         });
 
         if (updatedMerchant) {
+            console.log('Updated: ', updatedMerchant)
             const { password, ...merchant } = updatedMerchant;
             return merchant;
         }
@@ -109,7 +110,7 @@ export class MerchantsService {
         await this.merchantRepository.update(id, {
             systemId
         });
-        
+
         const updatedMerchant = await this.merchantRepository.findOne({
             where: {
                 id: id

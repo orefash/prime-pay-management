@@ -16,7 +16,11 @@ export class TransactionController {
     @UsePipes(ValidationPipe)
     async createTransaction(@Body() createTransactionDto: CreateTransactionDto) {
         try {
-            return await this.transactionService.createTransaction(createTransactionDto);
+            const transaction = await this.transactionService.createTransaction(createTransactionDto);
+            return {
+                status: HttpStatus.OK,
+                data: transaction
+            }
         } catch (error) {
             console.log('create transaction error')
             console.log(error)

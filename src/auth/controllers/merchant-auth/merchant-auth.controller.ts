@@ -35,6 +35,7 @@ export class MerchantAuthController {
         return response.send({ merchant, token });
     }
 
+    
     // @HttpCode(200)
     // @UseGuards(AuthGuard('merchant-local'))
     // @Post('login')
