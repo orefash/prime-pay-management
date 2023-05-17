@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Length } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Length, MinLength } from "class-validator";
 
 
 export enum TransactionStatus {
@@ -53,7 +53,7 @@ export class CreateTransactionDto {
     customerName: string;
 
     @IsString()
-    @Length(11)
+    @MinLength(10)
     @IsNotEmpty()
     customerPhone: string;
 

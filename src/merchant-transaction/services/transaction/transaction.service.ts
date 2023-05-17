@@ -44,7 +44,7 @@ export class TransactionService {
 
         const savedCustomer = await this.customerService.createCustomer(customerData);
 
-        console.log('in tr: ', savedCustomer)
+        // console.log('in tr: ', savedCustomer)
 
         const transactionData: mTransaction = {
             amount: createTransactionDto.amount,
