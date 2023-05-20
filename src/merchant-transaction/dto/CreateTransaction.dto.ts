@@ -36,6 +36,10 @@ export class CreateTransactionDto {
     @IsNotEmpty()
     description: string;
 
+    @IsString()
+    @IsOptional()
+    channel_id: string;
+
     @IsNumberString()
     @IsNotEmpty()
     ippis: number;

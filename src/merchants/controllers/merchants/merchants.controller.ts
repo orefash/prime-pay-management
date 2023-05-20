@@ -30,75 +30,6 @@ export class MerchantsController {
 
 
 
-    // @Post('create')
-    // @UsePipes(ValidationPipe)
-    // async createMerchant(@Body() createMerchantDto: CreateMerchantDto,) {
-
-    //     try {
-
-    //         // let address: Address = {
-    //         //     street: createMerchantDto.street,
-    //         //     no: parseInt(createMerchantDto.streetNo, 10),
-    //         //     country: createMerchantDto.country,
-    //         //     state: createMerchantDto.state,
-    //         //     landmark: createMerchantDto.landmark,
-    //         //     lga: createMerchantDto.lga
-    //         // }
-
-    //         // createMerchantDto.address = address;
-
-    //         return await this.merchantService.createMerchant(createMerchantDto);
-
-    //     } catch (error) {
-    //         console.log('create error: ', error)
-    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
-
-
-    // @Post('create')
-    // @UseInterceptors(
-    //     CustomFileInterceptor(
-
-    //         'promoterIdDoc',
-    //         ['image/jpeg', 'image/png', 'application/pdf']
-    //     ),
-    // )
-    // @UsePipes(ValidationPipe)
-    // async createMerchant(@Body() createMerchantDto: CreateMerchantDto, @UploadedFile() promoterIdDoc: Express.Multer.File,) {
-
-    //     if (!promoterIdDoc)
-    //         throw new HttpException("Means of ID not uploaded", HttpStatus.BAD_REQUEST);
-
-    //     console.log('Promoter Doc: ', promoterIdDoc)
-    //     const filepath = promoterIdDoc.path;
-    //     try {
-
-    //         createMerchantDto.promoterId = filepath;
-    //         createMerchantDto.promoterIdMime = promoterIdDoc.mimetype;
-
-    //         let address: Address = {
-    //             street: createMerchantDto.street,
-    //             no: parseInt(createMerchantDto.streetNo, 10),
-    //             country: createMerchantDto.country,
-    //             state: createMerchantDto.state,
-    //             landmark: createMerchantDto.landmark,
-    //             lga: createMerchantDto.lga
-    //         }
-
-    //         createMerchantDto.address = address;
-
-    //         return await this.merchantService.createMerchant(createMerchantDto);
-
-    //     } catch (error) {
-    //         console.log('create error: ', error)
-    //         unlinkSync(filepath);
-    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
-
-
-
     @Post('activate-merchant/:id')
     @UseGuards(JwtAuthenticationGuard)
     async activateMerchant(@Param('id') merchantId: string) {
@@ -109,6 +40,8 @@ export class MerchantsController {
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
     @Patch('profile/:id')
     @UseGuards(JwtAuthenticationGuard)
@@ -152,8 +85,20 @@ export class MerchantsController {
 
     @Get(':merchantId')
     @UseGuards(JwtAuthenticationGuard)
-    getMerchantById(@Param('merchantId') merchantId: string) {
-        return this.merchantService.getMerchantById(merchantId);
+    async getMerchantById(
+        @Param('merchantId') merchantId: string, 
+        @Req() req) {
+        let merchant = await this.merchantService.getMerchantById(merchantId);
+
+        const logoUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
+        // console.log(`req: ${logoUrl}`)
+        
+        let data = {
+            ...merchant,
+            logoUrl: logoUrl, 
+        };
+
+        return data;
     }
 
     @Get(':merchantId/id-card')
@@ -303,7 +248,7 @@ export class MerchantsController {
 
             const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
 
-            // console.log('du: ', downloadUrl)
+            console.log('du: ', downloadUrl)
             // Save the merchant identification data to the database
             await this.merchantService.setMerchantLogo(merchantId, setLogoDto);
 

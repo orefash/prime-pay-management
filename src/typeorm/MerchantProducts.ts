@@ -12,6 +12,8 @@ export class MerchantProduct {
     })
     item: string;
 
+   
+
     @Column({
         nullable: false,
     })

@@ -38,6 +38,11 @@ export class MerchantTransaction {
     @Column({
         nullable: true,
     })
+    channel_id: string;
+
+    @Column({
+        nullable: true,
+    })
     description: string;
 
     // @ManyToOne(type => Merchant, merchant => merchant.systemId)

@@ -28,14 +28,18 @@ export class MerchantAuthController {
     async login(@Req() request: RequestWithMerchant, @Res() response: Response) {
         // const { merchant } = request;
         const merchant = request.user;
-        // console.log('mc: ', merchant)
+        // console.log('mc: ', request)
         const token = this.merchantAuthService.getJwtToken(merchant.id);
         merchant.password = undefined;
+
+        const logoUrl = `${request.protocol}://${request.headers.host}/api/merchants/${merchant.id}/logo`;
+
+        merchant.logoUrl = logoUrl;
         
         return response.send({ merchant, token });
     }
 
-    
+
     // @HttpCode(200)
     // @UseGuards(AuthGuard('merchant-local'))
     // @Post('login')
