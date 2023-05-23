@@ -102,7 +102,7 @@ export class MerchantsController {
     }
 
     @Get(':merchantId/id-card')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getMerchantIdentification(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantIdentification(merchantId);
         res.attachment(fileData.fileName);
@@ -113,7 +113,7 @@ export class MerchantsController {
     }
 
     @Get(':merchantId/logo')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getMerchantLogo(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantLogo(merchantId);
         res.attachment(fileData.fileName);
@@ -124,7 +124,7 @@ export class MerchantsController {
     }
 
     @Get(':merchantId/cac')
-    @UseGuards(JwtAuthenticationGuard)
+    // @UseGuards(JwtAuthenticationGuard)
     async getMerchantCAC(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantCAC(merchantId);
         res.attachment(fileData.fileName);
