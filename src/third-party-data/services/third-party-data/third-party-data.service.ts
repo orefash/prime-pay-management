@@ -23,7 +23,7 @@ export class ThirdPartyDataService {
                         "vser": [
                             {
                                 "merchID": "vendor",
-                                "key": "NT9YkqNCZOlUlXcW8YNyenUhw6kd9Zl5W6xEUB02zEQ",
+                                "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
                                 "reqType": "reg_merch",
                                 "Name": registerMerchantDto.name,
                                 "acctNo": registerMerchantDto.accountNo,
@@ -59,7 +59,7 @@ export class ThirdPartyDataService {
                         "vser": [
                             {
                                 "merchID": "vendor",
-                                "key": "NT9YkqNCZOlUlXcW8YNyenUhw6kd9Zl5W6xEUB02zEQ",
+                                "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
                                 "reqType": "book_ippis",
                                 "ippis": payMerchantDto.ippis,
                                 "amount": payMerchantDto.amount,
@@ -99,7 +99,7 @@ export class ThirdPartyDataService {
                         "vser": [
                             {
                                 "merchID": "vendor",
-                                "key": "NT9YkqNCZOlUlXcW8YNyenUhw6kd9Zl5W6xEUB02zEQ",
+                                "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
                                 "reqType": "get_bank"
                             }
                         ]
