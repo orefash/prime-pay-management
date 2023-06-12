@@ -1,9 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateMerchantProductDto } from 'src/merchant-product/dto/CreateProduct.dto';
-import { UpdateMerchantProductDto } from 'src/merchant-product/dto/UpdateProduct.dto copy';
+import { CreateMerchantProductsDto } from 'src/merchant-product/dto/CreateProducts.dto';
+import { UpdateMerchantProductDto } from 'src/merchant-product/dto/UpdateProduct.dto';
 import { Merchant, MerchantProduct } from 'src/typeorm';
 import { LessThan, LessThanOrEqual, Repository } from 'typeorm';
+import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
+import { LoadImageUrl } from 'src/types/image.url.interface';
+import { GetProductDto } from 'src/merchant-product/dto/GetProduct.dto';
+import { ProductImageDto } from 'src/merchant-product/dto/Upload.dto';
+
 
 @Injectable()
 export class MerchantProductService {
@@ -13,9 +19,29 @@ export class MerchantProductService {
         private readonly merchantProductRepository: Repository<MerchantProduct>,
         @InjectRepository(Merchant)
         private readonly merchantRepository: Repository<Merchant>,
+        @Inject(ConfigService)
+        private readonly configService: ConfigService,
     ) { }
 
-    async create(createMerchantProductDto: CreateMerchantProductDto): Promise<MerchantProduct> {
+    // async fetchUploadPath(fileName: string) {
+    //     const isLocal = this.configService.get<boolean>('IS_LOCAL_STORAGE');
+    //     console.log('islocal: ', isLocal);
+
+    //     if (isLocal) {
+    //         const destination = this.configService.get<string>('UPLOADED_FILES_DESTINATION');
+
+    //         const filePath = path.join(__dirname, '..', '..', '..', '..', destination, fileName);
+    //         return filePath;
+    //     }
+
+    //     const destination = this.configService.get<string>('DOCKER_UPLOAD_DIR');
+
+    //     return path.join(destination, fileName);
+    // }
+
+
+
+    async createProducts(createMerchantProductDto: CreateMerchantProductsDto): Promise<MerchantProduct> {
         const merchant = await this.merchantRepository.findOne({
             where: {
                 id: createMerchantProductDto.merchantId
@@ -26,28 +52,153 @@ export class MerchantProductService {
             throw new NotFoundException(`Merchant with id ${createMerchantProductDto.merchantId} not found`);
         }
 
+
+
         merchant.password = null;
 
         const merchantProduct = new MerchantProduct();
         merchantProduct.item = createMerchantProductDto.item;
         merchantProduct.price = createMerchantProductDto.price;
+        merchantProduct.actualPrice = createMerchantProductDto.actualPrice;
+        merchantProduct.summary = createMerchantProductDto.summary;
+        merchantProduct.quantity = createMerchantProductDto.quantity;
+        merchantProduct.pImages = createMerchantProductDto.images;
         merchantProduct.description = createMerchantProductDto.description;
-        merchantProduct.imagePath = createMerchantProductDto.imagePath;
-        merchantProduct.imageMime = createMerchantProductDto.imageMime;
+        merchantProduct.category = createMerchantProductDto.category;
         merchantProduct.merchant = merchant;
 
 
-        return await this.merchantProductRepository.save(merchantProduct);
+        let savedProduct = await this.merchantProductRepository.save(merchantProduct);
+
+        // let { id, promoterFname, promoterLname,  } = savedProduct.merchant;
+        // savedProduct = {
+        //     ...savedProduct,
+        //     merchant: {
+        //         id, promoterFname, promoterLname
+        //     }
+        // }
+
+        return savedProduct;
     }
 
-    async findAll(): Promise<MerchantProduct[]> {
-        return await this.merchantProductRepository.find();
+    appendProductUrl(productImages: ProductImageDto[], baseUrl: string): ProductImageDto[] {
+
+        const npImages = productImages.map((np) => {
+            const updatedImage = { ...np };
+
+            updatedImage.imgUrl = baseUrl + np.name;
+
+            return updatedImage;
+        })
+
+        return npImages;
+
     }
 
-    async findOne(id: number): Promise<MerchantProduct> {
-        return await this.merchantProductRepository.findOne({
+    async findAll(baseUrl: string): Promise<GetProductDto[]> {
+        let products = await this.merchantProductRepository.find();
+
+        if (!products)
+            throw new Error("No Products to Show")
+
+        const updatedProducts = products.map((product) => {
+            const newProduct = { ...product };
+
+            if (newProduct.pImages && newProduct.pImages.length > 0) {
+                const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+
+                const npImages = updatedProductImages;
+
+                newProduct.pImages = npImages;
+            }
+
+            return newProduct;
+        })
+
+
+        return updatedProducts;
+    }
+
+    async findByMerchantId(mid: string, baseUrl: string): Promise<MerchantProduct[]> {
+        let products = await this.merchantProductRepository.find({
+            where: {
+                merchant: {
+                    id: mid
+                }
+            },
+        });
+
+        if (!products)
+            throw new Error("No Products to Show")
+
+        const updatedProducts = products.map((product) => {
+            const newProduct = { ...product };
+
+            if (newProduct.pImages && newProduct.pImages.length > 0) {
+                const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+
+                const npImages = updatedProductImages;
+
+                newProduct.pImages = npImages;
+            }
+
+            return newProduct;
+        })
+
+
+        return updatedProducts;
+    }
+
+    async findByMerchantIdWithinRange(mid: string, baseUrl: string, amount: number): Promise<MerchantProduct[]> {
+        let products = await this.merchantProductRepository.find({
+            where: {
+                merchant: {
+                    id: mid
+                },
+                price: LessThanOrEqual(amount)
+            },
+        });
+
+        if (!products)
+            throw new Error("No Products to Show")
+
+        const updatedProducts = await products.map((product) => {
+            const newProduct = { ...product };
+
+            if (newProduct.pImages && newProduct.pImages.length > 0) {
+                const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+
+                const npImages = updatedProductImages;
+
+                newProduct.pImages = npImages;
+            }
+
+            return newProduct;
+        })
+
+
+        return updatedProducts;
+
+    }
+
+    async findOne(id: number, baseUrl: string): Promise<MerchantProduct> {
+        let product = await this.merchantProductRepository.findOne({
             where: { id: id }
         });
+
+        if (!product)
+            throw new Error("No Product with ID: " + id);
+
+        if (product.pImages && product.pImages.length > 0) {
+
+            const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+
+            const npImages = updatedProductImages;
+
+            product.pImages = npImages;
+        }
+
+        return product;
     }
 
     async update(id: number, updateMerchantProductDto: UpdateMerchantProductDto): Promise<MerchantProduct> {
@@ -60,11 +211,34 @@ export class MerchantProductService {
         if (!merchantProduct)
             throw new Error('Product not found!!')
 
+        // console.log('HH: ', merchantProduct.pImages);
+
+        // console.log('HO: ', updateMerchantProductDto.images);
+
+        if (updateMerchantProductDto.existingImageString && merchantProduct.pImages && merchantProduct.pImages.length > 0) {
+            let existingImgs: LoadImageUrl[] = JSON.parse(updateMerchantProductDto.existingImageString);
+
+            // console.log('HI: ', existingImgs);
+
+            merchantProduct.pImages = merchantProduct.pImages.filter((object) =>
+                existingImgs.some((otherObject) => otherObject.name === object.name)
+            );
+
+            // console.log('HF: ', merchantProduct.pImages);
+
+            updateMerchantProductDto.images = merchantProduct.pImages.concat(updateMerchantProductDto.images);
+        }
+
         merchantProduct.item = updateMerchantProductDto.item || merchantProduct.item;
         merchantProduct.price = updateMerchantProductDto.price || merchantProduct.price;
         merchantProduct.description = updateMerchantProductDto.description || merchantProduct.description;
-        merchantProduct.imagePath = updateMerchantProductDto.imagePath || merchantProduct.imagePath;
-        merchantProduct.imageMime = updateMerchantProductDto.imageMime || merchantProduct.imageMime;
+
+        merchantProduct.actualPrice = updateMerchantProductDto.actualPrice || merchantProduct.actualPrice;
+        merchantProduct.summary = updateMerchantProductDto.summary || merchantProduct.summary;
+        merchantProduct.quantity = updateMerchantProductDto.quantity || merchantProduct.quantity;
+        merchantProduct.pImages = updateMerchantProductDto.images || merchantProduct.pImages;
+        merchantProduct.description = updateMerchantProductDto.description || merchantProduct.description;
+        merchantProduct.category = updateMerchantProductDto.category || merchantProduct.category;
 
         return await this.merchantProductRepository.save(merchantProduct);
     }
@@ -88,26 +262,7 @@ export class MerchantProductService {
         await this.merchantProductRepository.delete(id);
     }
 
-    async findByMerchantId(mid: number): Promise<MerchantProduct[]> {
-        return await this.merchantProductRepository.find({
-            where: {
-                merchant: {
-                    systemId: mid
-                }
-            },
-        });
-    }
 
-    async findByMerchantIdWithinRange(mid: number, amount: number): Promise<MerchantProduct[]> {
-        return await this.merchantProductRepository.find({
-            where: {
-                merchant: {
-                    systemId: mid
-                },
-                price: LessThanOrEqual(amount)
-            },
-        });
-    }
 
 
 }

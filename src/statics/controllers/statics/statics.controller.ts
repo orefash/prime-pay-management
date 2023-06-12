@@ -20,6 +20,12 @@ export class StaticsController {
         return await this.staticsService.getServiceTypes();
     }
 
+    @Get('product-categories')
+    // @UseGuards(JwtAuthenticationGuard)
+    async getProductCategories() {
+        return await this.staticsService.getProductCategories();
+    }
+
     @Get('nigeria-states')
     // @UseGuards(JwtAuthenticationGuard)
     async getNigeriaStatesData() {

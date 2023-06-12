@@ -286,7 +286,6 @@ export class MerchantsService {
         const destination = this.configService.get<string>('DOCKER_UPLOAD_DIR');
 
         return path.join(destination, fileName);
-
     }
 
     async getMerchantIdentification(merchantId: string) {

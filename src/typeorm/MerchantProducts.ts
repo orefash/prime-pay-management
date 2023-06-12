@@ -1,5 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Merchant } from './Merchant';
+import { MerchantProductImage } from './MerchantProductImages';
+import { ProductImageDto } from 'src/merchant-product/dto/Upload.dto';
 
 @Entity()
 export class MerchantProduct {
@@ -12,8 +14,6 @@ export class MerchantProduct {
     })
     item: string;
 
-   
-
     @Column({
         nullable: false,
     })
@@ -22,17 +22,39 @@ export class MerchantProduct {
     @Column({
         nullable: true,
     })
+    actualPrice: number;
+
+    @Column({
+        nullable: true,
+    })
+    quantity: number;
+
+    @Column({
+        nullable: true,
+    })
     description: string;
 
     @Column({
-        nullable: true,
+        nullable: false,
     })
-    imagePath: string;
+    summary: string;
 
     @Column({
-        nullable: true,
+        nullable: false,
     })
-    imageMime: string;
+    category: string;
+
+    // @Column({
+    //     nullable: true,
+    // })
+    // imageMime: string;
+
+    // Define the relationship with images
+    // @OneToMany(() => MerchantProductImage, image => image.product, { cascade: true })
+    // images: MerchantProductImage[];
+
+    @Column('jsonb', { nullable: true })
+    pImages: ProductImageDto[];
 
     @ManyToOne(() => Merchant, merchant => merchant.products)
     merchant: Merchant;
@@ -42,6 +64,12 @@ export class MerchantProduct {
         default: true
     })
     isActive: boolean;
+
+    @Column({
+        nullable: false,
+        default: true
+    })
+    isVerified: boolean;
 
 
     @CreateDateColumn({
