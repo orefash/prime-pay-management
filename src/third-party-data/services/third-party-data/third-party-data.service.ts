@@ -65,7 +65,7 @@ export class ThirdPartyDataService {
                                 "amount": payMerchantDto.amount,
                                 "tenor": payMerchantDto.loanTenor,
                                 "vendor": payMerchantDto.mid,
-                                "rfCode": "",
+                                "rfCode": payMerchantDto.refCode,
                                 "Desc": payMerchantDto.description
                             }
                         ]

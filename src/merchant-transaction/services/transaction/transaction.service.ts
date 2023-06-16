@@ -27,7 +27,7 @@ export class TransactionService {
 
         let PPAY_STATUS = this.configService.get<number>('PPAY');
 
-        // console.log("pp", PPAY_STATUS)
+        console.log("in ct service - pp", PPAY_STATUS)
 
         if(PPAY_STATUS == 0){
             let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)

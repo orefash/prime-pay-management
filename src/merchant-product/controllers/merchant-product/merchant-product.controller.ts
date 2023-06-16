@@ -57,7 +57,7 @@ export class MerchantProductController {
 
       createProductDto.images = fileList;
 
-      console.log('data: ', createProductDto)
+      // console.log('data: ', createProductDto)
 
       return await this.merchantProductService.createProducts(createProductDto);
     } catch (error) {

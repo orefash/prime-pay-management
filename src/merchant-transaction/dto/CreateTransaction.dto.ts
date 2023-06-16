@@ -53,6 +53,10 @@ export class CreateTransactionDto {
     loanTenor: number;
 
     @IsString()
+    @IsOptional()
+    refCode: string;
+
+    @IsString()
     @IsNotEmpty()
     customerName: string;
 
