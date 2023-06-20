@@ -66,14 +66,17 @@ export class MerchantProductController {
   }
 
 
-
-
   @Get()
   async findAll(@Req() req): Promise<MerchantProduct[]> {
 
-    const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
+    try {
+      const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
-    return await this.merchantProductService.findAll(baseUrl);
+      return await this.merchantProductService.findAll(baseUrl);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+
   }
 
 
@@ -81,15 +84,20 @@ export class MerchantProductController {
   @Get('merchant/:id')
   async findByMerchantId(@Req() req, @Param('id') id: string): Promise<MerchantProduct[]> {
 
-    const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
+    try {
+      const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
-    const products = await this.merchantProductService.findByMerchantId(id, baseUrl);
+      const products = await this.merchantProductService.findByMerchantId(id, baseUrl);
 
-    if (products.length === 0) {
-      throw new NotFoundException(`No products found for merchant with id ${id}`);
+      if (products.length === 0) {
+        throw new NotFoundException(`No products found for merchant with id ${id}`);
+      }
+
+      return products;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
 
-    return products;
   }
 
   @Get('merchant/:id/within-range/:amount')
@@ -99,16 +107,22 @@ export class MerchantProductController {
     @Param('amount', ParseIntPipe) amount: number,
   ): Promise<MerchantProduct[]> {
 
-    const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
+
+    try {
+      const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
 
-    const products = await this.merchantProductService.findByMerchantIdWithinRange(id, baseUrl, amount);
+      const products = await this.merchantProductService.findByMerchantIdWithinRange(id, baseUrl, amount);
 
-    if (products.length === 0) {
-      throw new NotFoundException(`No products found for merchant with id ${id} within price range of ${amount}`);
+      if (products.length === 0) {
+        throw new NotFoundException(`No products found for merchant with id ${id} within price range of ${amount}`);
+      }
+
+      return products;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
 
-    return products;
   }
 
 
@@ -116,15 +130,20 @@ export class MerchantProductController {
   @Get(':id')
   async findOne(@Req() req, @Param('id', ParseIntPipe) id: number): Promise<MerchantProduct> {
 
-    const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
+    try {
+      const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
-    const product = await this.merchantProductService.findOne(id, baseUrl);
+      const product = await this.merchantProductService.findOne(id, baseUrl);
 
-    if (!product) {
-      throw new NotFoundException(`Product with id ${id} not found`);
+      if (!product) {
+        throw new NotFoundException(`Product with id ${id} not found`);
+      }
+
+      return product;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
 
-    return product;
   }
 
 
@@ -158,8 +177,6 @@ export class MerchantProductController {
     // console.log('edit body: ', editProductDto)
 
     try {
-
-
       let fileList: ProductImageDto[] = [];
 
       for (const file of files) {
@@ -173,7 +190,7 @@ export class MerchantProductController {
 
       editProductDto.images = fileList;
 
-      console.log('edit data images: ', editProductDto)
+      // console.log('edit data images: ', editProductDto)
 
       return await this.merchantProductService.update(id, editProductDto);
     } catch (error) {
@@ -192,8 +209,14 @@ export class MerchantProductController {
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.merchantProductService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<any> {
+    try {
+      const deleted = await this.merchantProductService.remove(id);
+      return { deleted: deleted }
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+    
   }
 
 }

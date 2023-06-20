@@ -2,6 +2,7 @@ import { Address } from "src/types/address.interface";
 import { Socials } from "src/types/socials.interface";
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { MerchantProduct } from "./MerchantProducts";
+import { MerchantPayout } from "./MerchantPayout";
 
 @Entity()
 @Unique(['email', 'accountNo',])
@@ -15,6 +16,21 @@ export class Merchant {
         default: -99
     })
     systemId: number;
+
+
+    @Column({
+        nullable: false,
+        default: 0
+    })
+    availableBalance: number;
+
+
+    @Column({
+        nullable: false,
+        default: 0
+    })
+    actualBalance: number;
+
 
     @Column({
         nullable: false,
@@ -191,7 +207,7 @@ export class Merchant {
     })
     modifiedDate: Date;
 
-    // @OneToMany( type => MerchantTransaction , transaction => transaction.merchant)
-    // transactions: MerchantTransaction[];
+    @OneToMany( type => MerchantPayout , payout => payout.merchant)
+    payouts: MerchantPayout[];
 
 }

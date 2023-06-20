@@ -5,3 +5,4 @@ export interface LoadImageUrl {
     name: string;
 
 }
+

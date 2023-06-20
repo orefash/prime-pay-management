@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateMerchantProductsDto } from 'src/merchant-product/dto/CreateProducts.dto';
 import { UpdateMerchantProductDto } from 'src/merchant-product/dto/UpdateProduct.dto';
@@ -202,45 +202,54 @@ export class MerchantProductService {
     }
 
     async update(id: number, updateMerchantProductDto: UpdateMerchantProductDto): Promise<MerchantProduct> {
-        const merchantProduct = await this.merchantProductRepository.findOne({
-            where: {
-                id: id
+        
+        // try{
+
+            const merchantProduct = await this.merchantProductRepository.findOne({
+                where: {
+                    id: id
+                }
+            });
+    
+            if (!merchantProduct)
+                throw new Error('Product not found!!')
+    
+            // console.log('HH: ', merchantProduct.pImages);
+    
+            // console.log('HO: ', updateMerchantProductDto.images);
+    
+            if (updateMerchantProductDto.existingImageString && merchantProduct.pImages && merchantProduct.pImages.length > 0) {
+                let existingImgs: LoadImageUrl[] = JSON.parse(updateMerchantProductDto.existingImageString);
+    
+                // console.log('HI: ', existingImgs);
+    
+                merchantProduct.pImages = merchantProduct.pImages.filter((object) =>
+                    existingImgs.some((otherObject) => otherObject.name === object.name)
+                );
+    
+                // console.log('HF: ', merchantProduct.pImages);
+    
+                updateMerchantProductDto.images = merchantProduct.pImages.concat(updateMerchantProductDto.images);
             }
-        });
+    
+            merchantProduct.item = updateMerchantProductDto.item || merchantProduct.item;
+            merchantProduct.price = updateMerchantProductDto.price || merchantProduct.price;
+            merchantProduct.description = updateMerchantProductDto.description || merchantProduct.description;
+    
+            merchantProduct.actualPrice = updateMerchantProductDto.actualPrice || merchantProduct.actualPrice;
+            merchantProduct.summary = updateMerchantProductDto.summary || merchantProduct.summary;
+            merchantProduct.quantity = updateMerchantProductDto.quantity || merchantProduct.quantity;
+            merchantProduct.pImages = updateMerchantProductDto.images || merchantProduct.pImages;
+            merchantProduct.description = updateMerchantProductDto.description || merchantProduct.description;
+            merchantProduct.category = updateMerchantProductDto.category || merchantProduct.category;
+    
+            return await this.merchantProductRepository.save(merchantProduct);
 
-        if (!merchantProduct)
-            throw new Error('Product not found!!')
-
-        // console.log('HH: ', merchantProduct.pImages);
-
-        // console.log('HO: ', updateMerchantProductDto.images);
-
-        if (updateMerchantProductDto.existingImageString && merchantProduct.pImages && merchantProduct.pImages.length > 0) {
-            let existingImgs: LoadImageUrl[] = JSON.parse(updateMerchantProductDto.existingImageString);
-
-            // console.log('HI: ', existingImgs);
-
-            merchantProduct.pImages = merchantProduct.pImages.filter((object) =>
-                existingImgs.some((otherObject) => otherObject.name === object.name)
-            );
-
-            // console.log('HF: ', merchantProduct.pImages);
-
-            updateMerchantProductDto.images = merchantProduct.pImages.concat(updateMerchantProductDto.images);
-        }
-
-        merchantProduct.item = updateMerchantProductDto.item || merchantProduct.item;
-        merchantProduct.price = updateMerchantProductDto.price || merchantProduct.price;
-        merchantProduct.description = updateMerchantProductDto.description || merchantProduct.description;
-
-        merchantProduct.actualPrice = updateMerchantProductDto.actualPrice || merchantProduct.actualPrice;
-        merchantProduct.summary = updateMerchantProductDto.summary || merchantProduct.summary;
-        merchantProduct.quantity = updateMerchantProductDto.quantity || merchantProduct.quantity;
-        merchantProduct.pImages = updateMerchantProductDto.images || merchantProduct.pImages;
-        merchantProduct.description = updateMerchantProductDto.description || merchantProduct.description;
-        merchantProduct.category = updateMerchantProductDto.category || merchantProduct.category;
-
-        return await this.merchantProductRepository.save(merchantProduct);
+        // }catch(error){
+            
+        //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        // }
+        
     }
 
     async toggleActive(id: number): Promise<MerchantProduct> {
@@ -258,8 +267,13 @@ export class MerchantProductService {
         return await this.merchantProductRepository.save(merchantProduct);
     }
 
-    async remove(id: number): Promise<void> {
-        await this.merchantProductRepository.delete(id);
+    async remove(id: number): Promise<boolean> {
+        
+        const val = await this.merchantProductRepository.delete(id);
+        if(val.affected != 1){
+            throw new Error('Product not found!!')
+        }
+        return true
     }
 
 
