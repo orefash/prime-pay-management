@@ -18,6 +18,7 @@ async function bootstrap() {
       'https://prim-pay-merchant.netlify.app',
       'http://localhost:5173',
       'http://localhost:3001',
+      'http://127.0.0.1:3001',
       'https://uat.prime-pay.africa',
       'http://uat.prime-pay.africa',
     ],
