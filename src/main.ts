@@ -21,6 +21,7 @@ async function bootstrap() {
       'http://127.0.0.1:3001',
       'https://uat.prime-pay.africa',
       'http://uat.prime-pay.africa',
+      'https://www.uat.prime-pay.africa'
     ],
     // methods: ["GET", "POST"],
     credentials: true,
