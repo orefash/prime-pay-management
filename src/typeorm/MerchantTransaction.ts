@@ -26,9 +26,14 @@ export class MerchantTransaction {
 
     @Column({
         nullable: false,
-        default: '₦'
+        default: '₦GN'
     })
     currency: string;
+
+    @Column({
+        nullable: true,
+    })
+    merchantReference: string;
 
     @Column({
         nullable: true,
