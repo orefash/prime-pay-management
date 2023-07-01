@@ -8,5 +8,5 @@ export interface mCustomer {
 
     email?: string;
 
-    ippis?: number;
+    ippis?: string;
 }

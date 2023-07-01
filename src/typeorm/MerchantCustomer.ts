@@ -32,7 +32,7 @@ export class MerchantCustomer {
     @Column({
         nullable: true,
     })
-    ippis: number;
+    ippis: string;
 
     @CreateDateColumn({
         nullable: false,
