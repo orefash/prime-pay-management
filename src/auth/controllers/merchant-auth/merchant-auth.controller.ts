@@ -32,9 +32,11 @@ export class MerchantAuthController {
         const token = this.merchantAuthService.getJwtToken(merchant.id);
         merchant.password = undefined;
 
-        const logoUrl = `${request.protocol}://${request.headers.host}/api/merchants/${merchant.id}/logo`;
+        if(merchant.logoUrl){
+            const logoUrl = `${request.protocol}://${request.headers.host}/api/merchants/${merchant.id}/logo`;
 
-        merchant.logoUrl = logoUrl;
+            merchant.logoUrl = logoUrl;
+        }
         
         return response.send({ merchant, token });
     }

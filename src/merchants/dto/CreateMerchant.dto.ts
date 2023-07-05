@@ -31,7 +31,7 @@ export class CreateMerchantDto {
     @IsNotEmpty()
     isRegistered: boolean;
 
-    @ValidateIf((object, value) => value.trim() !== '')
+    // @ValidateIf((object, value) => value.trim() !== '')
     @IsNumberString()
     @Length(11)
     @MaxLength(11)
