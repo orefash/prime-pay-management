@@ -46,7 +46,14 @@ export class MerchantKey {
     })
     test_private_key: string;
 
-    @OneToOne(() => Merchant)
+    // @OneToOne(() => Merchant)
+    // @JoinColumn()
+    // merchant: Merchant
+
+    // @OneToOne(type => Merchant, merchant => merchant.keys)
+    // merchant: Merchant
+
+    @OneToOne(() => Merchant, (merchant: Merchant) => merchant.keys, { cascade: true })
     @JoinColumn()
     merchant: Merchant
 

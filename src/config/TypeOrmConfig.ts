@@ -22,6 +22,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             database: isDevelopment? this.configService.get('POSTGRES_DB_DEV') : this.configService.get('POSTGRES_DB'),
             entities: entities,
             synchronize: this.configService.get<boolean>('DB_SYNC'),
+            // lazyRelations: true,
         }
     }
 }

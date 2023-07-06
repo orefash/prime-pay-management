@@ -1,8 +1,9 @@
 import { Address } from "src/types/address.interface";
 import { Socials } from "src/types/socials.interface";
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { MerchantProduct } from "./MerchantProducts";
 import { MerchantPayout } from "./MerchantPayout";
+import { MerchantKey } from "./Keys";
 
 @Entity()
 @Unique(['email', 'accountNo',])
@@ -209,5 +210,8 @@ export class Merchant {
 
     @OneToMany( type => MerchantPayout , payout => payout.merchant)
     payouts: MerchantPayout[];
+
+    @OneToOne(type => MerchantKey, key => key.merchant)
+    keys: MerchantKey;
 
 }

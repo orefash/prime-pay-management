@@ -1,8 +1,9 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { KeyFindResponse } from 'src/keys/types/KeyFindResponse';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
 import { Merchant, MerchantKey } from 'src/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Like, Repository, getConnection } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -10,23 +11,25 @@ export class KeysService {
     constructor(
         @InjectRepository(MerchantKey)
         private merchantKeyRepository: Repository<MerchantKey>,
+        @InjectRepository(Merchant)
+        private readonly merchantRepository: Repository<Merchant>,
         // @Inject(forwardRef(() => MerchantsService)) 
         // private readonly merchantService: MerchantsService
     ) { }
 
-    generateKey(isLive: boolean, isPub: boolean):string {
+    generateKey(isLive: boolean, isPub: boolean): string {
 
         // console.log(`islive: ${isLive} |  isPub: ${isPub}`)
         let uniqueKey = uuidv4({ nodash: true }).replace(/-/g, '');
 
         let init = 'prm';
 
-        if(isPub)
+        if (isPub)
             init = init + '_pubk';
         else
             init = init + '_prvk';
 
-        if(isLive)
+        if (isLive)
             init = init + '_live_'
         else
             init = init + '_test_'
@@ -38,22 +41,54 @@ export class KeysService {
 
 
 
-    async create(merchant: Merchant): Promise<MerchantKey> {
+    async createMerchantKey(merchant: Merchant): Promise<Merchant> {
         try {
 
-            let merchantKeyData = {
-                merchant: merchant,
-                live_private_key: this.generateKey(true, false),
-                live_public_key: this.generateKey(true, true),
-                test_private_key: this.generateKey(false, false),
-                test_public_key: this.generateKey(false, true)
-            }
+            const key = new MerchantKey();
+            key.live_private_key = this.generateKey(true, false);
+            key.live_public_key = this.generateKey(true, true);
+            key.test_private_key = this.generateKey(false, false);
+            key.test_public_key = this.generateKey(false, true);
 
-            return await this.merchantKeyRepository.save(merchantKeyData);
+
+            // let merchantKeyData = {
+            //     merchant: merchant,
+            //     live_private_key: this.generateKey(true, false),
+            //     live_public_key: this.generateKey(true, true),
+            //     test_private_key: this.generateKey(false, false),
+            //     test_public_key: this.generateKey(false, true)
+            // }
+
+            // merchant.keys = key;
+
+
+
+            let createdMerchant = await this.merchantRepository.save(merchant);
+            key.merchant = createdMerchant;
+            await this.merchantKeyRepository.save(key);
+
+            return createdMerchant;
         } catch (err) {
             throw new Error(`Error creating merchant key: ${err.message}`);
         }
     }
+
+    // async create(merchant: Merchant): Promise<MerchantKey> {
+    //     try {
+
+    //         let merchantKeyData = {
+    //             merchant: merchant,
+    //             live_private_key: this.generateKey(true, false),
+    //             live_public_key: this.generateKey(true, true),
+    //             test_private_key: this.generateKey(false, false),
+    //             test_public_key: this.generateKey(false, true)
+    //         }
+
+    //         return await this.merchantKeyRepository.save(merchantKeyData);
+    //     } catch (err) {
+    //         throw new Error(`Error creating merchant key: ${err.message}`);
+    //     }
+    // }
 
     async findAll(): Promise<MerchantKey[]> {
         try {
@@ -79,6 +114,7 @@ export class KeysService {
 
     async findByMerchant(MerchantId: string): Promise<MerchantKey> {
         try {
+            console.log("ID: ", MerchantId);
             const merchantKey = await this.merchantKeyRepository.findOne({
                 where: { merchant: { id: MerchantId } },
             });
@@ -88,6 +124,44 @@ export class KeysService {
             return merchantKey;
         } catch (err) {
             throw new Error(`Error retrieving merchant key: ${err.message}`);
+        }
+    }
+
+
+    async findByKey(publicKey: string): Promise<Partial<KeyFindResponse>> {
+        try {
+
+            const merchantKey = await this.merchantKeyRepository.findOne({
+                where: [
+                    { live_public_key: publicKey },
+                    { test_public_key: publicKey },
+                ],
+                relations: ['merchant'],
+            });
+
+            if (!merchantKey || !merchantKey.merchant) {
+                throw new Error(`Merchant key is Invalid`);
+            }
+
+            let isLive = false;
+            if (merchantKey.live_public_key === publicKey){
+                isLive = true;
+                if(!merchantKey.isLiveActive)
+                    throw new Error('Key is not Active')
+            }else{
+                if(!merchantKey.isTestActive)
+                    throw new Error('Key is not Active')
+            }
+                
+
+            let { systemId, name } = merchantKey.merchant;
+
+            let responseData = {
+                isLive, systemId, name
+            }
+            return responseData;
+        } catch (err) {
+            throw new Error(`${err.message}`);
         }
     }
 
@@ -103,18 +177,18 @@ export class KeysService {
 
     async resetKeys(mid: string, isLive: boolean): Promise<MerchantKey> {
         try {
-      
+
             let updateData: Partial<MerchantKey> = {}
-            if(isLive === true){
+            if (isLive === true) {
                 updateData.live_private_key = this.generateKey(true, false);
                 updateData.live_public_key = this.generateKey(true, true);
-            }else{
+            } else {
                 updateData.test_private_key = this.generateKey(false, false);
                 updateData.test_public_key = this.generateKey(false, true);
             }
 
             // console.log(`reset:  isupd: ${JSON.stringify(updateData)} | islive: ${isLive}  | type: ${typeof(isLive)}`)
-           
+
 
             // console.log('upd: ', updateData)
             await this.merchantKeyRepository.update({
@@ -130,15 +204,15 @@ export class KeysService {
         try {
             const keyData: MerchantKey = await this.findByMerchant(mid);
             let updateData: Partial<MerchantKey> = {}
-            if(isLive == true){
+            if (isLive == true) {
                 // console.log('in islive')
                 updateData.isLiveActive = !keyData.isLiveActive;
-            }else{
+            } else {
                 updateData.isTestActive = !keyData.isTestActive;
             }
-            
+
             // console.log(`isupd: ${JSON.stringify(updateData)} | islive: ${isLive}  | type: ${typeof(isLive)}`)
-            
+
             await this.merchantKeyRepository.update({
                 merchant: { id: mid }
             }, updateData);

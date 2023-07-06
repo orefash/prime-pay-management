@@ -5,14 +5,14 @@ import { MerchantsModule } from 'src/merchants/merchants.module';
 import { KeysModule } from 'src/keys/keys.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Merchant } from 'src/typeorm';
+import { Merchant, MerchantKey } from 'src/typeorm';
 
 @Module({
   imports: [
     MerchantsModule,
     KeysModule,
     ConfigModule,
-    TypeOrmModule.forFeature([Merchant]),
+    TypeOrmModule.forFeature([Merchant, MerchantKey]),
   ],
   providers: [
     MerchantKeyCreatorService
