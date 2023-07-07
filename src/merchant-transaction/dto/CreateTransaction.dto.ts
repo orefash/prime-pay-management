@@ -44,7 +44,7 @@ export class CreateTransactionDto {
     @IsNotEmpty()
     ippis: string;
 
-    @IsNumberString()
+    @IsNumber()
     @IsNotEmpty()
     mid: number;
 
@@ -61,8 +61,13 @@ export class CreateTransactionDto {
     customerName: string;
 
     @IsString()
-    @MinLength(10)
+    // @MinLength(10)
     @IsNotEmpty()
     customerPhone: string;
+
+    @IsString()
+    // @IsEm(10)
+    @IsOptional()
+    customerEmail: string;
 
 }

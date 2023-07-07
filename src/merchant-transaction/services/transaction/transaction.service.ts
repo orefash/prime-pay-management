@@ -39,7 +39,8 @@ export class TransactionService {
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
             phone: createTransactionDto.customerPhone,
-            ippis: createTransactionDto.ippis
+            ippis: createTransactionDto.ippis,
+            email: createTransactionDto.customerEmail
         }
 
         const savedCustomer = await this.customerService.createCustomer(customerData);
