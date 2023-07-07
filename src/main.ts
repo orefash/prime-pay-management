@@ -20,6 +20,7 @@ async function bootstrap() {
       'http://localhost:3001',
       'http://127.0.0.1:3001',
       'http://127.0.0.1:5500',
+      'http://127.0.0.1:5502',
       'https://uat.prime-pay.africa',
       'http://uat.prime-pay.africa',
       'https://www.uat.prime-pay.africa'
