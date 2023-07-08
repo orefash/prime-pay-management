@@ -16,13 +16,13 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'https://prim-pay-merchant.netlify.app',
-      'http://localhost:5173',
-      'http://localhost:3001',
-      'http://127.0.0.1:3001',
-      'http://127.0.0.1:5500',
-      'http://127.0.0.1:5502',
+      // 'http://localhost:5173',
+      // 'http://localhost:3001',
+      // 'http://127.0.0.1:3001',
+      // 'http://127.0.0.1:5500',
+      // 'http://127.0.0.1:5502',
+      'https://checkout.prime-pay.africa',
       'https://uat.prime-pay.africa',
-      'http://uat.prime-pay.africa',
       'https://www.uat.prime-pay.africa'
     ],
     // methods: ["GET", "POST"],
