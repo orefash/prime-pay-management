@@ -36,6 +36,12 @@ export class MerchantTransaction {
     merchantReference: string;
 
     @Column({
+        nullable: false,
+        default: false
+    })
+    isTest: boolean;
+
+    @Column({
         nullable: true,
     })
     orderChannel: string;
