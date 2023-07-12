@@ -9,6 +9,7 @@ import { Merchant, MerchantPayout } from 'src/typeorm';
     TypeOrmModule.forFeature([MerchantPayout, Merchant]),
   ],
   providers: [MerchantPayoutService],
-  controllers: [MerchantPayoutController]
+  controllers: [MerchantPayoutController],
+  exports: [MerchantPayoutService]
 })
 export class MerchantPayoutModule {}

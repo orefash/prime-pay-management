@@ -7,12 +7,14 @@ import { MerchantCustomerModule } from 'src/merchant-customer/merchant-customer.
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThirdPartyDataModule } from 'src/third-party-data/third-party-data.module';
+import { MerchantPayoutModule } from 'src/merchant-payout/merchant-payout.module';
 
 @Module({
   imports: [
     MerchantCustomerModule,
     TypeOrmModule.forFeature([MerchantTransaction]),
-    ThirdPartyDataModule
+    ThirdPartyDataModule,
+    MerchantPayoutModule
   ],
   providers: [
     {
@@ -20,6 +22,9 @@ import { ThirdPartyDataModule } from 'src/third-party-data/third-party-data.modu
       useClass: TransactionService,
     }
   ],
-  controllers: [TransactionController]
+  controllers: [TransactionController],
+  // exports: [
+  //   TransactionService
+  // ],
 })
 export class MerchantTransactionModule {}
