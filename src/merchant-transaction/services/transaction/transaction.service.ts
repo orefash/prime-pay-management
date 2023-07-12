@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerService } from 'src/merchant-customer/services/customer/customer.service';
+import { MerchantPayoutService } from 'src/merchant-payout/services/merchant-payout/merchant-payout.service';
 import { CreateTransactionDto, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { MerchantTransaction as TransactionEntity } from 'src/typeorm';
@@ -17,6 +18,8 @@ export class TransactionService {
             private readonly transactionRepository: Repository<TransactionEntity>,
             @Inject(CustomerService)
             private readonly customerService: CustomerService,
+            @Inject(MerchantPayoutService)
+            private readonly payoutService: MerchantPayoutService,
             @Inject(ThirdPartyDataService)
             private readonly thirdPartyService: ThirdPartyDataService,
             @Inject(ConfigService)
