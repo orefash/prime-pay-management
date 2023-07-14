@@ -5,8 +5,8 @@ import { PayoutChannels } from "../statics/PayoutChannels";
 
 export enum PTransactionStatus {
     PENDING = 'Pending',
-    DELIVERED = 'Delivered',
-    CONFIRMED = 'Confirmed'
+    FAILED = 'Failed',
+    COMPLETED = 'Completed'
 }
 
 

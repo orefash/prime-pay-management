@@ -21,6 +21,8 @@ async function bootstrap() {
       // 'http://127.0.0.1:3001',
       // 'http://127.0.0.1:5500',
       // 'http://127.0.0.1:5502',
+      'https://uat.merchant.prime-pay.africa',
+      'https://www.uat.merchant.prime-pay.africa',
       'http://127.0.0.1:5173',
       'https://checkout.prime-pay.africa',
       'https://uat.prime-pay.africa',

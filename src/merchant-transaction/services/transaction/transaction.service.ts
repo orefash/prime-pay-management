@@ -2,7 +2,9 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerService } from 'src/merchant-customer/services/customer/customer.service';
+import { CreatePayoutDto, PTransactionStatus } from 'src/merchant-payout/dto/CreatePayoutTransaction.dto';
 import { MerchantPayoutService } from 'src/merchant-payout/services/merchant-payout/merchant-payout.service';
+import { PayoutChannels } from 'src/merchant-payout/statics/PayoutChannels';
 import { CreateTransactionDto, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { MerchantTransaction as TransactionEntity } from 'src/typeorm';
@@ -145,6 +147,14 @@ export class TransactionService {
         });
 
         if (updatedTransaction) {
+            // let payout: CreatePayoutDto =  {
+            //     amount: updatedTransaction.amount,
+            //     status: PTransactionStatus.COMPLETED,
+            //     channel: PayoutChannels.INFLOW,
+            //     isWithdraw: false,
+            //     currency: 'NGN',
+
+            // }
             return updatedTransaction
         }
 
