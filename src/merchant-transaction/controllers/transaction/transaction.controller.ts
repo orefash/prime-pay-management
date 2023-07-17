@@ -4,6 +4,7 @@ import { CreateTransactionDto } from 'src/merchant-transaction/dto/CreateTransac
 import { TransactionService } from 'src/merchant-transaction/services/transaction/transaction.service';
 import RequestWithMerchant from 'src/auth/types/requestWithMerchant.interface';
 import { mTransaction } from 'src/types/mTransaction.interface';
+import { isValidDate } from 'src/utils/date-functions';
 
 @Controller('transactions')
 export class TransactionController {
@@ -11,7 +12,7 @@ export class TransactionController {
     constructor(
         @Inject('TRANSACTION_SERVICE')
         private readonly transactionService: TransactionService
-    ){}
+    ) { }
 
     @Post('create')
     @UsePipes(ValidationPipe)
@@ -27,7 +28,7 @@ export class TransactionController {
             console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        
+
     }
 
     @Post('create-demo')
@@ -40,7 +41,7 @@ export class TransactionController {
             console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        
+
     }
 
     @Post(':id/toggle-delivered')
@@ -53,7 +54,7 @@ export class TransactionController {
             console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        
+
     }
 
     @Post(':id/toggle-confirmed')
@@ -66,57 +67,63 @@ export class TransactionController {
             console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        
+
     }
 
-    // @Get('')
-    // @UseGuards(JwtAuthenticationGuard)
-    // getAllTransactions(@Req() request: RequestWithMerchant) {
-
-    //     return this.transactionService.getAllTransactions();
-    // }
 
     @Get('')
     @UseGuards(JwtAuthenticationGuard)
     async getAllTransactions(@Req() request: RequestWithMerchant, @Query() queryParams: any) {
 
         let whereConditions = {};
-        let searchQuery = null;
+        let searchQuery: string = null;
+        let pageNo: number = null;
+        let itemLimit: number = null;
 
-        if(queryParams.orderChannel){
+        if (queryParams.orderChannel) {
             whereConditions['orderChannel'] = queryParams.orderChannel;
         }
 
-        if(queryParams.isTest){
+        if (queryParams.isTest) {
             whereConditions['isTest'] = queryParams.isTest;
         }
 
-        if(queryParams.search){
+        if (queryParams.search) {
             searchQuery = queryParams.search;
         }
 
-        if(queryParams.status){
+        if (queryParams.status) {
             whereConditions['status'] = queryParams.status;
         }
 
-        console.log('sc: ', searchQuery)
-        console.log('wc: ', whereConditions)
+        if (queryParams.page && !isNaN(Number(queryParams.page))) {
+            // console.log("page: ", queryParams.page)
+            pageNo = Number(queryParams.page);
+        }
+
+        if (queryParams.limit && !isNaN(Number(queryParams.limit))) {
+            // console.log("limit: ", queryParams.limit)
+            itemLimit = Number(queryParams.limit);
+        }
+
+        let startDate = null;
+        let endDate = null;
+
+        if (queryParams.startDate && isValidDate(queryParams.startDate))
+            startDate = queryParams.startDate;
+
+        if (queryParams.endDate && isValidDate(queryParams.endDate))
+            endDate = queryParams.endDate;
+
+        console.log('st: ', startDate)
 
         try {
-            return await this.transactionService.findEntities(whereConditions, searchQuery);
+            return await this.transactionService.findEntities(whereConditions, searchQuery, pageNo, itemLimit, startDate, endDate);
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        
     }
-
-
-    // @Get('merchant/:mid')
-    // @UseGuards(JwtAuthenticationGuard)
-    // getMerchantTransactions(@Param('mid') mid: number) {
-    //     return this.transactionService.getMerchantTransactions(mid);
-    // }
 
 
     @Get('merchant/:mid')
@@ -128,29 +135,50 @@ export class TransactionController {
             mid: mid
         };
 
+        let pageNo: number = null;
+        let itemLimit: number = null;
+
         let searchQuery = null;
 
-        if(queryParams.orderChannel){
+        if (queryParams.orderChannel) {
             whereConditions['orderChannel'] = queryParams.orderChannel;
         }
 
-        if(queryParams.isTest){
+        if (queryParams.isTest) {
             whereConditions['isTest'] = queryParams.isTest;
         }
 
-        if(queryParams.search){
+        if (queryParams.search) {
             searchQuery = queryParams.search;
         }
 
-        if(queryParams.status){
+        if (queryParams.status) {
             whereConditions['status'] = queryParams.status;
         }
 
-        console.log('sc: ', searchQuery)
-        console.log('wc: ', whereConditions)
-        
+        if (queryParams.page && !isNaN(Number(queryParams.page))) {
+            // console.log("page: ", queryParams.page)
+            pageNo = Number(queryParams.page);
+        }
+
+        if (queryParams.limit && !isNaN(Number(queryParams.limit))) {
+            // console.log("limit: ", queryParams.limit)
+            itemLimit = Number(queryParams.limit);
+        }
+
+        let startDate = null;
+        let endDate = null;
+
+        if (queryParams.startDate && isValidDate(queryParams.startDate))
+            startDate = queryParams.startDate;
+
+        if (queryParams.endDate && isValidDate(queryParams.endDate))
+            endDate = queryParams.endDate;
+
+        console.log('st: ', startDate)
+
         try {
-            return await this.transactionService.findEntities(whereConditions, searchQuery);
+            return await this.transactionService.findEntities(whereConditions, searchQuery, pageNo, itemLimit, startDate, endDate);
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }

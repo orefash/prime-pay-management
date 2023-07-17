@@ -33,7 +33,7 @@ export class CustomerService {
     };
 
 
-    async getAllCustomersByMid(mid: number, isTest: boolean, searchQuery = null): Promise<MerchantCustomer[]> {
+    async getAllCustomersByMid(mid: number, isTest: boolean, searchQuery: string, pageNo: number, itemLimit: number, startDate: string, endDate: string): Promise<MerchantCustomer[]> {
 
         let customerData = this.transactionRepository
             .createQueryBuilder('merchant_transaction')
@@ -52,7 +52,35 @@ export class CustomerService {
                 .orWhere("merchant_customer.email ILIKE :email", { email: `%${searchQuery}%` });
         }
 
+        if (startDate && endDate) {
+            const startDateObject = new Date(startDate);
+            const endDateObject = new Date(endDate);
+            customerData.andWhere("merchant_customer.orderDate BETWEEN :startDate AND :endDate", {
+                startDate: startDateObject,
+                endDate: endDateObject,
+            });
+        } else if (startDate) {
+            // Only startDate is provided
+            console.log("Only startDate is provided")
+            const startDateObject = new Date(startDate);
+            customerData.andWhere("merchant_customer.orderDate >= :startDate", {
+                startDate: startDateObject,
+            });
+        } else if (endDate) {
+            // Only endDate is provided
+            const endDateObject = new Date(endDate);
+            customerData.andWhere("merchant_customer.orderDate <= :endDate", {
+                endDate: endDateObject,
+            });
+        }
+
         customerData.distinctOn(["merchant_transaction.customerId"]);
+
+        if (pageNo && itemLimit) {
+            console.log("in paginate")
+            const skipValue = (pageNo - 1) * itemLimit;
+            customerData = customerData.skip(skipValue).take(itemLimit);
+        }
 
         // console.log('Cust: ', customerData)
         return customerData.getRawMany();

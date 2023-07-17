@@ -111,11 +111,13 @@ export class TransactionService {
 
     async findEntities(
         whereConditions: Record<string, any>,
-        searchQuery: string
+        searchQuery: string,
+        pageNo: number,
+        itemLimit: number, startDate: string, endDate: string
         // orderBy: Record<string, 'ASC' | 'DESC'>,
     ): Promise<TransactionEntity[]> {
         const queryBuilder = this.transactionRepository.createQueryBuilder('merchant_transaction')
-        .leftJoinAndSelect('merchant_transaction.customer', 'customer');
+            .leftJoinAndSelect('merchant_transaction.customer', 'customer');
 
         // Add WHERE conditions dynamically
         Object.entries(whereConditions).forEach(([key, value]) => {
@@ -141,8 +143,35 @@ export class TransactionService {
             }
         }
 
+        if (startDate && endDate) {
+            const startDateObject = new Date(startDate);
+            const endDateObject = new Date(endDate);
+            queryBuilder.andWhere("merchant_transaction.orderDate BETWEEN :startDate AND :endDate", {
+                startDate: startDateObject,
+                endDate: endDateObject,
+            });
+        } else if (startDate) {
+            // Only startDate is provided
+            console.log("Only startDate is provided")
+            const startDateObject = new Date(startDate);
+            queryBuilder.andWhere("merchant_transaction.orderDate >= :startDate", {
+                startDate: startDateObject,
+            });
+        } else if (endDate) {
+            // Only endDate is provided
+            const endDateObject = new Date(endDate);
+            queryBuilder.andWhere("merchant_transaction.orderDate <= :endDate", {
+                endDate: endDateObject,
+            });
+        }
 
         queryBuilder.addOrderBy(`merchant_transaction.orderDate`, "DESC");
+
+        if (pageNo && itemLimit) {
+            let skipValue = (pageNo - 1) * itemLimit;
+            queryBuilder.skip(skipValue)
+                .take(itemLimit);
+        }
 
         return queryBuilder.getMany();
     }
