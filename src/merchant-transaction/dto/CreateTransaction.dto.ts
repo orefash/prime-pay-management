@@ -37,7 +37,7 @@ export class CreateTransactionDto {
     description: string;
 
     @IsBoolean()
-    @IsOptional()
+    @IsNotEmpty()
     isTest: boolean;
 
     @IsString()

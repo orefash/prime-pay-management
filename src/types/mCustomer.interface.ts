@@ -9,4 +9,6 @@ export interface mCustomer {
     email?: string;
 
     ippis?: string;
+
+    isTest: boolean;
 }

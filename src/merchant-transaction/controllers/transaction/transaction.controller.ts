@@ -1,8 +1,9 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Query, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import JwtAuthenticationGuard from '../../../auth/utils/JWTAuthGuard';
 import { CreateTransactionDto } from 'src/merchant-transaction/dto/CreateTransaction.dto';
 import { TransactionService } from 'src/merchant-transaction/services/transaction/transaction.service';
 import RequestWithMerchant from 'src/auth/types/requestWithMerchant.interface';
+import { mTransaction } from 'src/types/mTransaction.interface';
 
 @Controller('transactions')
 export class TransactionController {
@@ -68,18 +69,91 @@ export class TransactionController {
         
     }
 
+    // @Get('')
+    // @UseGuards(JwtAuthenticationGuard)
+    // getAllTransactions(@Req() request: RequestWithMerchant) {
+
+    //     return this.transactionService.getAllTransactions();
+    // }
+
     @Get('')
     @UseGuards(JwtAuthenticationGuard)
-    getAllTransactions(@Req() request: RequestWithMerchant) {
+    async getAllTransactions(@Req() request: RequestWithMerchant, @Query() queryParams: any) {
 
-        return this.transactionService.getAllTransactions();
+        let whereConditions = {};
+        let searchQuery = null;
+
+        if(queryParams.orderChannel){
+            whereConditions['orderChannel'] = queryParams.orderChannel;
+        }
+
+        if(queryParams.isTest){
+            whereConditions['isTest'] = queryParams.isTest;
+        }
+
+        if(queryParams.search){
+            searchQuery = queryParams.search;
+        }
+
+        if(queryParams.status){
+            whereConditions['status'] = queryParams.status;
+        }
+
+        console.log('sc: ', searchQuery)
+        console.log('wc: ', whereConditions)
+
+        try {
+            return await this.transactionService.findEntities(whereConditions, searchQuery);
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        
     }
+
+
+    // @Get('merchant/:mid')
+    // @UseGuards(JwtAuthenticationGuard)
+    // getMerchantTransactions(@Param('mid') mid: number) {
+    //     return this.transactionService.getMerchantTransactions(mid);
+    // }
 
 
     @Get('merchant/:mid')
     @UseGuards(JwtAuthenticationGuard)
-    getMerchantTransactions(@Param('mid') mid: number) {
-        return this.transactionService.getMerchantTransactions(mid);
+    async getMerchantTransactions(@Param('mid') mid: number, @Query() queryParams: any) {
+
+
+        let whereConditions = {
+            mid: mid
+        };
+
+        let searchQuery = null;
+
+        if(queryParams.orderChannel){
+            whereConditions['orderChannel'] = queryParams.orderChannel;
+        }
+
+        if(queryParams.isTest){
+            whereConditions['isTest'] = queryParams.isTest;
+        }
+
+        if(queryParams.search){
+            searchQuery = queryParams.search;
+        }
+
+        if(queryParams.status){
+            whereConditions['status'] = queryParams.status;
+        }
+
+        console.log('sc: ', searchQuery)
+        console.log('wc: ', whereConditions)
+        
+        try {
+            return await this.transactionService.findEntities(whereConditions, searchQuery);
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get(':tid')

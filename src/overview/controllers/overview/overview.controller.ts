@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Query, UseGuards } from '@nestjs/common';
 import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 import { OverviewService } from 'src/overview/services/overview/overview.service';
 
@@ -10,7 +10,20 @@ export class OverviewController {
 
     @Get('merchant/:mid')
     @UseGuards(JwtAuthenticationGuard)
-    async getMerchantOverview (@Param('mid') mid: string){
-        return await this.overviewService.getOverviewData(mid);
+    async getMerchantOverview (@Param('mid') mid: string, @Query() queryParams: any){
+        try {
+            let isTest = null;
+
+            if(queryParams.isTest){
+               isTest = queryParams.isTest;
+            }else{
+                throw new Error("Missing isTest value!!")
+            }
+
+            return await this.overviewService.getOverviewData(mid, isTest);
+            
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
     }
 }

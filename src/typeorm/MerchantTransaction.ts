@@ -37,7 +37,7 @@ export class MerchantTransaction {
 
     @Column({
         nullable: false,
-        default: false
+        default: true
     })
     isTest: boolean;
 

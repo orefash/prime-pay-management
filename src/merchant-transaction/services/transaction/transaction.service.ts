@@ -34,10 +34,10 @@ export class TransactionService {
 
         console.log("in ct service - pp", PPAY_STATUS)
 
-        if(PPAY_STATUS == 0){
+        if (PPAY_STATUS == 0) {
             let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
 
-            if(!payMerchantResponse)
+            if (!payMerchantResponse)
                 throw new Error('Not eligible for Loan')
         }
 
@@ -45,7 +45,8 @@ export class TransactionService {
             name: createTransactionDto.customerName,
             phone: createTransactionDto.customerPhone,
             ippis: createTransactionDto.ippis,
-            email: createTransactionDto.customerEmail
+            email: createTransactionDto.customerEmail,
+            isTest: createTransactionDto.isTest
         }
 
         const savedCustomer = await this.customerService.createCustomer(customerData);
@@ -53,6 +54,7 @@ export class TransactionService {
         // console.log('in tr: ', savedCustomer)
 
         const transactionData: mTransaction = {
+            isTest: createTransactionDto.isTest,
             amount: createTransactionDto.amount,
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
@@ -72,7 +74,8 @@ export class TransactionService {
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
             phone: createTransactionDto.customerPhone,
-            ippis: createTransactionDto.ippis
+            ippis: createTransactionDto.ippis,
+            isTest: createTransactionDto.isTest
         }
 
         const savedCustomer = await this.customerService.createCustomer(customerData);
@@ -84,6 +87,7 @@ export class TransactionService {
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
             mid: createTransactionDto.mid,
+            isTest: true,
             customer: savedCustomer,
             loanTenor: createTransactionDto.loanTenor
         }
@@ -96,6 +100,58 @@ export class TransactionService {
 
     async getAllTransactions(): Promise<TransactionEntity[]> {
         return this.transactionRepository.find({
+            relations: {
+                customer: true
+            },
+            order: {
+                orderDate: 'DESC'
+            }
+        });
+    }
+
+    async findEntities(
+        whereConditions: Record<string, any>,
+        searchQuery: string
+        // orderBy: Record<string, 'ASC' | 'DESC'>,
+    ): Promise<TransactionEntity[]> {
+        const queryBuilder = this.transactionRepository.createQueryBuilder('merchant_transaction')
+        .leftJoinAndSelect('merchant_transaction.customer', 'customer');
+
+        // Add WHERE conditions dynamically
+        Object.entries(whereConditions).forEach(([key, value]) => {
+            queryBuilder.andWhere(`merchant_transaction.${key} = :${key}`, { [key]: value });
+        });
+
+        // Add ORDER BY dynamically
+        // Object.entries(orderBy).forEach(([key, value]) => {
+        //   queryBuilder.addOrderBy(`merchant_transaction.${key}`, value);
+        // });
+
+        if (searchQuery) {
+            if (!isNaN(Number(searchQuery))) {
+                // Search query is a number
+                queryBuilder.andWhere(`merchant_transaction.amount = :searchQueryNum`, {
+                    searchQueryNum: Number(searchQuery),
+                });
+            } else {
+                // Search query is a string
+                queryBuilder.andWhere(`customer.name ILIKE :searchQueryString`, {
+                    searchQueryString: `%${searchQuery}%`,
+                });
+            }
+        }
+
+
+        queryBuilder.addOrderBy(`merchant_transaction.orderDate`, "DESC");
+
+        return queryBuilder.getMany();
+    }
+
+    async getAllTransactionsByMode(isTest: boolean): Promise<TransactionEntity[]> {
+        return this.transactionRepository.find({
+            where: {
+                isTest
+            },
             relations: {
                 customer: true
             },
@@ -129,7 +185,7 @@ export class TransactionService {
             },
         });
 
-        if(transaction) return transaction;
+        if (transaction) return transaction;
 
         throw new HttpException('Transaction not found', HttpStatus.NOT_FOUND);
     }
@@ -177,8 +233,8 @@ export class TransactionService {
         if (updatedTransaction) {
             return updatedTransaction
         }
-        
-        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+
+        throw new HttpException('Transaction not found', HttpStatus.NOT_FOUND);
 
     }
 }

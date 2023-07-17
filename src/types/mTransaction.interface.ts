@@ -15,4 +15,6 @@ export interface mTransaction {
 
     loanTenor?: number;
 
+    isTest: boolean;
+
 }

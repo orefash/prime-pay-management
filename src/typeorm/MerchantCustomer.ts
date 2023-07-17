@@ -34,6 +34,12 @@ export class MerchantCustomer {
     })
     ippis: string;
 
+    @Column({
+        nullable: false,
+        default: false
+    })
+    isTest: boolean;
+
     @CreateDateColumn({
         nullable: false,
     })
