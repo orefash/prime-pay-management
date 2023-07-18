@@ -259,7 +259,24 @@ export class TransactionService {
             }
         });
 
-        if (updatedTransaction) {
+        if (updatedTransaction && !updatedTransaction.isTest) {
+            
+            let payout: CreatePayoutDto = {
+                amount: updatedTransaction.amount,
+                status: PTransactionStatus.COMPLETED,
+                channel: PayoutChannels.INFLOW,
+                isWithdraw: false,
+                currency: 'NGN',
+                mid: updatedTransaction.mid
+            }
+
+            try {
+                //add to payout list
+                await this.payoutService.addTransactionToList(payout);
+            } catch (error) {
+                console.log('Not added to Payout');
+            }
+
             return updatedTransaction
         }
 

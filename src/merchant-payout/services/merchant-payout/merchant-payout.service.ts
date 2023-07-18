@@ -34,7 +34,7 @@ export class MerchantPayoutService {
     async addTransactionToList(transactionData: CreatePayoutDto): Promise<MerchantPayout> {
         const merchant = await this.merchantRepository.findOne({
             where: {
-                id: transactionData.mid
+                systemId: transactionData.mid
             }
         });
 
@@ -42,13 +42,27 @@ export class MerchantPayoutService {
             throw new NotFoundException(`Merchant with id ${transactionData.mid} not found`);
         }
 
+        let newAvailableBalance = merchant.availableBalance;
+        let newActualBalance = merchant.actualBalance;
+
+        if(transactionData.isWithdraw){
+            newActualBalance = newActualBalance - transactionData.amount;
+            newAvailableBalance = newAvailableBalance - transactionData.amount;
+        }else{
+            newAvailableBalance = newAvailableBalance + transactionData.amount;
+        }
+
+        await this.merchantRepository.update(merchant.id, {
+            availableBalance: newAvailableBalance,
+            actualBalance: newActualBalance
+        });
+
         // if(!transactionData.isWithdraw){
 
         // }
         const newTransaction = await this.payoutRepository.create(transactionData);
 
         return this.payoutRepository.save(newTransaction);
-
 
     }
 }

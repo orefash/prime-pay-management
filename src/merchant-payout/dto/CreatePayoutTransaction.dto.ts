@@ -36,11 +36,11 @@ export class CreatePayoutDto {
 
     @IsString()
     @IsOptional()
-    channelId: string;
+    channelId?: string;
 
     @IsString()
     @IsNotEmpty()
-    mid: string;
+    mid: number;
 
     // @IsNumber()
     // @IsOptional()
@@ -48,6 +48,6 @@ export class CreatePayoutDto {
 
     @IsString()
     @IsOptional()
-    accountNo: string;
+    accountNo?: string;
 
 }
