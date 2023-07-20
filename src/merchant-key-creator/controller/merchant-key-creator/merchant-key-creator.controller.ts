@@ -20,7 +20,7 @@ export class MerchantKeyCreatorController {
             return await this.merchantProfileService.createMerchantProfile(createMerchantDto);
 
         } catch (error) {
-            console.log('create Merchant Profile error: ', error)
+            // console.log('create Merchant Profile error: ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }

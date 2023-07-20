@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { KeysService } from 'src/keys/services/keys/keys.service';
 import { CreateMerchantDto } from 'src/merchants/dto/CreateMerchant.dto';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
+import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { Merchant, MerchantKey } from 'src/typeorm';
 import { encodePassword } from 'src/utils/bcrypt';
 import { Repository } from 'typeorm';
@@ -21,11 +22,11 @@ export class MerchantKeyCreatorService {
         private readonly merchantRepository: Repository<Merchant>,
         @InjectRepository(MerchantKey)
         private readonly merchantKeyRepository: Repository<MerchantKey>,
+        @Inject(ThirdPartyDataService)
+        private readonly thirdPartyService: ThirdPartyDataService,
     ) { }
 
     async createMerchantProfile(createMerchantDto: CreateMerchantDto): Promise<Merchant> {
-
-        // console.log(`Merchant: ${JSON.stringify(createMerchantDto)}`);
 
         createMerchantDto.password = createMerchantDto.password.trim();
         createMerchantDto.email = createMerchantDto.email.trim();
@@ -41,6 +42,10 @@ export class MerchantKeyCreatorService {
 
         // let PPAY_STATUS = this.configService.get<number>('PPAY');
 
+        let isAccountValid = await this.thirdPartyService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
+
+        if(!isAccountValid)
+            throw new Error("Invalid Bank Details!!")
 
         const password = encodePassword(createMerchantDto.password);
         // const newMerchant = this.merchantRepository.create({ ...createMerchantDto, password });
@@ -63,15 +68,7 @@ export class MerchantKeyCreatorService {
         newMerchant.bankCode = createMerchantDto.bankCode;
         newMerchant.bankName = createMerchantDto.bankName;
 
-        // const key: MerchantKey = new MerchantKey();
-
-
-
-        
-
-        // let saved = await this.merchantRepository.save(newMerchant);
-
-        console.log("nm: ", newMerchant);
+        // console.log("nm: ", newMerchant);
 
         //creating keys
         let createdMerchant = await this.keyService.createMerchantKey(newMerchant);

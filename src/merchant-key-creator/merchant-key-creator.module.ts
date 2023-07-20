@@ -6,6 +6,7 @@ import { KeysModule } from 'src/keys/keys.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Merchant, MerchantKey } from 'src/typeorm';
+import { ThirdPartyDataModule } from 'src/third-party-data/third-party-data.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Merchant, MerchantKey } from 'src/typeorm';
     KeysModule,
     ConfigModule,
     TypeOrmModule.forFeature([Merchant, MerchantKey]),
+    ThirdPartyDataModule,
   ],
   providers: [
     MerchantKeyCreatorService

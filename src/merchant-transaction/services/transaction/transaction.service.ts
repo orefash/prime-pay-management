@@ -32,7 +32,10 @@ export class TransactionService {
 
         let PPAY_STATUS = this.configService.get<number>('PPAY');
 
-        console.log("in ct service - pp", PPAY_STATUS)
+        console.log("in ct service - pp", PPAY_STATUS);
+
+
+
 
         if (PPAY_STATUS == 0) {
             let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
@@ -99,6 +102,9 @@ export class TransactionService {
     }
 
     async getAllTransactions(): Promise<TransactionEntity[]> {
+
+        
+
         return this.transactionRepository.find({
             relations: {
                 customer: true
@@ -116,6 +122,9 @@ export class TransactionService {
         itemLimit: number, startDate: string, endDate: string
         // orderBy: Record<string, 'ASC' | 'DESC'>,
     ): Promise<TransactionEntity[]> {
+
+        
+
         const queryBuilder = this.transactionRepository.createQueryBuilder('merchant_transaction')
             .leftJoinAndSelect('merchant_transaction.customer', 'customer');
 
