@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreatePayoutDto } from 'src/merchant-payout/dto/CreatePayoutTransaction.dto';
+import { CreatePayoutDto, PTransactionStatus } from 'src/merchant-payout/dto/CreatePayoutTransaction.dto';
+import { WithdrawPayoutDto } from 'src/merchant-payout/dto/WithdrawPayout.dto';
+import { PayoutChannels } from 'src/merchant-payout/statics/PayoutChannels';
 import { Merchant, MerchantPayout } from 'src/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
@@ -21,14 +23,30 @@ export class MerchantPayoutService {
         return await this.payoutRepository.find();
     }
 
-    async getPayoutListByMerchant(mid: string): Promise<MerchantPayout[]> {
+    async getPayoutListByMerchant(mid: number): Promise<MerchantPayout[]> {
         return await this.payoutRepository.find({
             where: {
                 merchant: {
-                    id: mid
+                    systemId: mid
                 }
             }
         });
+    }
+
+    async withdrawFromBalance(mid: string, withdrawDto: WithdrawPayoutDto): Promise<MerchantPayout> {
+
+
+        let payout: CreatePayoutDto = {
+            amount: withdrawDto.amount,
+            status: PTransactionStatus.COMPLETED,
+            channel: PayoutChannels.WITHDRAW,
+            isWithdraw: true,
+            currency: 'NGN',
+            mid: 133
+        }
+
+
+        return this.addTransactionToList(payout);
     }
 
     async addTransactionToList(transactionData: CreatePayoutDto): Promise<MerchantPayout> {
@@ -60,6 +78,7 @@ export class MerchantPayoutService {
         // if(!transactionData.isWithdraw){
 
         // }
+
         const newTransaction = await this.payoutRepository.create(transactionData);
 
         return this.payoutRepository.save(newTransaction);

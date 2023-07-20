@@ -232,14 +232,7 @@ export class TransactionService {
         });
 
         if (updatedTransaction) {
-            // let payout: CreatePayoutDto =  {
-            //     amount: updatedTransaction.amount,
-            //     status: PTransactionStatus.COMPLETED,
-            //     channel: PayoutChannels.INFLOW,
-            //     isWithdraw: false,
-            //     currency: 'NGN',
-
-            // }
+           
             return updatedTransaction
         }
 

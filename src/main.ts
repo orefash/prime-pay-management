@@ -26,7 +26,8 @@ async function bootstrap() {
       'http://127.0.0.1:5173',
       'https://checkout.prime-pay.africa',
       'https://uat.prime-pay.africa',
-      'https://www.uat.prime-pay.africa'
+      'https://www.uat.prime-pay.africa',
+      'https://prime-pay-merchant-lgr079o1v-orefash.vercel.app'
     ],
     // methods: ["GET", "POST"],
     credentials: true,
