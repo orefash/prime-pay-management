@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-local";
 import { MerchantAuthService } from "../services/merchant-auth/merchant-auth.service";
@@ -19,7 +19,8 @@ export class MerchantLocalStrategy extends PassportStrategy(Strategy, 'merchant-
     async validate(email: string, password: string): Promise<any> {
         const merchant = await this.authService.validateMerchant(email, password);
         if(!merchant){
-            throw new UnauthorizedException();
+            // throw new UnauthorizedException();
+            throw new HttpException("Incorrect Email or Password", HttpStatus.UNAUTHORIZED);
         }
         return merchant;
     }
