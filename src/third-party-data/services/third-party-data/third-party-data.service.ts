@@ -95,61 +95,6 @@ export class ThirdPartyDataService {
         throw new BadRequestException('Pay Merchant error');
     }
 
-    async validateBankAccount(accountNo: string, bankCode: string) : Promise<boolean>{
-
-        if(bankCode.length>3){
-            // console.log('s; ',bankCode.slice(-3))
-            bankCode = bankCode.slice(-3);
-        }
-
-        const PAYSTACK_ENV = this.configService.get<string>('PAYSTACK_ENV');
-
-        let paystack_key = null;
-
-        if(PAYSTACK_ENV === "test"){
-            paystack_key = this.configService.get<string>('PAYSTACK_TEST_SKEY');
-        }else{
-            paystack_key = this.configService.get<string>('PAYSTACK_LIVE_SKEY');
-        }
-
-        const { data } = await lastValueFrom(
-            this.http
-                .get(
-                    `https://api.paystack.co/bank/resolve?account_number=${accountNo}&bank_code=${bankCode}`,
-                    // {
-                    //     "vser": [
-                    //         {
-                    //             "merchID": "vendor",
-                    //             "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
-                    //             "reqType": "book_ippis",
-                    //             "ippis": payMerchantDto.ippis,
-                    //             "amount": payMerchantDto.amount,
-                    //             "tenor": payMerchantDto.loanTenor,
-                    //             "vendor": payMerchantDto.mid,
-                    //             "rfCode": payMerchantDto.refCode,
-                    //             "Desc": payMerchantDto.description
-                    //         }
-                    //     ]
-                    // },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json', // afaik this one is not needed
-                            'Authorization': `Bearer ${paystack_key}`,
-                        }
-                    }
-                )
-                .pipe(
-                    catchError((error: AxiosError) => {
-                        console.log(error)
-                        // this.logger.error(error.response.data);
-                        throw new Error('Account validation error: '+ error.message);
-                    }),
-                )
-        );
-
-
-        return data.status;
-    }
 
     async getBankList() {
         const bankResponse = await lastValueFrom(

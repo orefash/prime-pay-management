@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { KeysService } from 'src/keys/services/keys/keys.service';
 import { CreateMerchantDto } from 'src/merchants/dto/CreateMerchant.dto';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
+import { PaystackService } from 'src/third-party-data/services/paystack-service/paystack-service.service';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { Merchant, MerchantKey } from 'src/typeorm';
 import { encodePassword } from 'src/utils/bcrypt';
@@ -12,7 +13,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class MerchantKeyCreatorService {
     constructor(
-        @Inject(MerchantsService) 
+        @Inject(MerchantsService)
         private readonly merchantService: MerchantsService,
         @Inject(KeysService)
         private readonly keyService: KeysService,
@@ -24,6 +25,8 @@ export class MerchantKeyCreatorService {
         private readonly merchantKeyRepository: Repository<MerchantKey>,
         @Inject(ThirdPartyDataService)
         private readonly thirdPartyService: ThirdPartyDataService,
+        @Inject(PaystackService)
+        private readonly paystackService: PaystackService,
     ) { }
 
     async createMerchantProfile(createMerchantDto: CreateMerchantDto): Promise<Merchant> {
@@ -40,12 +43,14 @@ export class MerchantKeyCreatorService {
 
         if (merchant) throw new Error("Merchant with Email already Exists")
 
-        // let PPAY_STATUS = this.configService.get<number>('PPAY');
+        let IS_TEST = this.configService.get<boolean>('IS_TEST');
 
-        let isAccountValid = await this.thirdPartyService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
+        if (!IS_TEST) {
+            let isAccountValid = await this.paystackService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
 
-        if(!isAccountValid)
-            throw new Error("Invalid Bank Details!!")
+            if (!isAccountValid)
+                throw new Error("Invalid Bank Details!!")
+        }
 
         const password = encodePassword(createMerchantDto.password);
         // const newMerchant = this.merchantRepository.create({ ...createMerchantDto, password });
@@ -63,7 +68,7 @@ export class MerchantKeyCreatorService {
         newMerchant.email = createMerchantDto.email;
         newMerchant.phone = createMerchantDto.phone;
         newMerchant.password = password;
-        newMerchant.address = { country: createMerchantDto.country , no: null, lga: "", state: "", street: "" };
+        newMerchant.address = { country: createMerchantDto.country, no: null, lga: "", state: "", street: "" };
         newMerchant.accountNo = createMerchantDto.accountNo;
         newMerchant.bankCode = createMerchantDto.bankCode;
         newMerchant.bankName = createMerchantDto.bankName;

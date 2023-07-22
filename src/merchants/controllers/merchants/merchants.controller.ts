@@ -73,7 +73,12 @@ export class MerchantsController {
     @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)
     async updateMerchantBank(@Param('id') merchantId: string, @Body() editMerchantBankDto: UpdateMerchantBankDto) {
-        return this.merchantService.updateMerchantBank(merchantId, editMerchantBankDto);
+        try {
+            return this.merchantService.updateMerchantBank(merchantId, editMerchantBankDto);
+        } catch (error) {
+            // console.log('update merchant bank error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Get('')

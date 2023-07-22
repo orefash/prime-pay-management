@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
@@ -18,6 +18,7 @@ import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dt
 import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
 import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
 import { KeysService } from 'src/keys/services/keys/keys.service';
+import { PaystackService } from 'src/third-party-data/services/paystack-service/paystack-service.service';
 
 @Injectable()
 export class MerchantsService {
@@ -30,39 +31,10 @@ export class MerchantsService {
             private readonly thirdPartDataService: ThirdPartyDataService,
             @Inject(ConfigService)
             private readonly configService: ConfigService,
-            // @Inject(forwardRef(() => KeysService))
-            // private readonly keyService: KeysService
+            @Inject(PaystackService)
+            private readonly paystackService: PaystackService,
         ) { }
 
-
-
-    // async createMerchant(createMerchantDto: CreateMerchantDto): Promise<MerchantEntity> {
-
-    //     createMerchantDto.password = createMerchantDto.password.trim();
-    //     createMerchantDto.email = createMerchantDto.email.trim();
-
-    //     const merchant = await this.merchantRepository.findOne({
-    //         where: {
-    //             email: createMerchantDto.email
-    //         }
-    //     });
-
-    //     if (merchant) throw new Error("Merchant with Email already Exists")
-
-    //     let PPAY_STATUS = this.configService.get<number>('PPAY');
-
-
-    //     const password = encodePassword(createMerchantDto.password);
-    //     const newMerchant = this.merchantRepository.create({ ...createMerchantDto, password });
-    //     let saved = await this.merchantRepository.save(newMerchant);
-
-    //     //creating keys
-    //     let createdKeys = await this.keyService.create(saved.id);
-    //     console.log(`createdkeys: ${JSON.stringify(createdKeys)}`)
-
-    //     delete saved.password
-    //     return saved;
-    // }
 
     async updateMerchantProfile(id: string, editMerchantDto: EditMerchantDto): Promise<Partial<MerchantEntity>> {
 
@@ -190,18 +162,37 @@ export class MerchantsService {
     }
 
     async updateMerchantBank(id: string, editMerchantBankDto: UpdateMerchantBankDto): Promise<Partial<MerchantEntity>> {
+        try {
+            // Validate the bank account using thirdPartDataService.
+            let IS_TEST = this.configService.get<boolean>('IS_TEST');
 
-        await this.merchantRepository.update(id, editMerchantBankDto);
-        const updatedMerchant = await this.merchantRepository.findOne({
-            where: {
-                id: id
+            if (!IS_TEST) {
+                const isAccountValid = await this.paystackService.validateBankAccount(editMerchantBankDto.accountNo, editMerchantBankDto.bankCode);
+
+                if (!isAccountValid) {
+                    throw new BadRequestException('Invalid Bank Details!!');
+                }
             }
-        });
-        if (updatedMerchant) {
-            const { password, ...merchant } = updatedMerchant;
-            return merchant;
+
+
+            // Perform the update in the database.
+            await this.merchantRepository.update(id, editMerchantBankDto);
+
+            // Fetch the updated merchant record from the database.
+            const updatedMerchant = await this.merchantRepository.findOne({
+                where: { id: id }
+            });
+
+            if (updatedMerchant) {
+                // Remove the password field from the result before returning.
+                const { password, ...merchant } = updatedMerchant;
+                return merchant;
+            }
+
+            throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
     //if merchant with ID exists, create merchant on the core banking and update the mid and active status
@@ -326,7 +317,7 @@ export class MerchantsService {
             const fileName = path.basename(docs.logoPath);
             // console.log('d: ', __dirname)
             const filePath = await this.fetchUploadPath(fileName);
-            
+
             const contentType = docs.logoMime;
             return { fileName, contentType, filePath: filePath }
         }
@@ -350,7 +341,7 @@ export class MerchantsService {
             const fileName = path.basename(docs.cacPath);
             // console.log('d: ', __dirname)
             const filePath = await this.fetchUploadPath(fileName);
-            
+
             const contentType = docs.cacMime;
             return { fileName, contentType, filePath: filePath }
         }
@@ -364,9 +355,9 @@ export class MerchantsService {
     async getMerchantByEmail(email: string): Promise<MerchantEntity> {
 
         let merchants = await this.merchantRepository.createQueryBuilder('m')
-        .select(['m.id', 'm.systemId', 'm.email', 'm.name', 'm.logoUrl', 'm.promoterFname', 'm.promoterLname', 'm.bvn', 'm.businessType', 'm.isRegistered', 'm.isActive', 'm.promoterIdType', 'm.websiteUrl', 'm.phone', 'm.address', 'm.avgMonthlySales', 'm.accountNo', 'm.bankCode', 'm.bankName', 'm.socials', 'm.regDate', 'm.modifiedDate', 'm.availableBalance', 'm.password'])
-        .where("LOWER(email) = LOWER(:email)", { email })
-        .getOne();
+            .select(['m.id', 'm.systemId', 'm.email', 'm.name', 'm.logoUrl', 'm.promoterFname', 'm.promoterLname', 'm.bvn', 'm.businessType', 'm.isRegistered', 'm.isActive', 'm.promoterIdType', 'm.websiteUrl', 'm.phone', 'm.address', 'm.avgMonthlySales', 'm.accountNo', 'm.bankCode', 'm.bankName', 'm.socials', 'm.regDate', 'm.modifiedDate', 'm.availableBalance', 'm.password'])
+            .where("LOWER(email) = LOWER(:email)", { email })
+            .getOne();
 
         return merchants;
     }
