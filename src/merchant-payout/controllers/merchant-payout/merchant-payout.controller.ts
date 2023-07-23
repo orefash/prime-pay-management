@@ -51,8 +51,8 @@ export class MerchantPayoutController {
                 data: transaction
             }
         } catch (error) {
-            console.log('create transaction error: ');
-            console.log(error);
+            // console.log('create transaction error: ');
+            // console.log(error);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }

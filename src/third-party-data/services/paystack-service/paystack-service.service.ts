@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { TransferRecipient } from 'src/third-party-data/types/paystack-req.data';
+import { TransferRecipient, WithdrawResponse } from 'src/third-party-data/types/paystack-req.data';
 
 @Injectable()
 export class PaystackService {
@@ -43,7 +43,7 @@ export class PaystackService {
         } catch (error) {
             // If there's an error during the API call, log the error and return false.
             // You can handle the error differently based on your use case.
-            // console.error('Account validation error:', error.message);
+            console.error('Account validation error: ', error.message);
             return false;
         }
     }
@@ -66,7 +66,7 @@ export class PaystackService {
 
             const isAccountValid = await this.validateBankAccount(accountNo, bankCode);
 
-            if(!isAccountValid)
+            if (!isAccountValid)
                 throw new Error("Bank details are invalid");
 
             const payUrl = `https://api.paystack.co/transferrecipient`;
@@ -92,26 +92,24 @@ export class PaystackService {
             let response_data: TransferRecipient = {
                 status: data.status
             }
-            if(data.status){
+            if (data.status) {
                 response_data.recipient_code = data.data.recipient_code;
             }
 
             return response_data;
         } catch (error) {
             console.log("transferRecipient error: ", error.message)
-           return {
+            return {
                 status: false
             };
         }
     }
 
-
-    async initiatePaystackTransfer(name: string, accountNo: string, bankCode: string): Promise<TransferRecipient> {
-        // Ensure the bankCode is a 3-character code (if it's longer).
-        if (bankCode.length > 3) {
-            bankCode = bankCode.slice(-3);
-        }
-
+    async initiatePaystackTransfer(
+        amount: number,
+        payRecipient: string,
+        merchantName: string,
+    ): Promise<WithdrawResponse> {
         // Get the Paystack API key based on the environment (test or live).
         const PAYSTACK_ENV = this.configService.get<string>('PAYSTACK_ENV');
         const paystack_key =
@@ -120,20 +118,21 @@ export class PaystackService {
                 : this.configService.get<string>('PAYSTACK_LIVE_SKEY');
 
         try {
+            const payUrl = `https://api.paystack.co/transfer`;
 
-            const isAccountValid = await this.validateBankAccount(accountNo, bankCode);
-
-            if(!isAccountValid)
-                throw new Error("Bank details are invalid");
-
-            const payUrl = `https://api.paystack.co/transferrecipient`;
+            const uuidRef = uuidv4();
 
             const postData = {
-                type: 'nuban',
-                name,
-                account_number: accountNo,
-                bank_code: bankCode,
-                currency: 'NGN',
+                source: 'balance',
+                amount,
+                reference: uuidRef,
+                recipient: payRecipient,
+                reason: `Withdrawal for ${merchantName}`,
+            };
+
+            // Create the response data object.
+            const responseData: WithdrawResponse = {
+                status: false,
             };
 
             // Make the API call to Paystack and extract the data property from the response.
@@ -141,23 +140,22 @@ export class PaystackService {
                 this.http.post(payUrl, postData, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${paystack_key}`,
+                        Authorization: `Bearer ${paystack_key}`,
                     },
-                })
+                }),
             );
 
-            let response_data: TransferRecipient = {
-                status: data.status
-            }
-            if(data.status){
-                response_data.recipient_code = data.data.recipient_code;
+            responseData.status = data.status;
+            if (data.status) {
+                responseData.withdraw_status = data.data.status;
             }
 
-            return response_data;
+            return responseData;
         } catch (error) {
-            console.log("transferRecipient error: ", error.message)
-           return {
-                status: false
+            // Handle specific errors if needed.
+            console.error('Initiate Paystack Transfer Error:', error.message);
+            return {
+                status: false,
             };
         }
     }

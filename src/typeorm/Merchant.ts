@@ -12,6 +12,7 @@ export class Merchant {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Index({ unique: false })
     @Column({
         nullable: false,
         default: -99
@@ -44,21 +45,25 @@ export class Merchant {
     })
     logoUrl: string;
 
+
     @Column({
         nullable: true,
         name: 'logo_doc'
     })
     logoPath: string;
 
+    
     @Column({
         nullable: true,
     })
     logoMime: string;
 
+
     @Column({
         nullable: true,
     })
     cacPath: string;
+
 
     @Column({
         nullable: true,
@@ -66,10 +71,17 @@ export class Merchant {
     cacMime: string;
 
     @Column({
+        nullable: true,
+    })
+    recepientCode: string;
+
+
+    @Column({
         nullable: false,
         name: 'promoter_fname'
     })
     promoterFname: string;
+
 
     @Column({
         nullable: false,
@@ -98,6 +110,7 @@ export class Merchant {
     })
     isRegistered: boolean;
 
+    @Index({ unique: false })
     @Column({
         nullable: false,
         name: 'is_active',
@@ -130,6 +143,7 @@ export class Merchant {
     })
     websiteUrl: string;
 
+
     @Column({
         nullable: true,
     })
@@ -140,6 +154,7 @@ export class Merchant {
         array: true
     })
     cacDocs: string[];
+
 
     @Index({ unique: true })
     @Column({
@@ -156,7 +171,6 @@ export class Merchant {
     @Column({
         nullable: false,
     })
-    // @Exclude()
     password: string;
 
 
@@ -210,6 +224,7 @@ export class Merchant {
 
     @OneToMany( type => MerchantPayout , payout => payout.merchant)
     payouts: MerchantPayout[];
+
 
     @OneToOne(type => MerchantKey, key => key.merchant)
     keys: MerchantKey;

@@ -265,7 +265,7 @@ export class TransactionService {
             
             let payout: CreatePayoutDto = {
                 amount: updatedTransaction.amount,
-                status: PTransactionStatus.COMPLETED,
+                status: PTransactionStatus.SUCCESS,
                 channel: PayoutChannels.INFLOW,
                 isWithdraw: false,
                 currency: 'NGN',
