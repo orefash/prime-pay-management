@@ -15,6 +15,7 @@ export class CustomerController {
     // }
 
     @Get('')
+    // @UseGuards(JwtExpirationGuard)
     async getAllCustomers(@Query() queryParams: any) {
         return await this.customerService.getAllCustomers();
     }
@@ -78,3 +79,4 @@ export class CustomerController {
         }
     }
 }
+

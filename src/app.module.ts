@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -15,6 +15,17 @@ import { KeysModule } from './keys/keys.module';
 import { MerchantKeyCreatorModule } from './merchant-key-creator/merchant-key-creator.module';
 import { MerchantProductModule } from './merchant-product/merchant-product.module';
 import { ImagesModule } from './images/images.module';
+import { UnauthorizedExceptionFilter } from './exceptions/unauthorized.exception';
+import { APP_FILTER } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtExpirationMiddleware } from './auth/utils/JWTExpirationGuard';
+import { TransactionController } from './merchant-transaction/controllers/transaction/transaction.controller';
+import { MerchantsController } from './merchants/controllers/merchants/merchants.controller';
+import { CustomerController } from './merchant-customer/controllers/customer/customer.controller';
+import { KeysController } from './keys/controllers/keys/keys.controller';
+import { MerchantPayoutController } from './merchant-payout/controllers/merchant-payout/merchant-payout.controller';
+import { MerchantProductController } from './merchant-product/controllers/merchant-product/merchant-product.controller';
+import { OverviewController } from './overview/controllers/overview/overview.controller';
 
 
 
@@ -27,6 +38,16 @@ import { ImagesModule } from './images/images.module';
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,
       inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: {
+          expiresIn: `${configService.get('JWT_EXPIRATION_TIME')}s`,
+        },
+      }),
     }),
     AuthModule,
     MerchantTransactionModule,
@@ -41,5 +62,21 @@ import { ImagesModule } from './images/images.module';
     ImagesModule,
  
   ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: UnauthorizedExceptionFilter,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtExpirationMiddleware)
+    // .exclude(
+    //   // { path: 'cats', method: RequestMethod.GET }, // Exclude the 'GET /cats' route from LoggerMiddleware
+    //   { path: '/statics', method: RequestMethod.GET }, 
+    // )
+    // .forRoutes('*')
+    .forRoutes(TransactionController, MerchantsController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
+  }
+}

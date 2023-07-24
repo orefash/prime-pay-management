@@ -33,6 +33,8 @@ export class MerchantAuthService {
     public getJwtToken(merchantId: string) {
         const payload: TokenPayload = { merchantId };
         const token = this.jwtService.sign(payload);
+
+        // console.log("dcd: ", this.jwtService.decode(token))
         return token;
     }
 

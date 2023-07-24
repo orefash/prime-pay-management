@@ -37,4 +37,22 @@ export class StaticsController {
     async getCountryCodes() {
         return await this.staticsService.getCountryCodes();
     }
+
+    @Get('transaction-statuses')
+    // @UseGuards(JwtAuthenticationGuard)
+    async getTransactionStatuses() {
+        return await this.staticsService.getTransactionStatuses();
+    }
+
+    @Get('transaction-channels')
+    // @UseGuards(JwtAuthenticationGuard)
+    async getTransactionChannels() {
+        return await this.staticsService.getTransactionChannels();
+    }
+
+    @Get('payout-statuses')
+    // @UseGuards(JwtAuthenticationGuard)
+    async getPayoutChannels() {
+        return await this.staticsService.getPayoutChannels();
+    }
 }
