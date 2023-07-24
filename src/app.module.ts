@@ -69,14 +69,10 @@ import { OverviewController } from './overview/controllers/overview/overview.con
     },
   ],
 })
+
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtExpirationMiddleware)
-    // .exclude(
-    //   // { path: 'cats', method: RequestMethod.GET }, // Exclude the 'GET /cats' route from LoggerMiddleware
-    //   { path: '/statics', method: RequestMethod.GET }, 
-    // )
-    // .forRoutes('*')
     .forRoutes(TransactionController, MerchantsController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
   }
 }

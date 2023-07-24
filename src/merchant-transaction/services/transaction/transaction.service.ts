@@ -6,6 +6,7 @@ import { CreatePayoutDto, PTransactionStatus } from 'src/merchant-payout/dto/Cre
 import { MerchantPayoutService } from 'src/merchant-payout/services/merchant-payout/merchant-payout.service';
 import { PayoutChannels } from 'src/merchant-payout/statics/PayoutChannels';
 import { CreateTransactionDto, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
+import { FindTransactionData } from 'src/merchant-transaction/types/TransactionTypes';
 import { ThirdPartyDataService } from 'src/third-party-data/services/third-party-data/third-party-data.service';
 import { MerchantTransaction as TransactionEntity } from 'src/typeorm';
 import { mCustomer } from 'src/types/mCustomer.interface';
@@ -103,7 +104,7 @@ export class TransactionService {
 
     async getAllTransactions(): Promise<TransactionEntity[]> {
 
-        
+
 
         return this.transactionRepository.find({
             relations: {
@@ -121,9 +122,10 @@ export class TransactionService {
         pageNo: number,
         itemLimit: number, startDate: string, endDate: string
         // orderBy: Record<string, 'ASC' | 'DESC'>,
-    ): Promise<TransactionEntity[]> {
+    ): Promise<FindTransactionData> {
 
         
+
 
         const queryBuilder = this.transactionRepository.createQueryBuilder('merchant_transaction')
             .leftJoinAndSelect('merchant_transaction.customer', 'customer');
@@ -176,13 +178,30 @@ export class TransactionService {
 
         queryBuilder.addOrderBy(`merchant_transaction.orderDate`, "DESC");
 
+        // Count the total number of entities that match the conditions
+        const totalCount = await queryBuilder.getCount();
+
+        console.log('cnt: ', totalCount)
+
+        // Calculate the total number of pages based on the total count and the item limit
+        const totalPages = Math.ceil(totalCount / itemLimit);
+
+
         if (pageNo && itemLimit) {
             let skipValue = (pageNo - 1) * itemLimit;
             queryBuilder.skip(skipValue)
                 .take(itemLimit);
         }
 
-        return queryBuilder.getMany();
+        let queryResponse =
+            await queryBuilder.getMany();
+        
+        const data: FindTransactionData = {
+            data: queryResponse,
+            totalPageNo: totalPages
+        }
+
+        return data;
     }
 
     async getAllTransactionsByMode(isTest: boolean): Promise<TransactionEntity[]> {
@@ -241,7 +260,7 @@ export class TransactionService {
         });
 
         if (updatedTransaction) {
-           
+
             return updatedTransaction
         }
 
@@ -262,7 +281,7 @@ export class TransactionService {
         });
 
         if (updatedTransaction && !updatedTransaction.isTest) {
-            
+
             let payout: CreatePayoutDto = {
                 amount: updatedTransaction.amount,
                 status: PTransactionStatus.SUCCESS,
