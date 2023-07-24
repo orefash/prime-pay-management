@@ -22,19 +22,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
  
   async validate(payload: TokenPayload) {
 
-    const currentTime = Math.floor(Date.now() / 1000);
-
-
-    console.log("current time expired: ", currentTime)
-
-    // Check if the token has expired
-    if (payload.exp < currentTime) {
-      // Token has expired
-      console.log("token expired: ", payload.exp)
-      throw new HttpException("Token has Expired", HttpStatus.UNAUTHORIZED);
-    }
-        
-
     return this.merchantService.getMerchantById(payload.merchantId);
   }
 }

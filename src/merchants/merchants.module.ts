@@ -13,6 +13,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { KeysModule } from 'src/keys/keys.module';
 // import { CustomFileInterceptor } from 'src/interceptors/file-upload.interceptor';
+import { MerchantMediaController } from './controllers/merchant-media/merchant-media.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { KeysModule } from 'src/keys/keys.module';
     ConfigModule,
   ],
   exports: [MerchantsService],
-  controllers: [MerchantsController],
+  controllers: [MerchantsController, MerchantMediaController],
   providers: [
     MerchantsService,
     // CustomFileInterceptor

@@ -117,16 +117,7 @@ export class MerchantsController {
         res.sendFile(fileData.filePath);
     }
 
-    @Get(':merchantId/logo')
-    // @UseGuards(JwtAuthenticationGuard)
-    async getMerchantLogo(@Param('merchantId') merchantId: string, @Res() res: Response) {
-        let fileData = await this.merchantService.getMerchantLogo(merchantId);
-        res.attachment(fileData.fileName);
-        res.setHeader('Content-Type', fileData.contentType);
-
-        // Send the file
-        res.sendFile(fileData.filePath);
-    }
+    
 
     @Get(':merchantId/cac')
     // @UseGuards(JwtAuthenticationGuard)

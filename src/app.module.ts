@@ -73,6 +73,7 @@ import { OverviewController } from './overview/controllers/overview/overview.con
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtExpirationMiddleware)
+    // .exclude('api/merchants/:merchantId/logo')
     .forRoutes(TransactionController, MerchantsController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
   }
 }
