@@ -26,9 +26,10 @@ export class MerchantMediaController {
         res.sendFile(fileData.filePath);
     }
 
-    @Get(':merchantId/id-card')
+    @Get(':merchantId/id-card/mm/:mime1/:mime2/:name')
     // @UseGuards(JwtAuthenticationGuard)
     async getMerchantIdentification(@Param('merchantId') merchantId: string, @Res() res: Response) {
+
         let fileData = await this.merchantService.getMerchantIdentification(merchantId);
         res.attachment(fileData.fileName);
         res.setHeader('Content-Type', fileData.contentType);

@@ -135,9 +135,9 @@ export class MerchantsController {
             setMerchantID.promoterId = promoterIdDoc.filename;
             setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
 
-            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card`;
+            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
 
-            // console.log('du: ', downloadUrl)
+            console.log('du: ', setMerchantID.promoterIdMime)
             // Save the merchant identification data to the database
             await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
 

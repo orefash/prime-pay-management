@@ -102,7 +102,6 @@ export class MerchantsService {
 
     async setMerchantIdentification(id: string, editMerchantID: SetMerchantIdDTO) {
 
-
         await this.merchantRepository.update(id, editMerchantID);
         const updatedMerchant = await this.merchantRepository.findOne({
             where: {
@@ -174,12 +173,6 @@ export class MerchantsService {
         if (!merchant)
             throw new Error(`Merchant with id ${setCACDocs.merchantID} not found!!`);
 
-        console.log("merchantd: ", merchant.cacDocuments)
-
-
-        console.log("menew drchantd: ", setCACDocs.docs)      
-
-
 
         if (setCACDocs.existingDocString && merchant.cacDocuments && merchant.cacDocuments.length > 0) {
             let exsitingDocs: CACDocType[] = JSON.parse(setCACDocs.existingDocString);
@@ -195,7 +188,7 @@ export class MerchantsService {
 
         const updatedCACDocuments = merchant.cacDocuments.map((doc) => ({
             ...doc,
-            docUrl: doc.docUrl.includes('http')? doc.docUrl : baseUrl + doc.docUrl,
+            docUrl: doc.docUrl.includes('http') ? doc.docUrl : baseUrl + doc.docUrl,
         }));
 
         merchant.cacDocuments = updatedCACDocuments;
