@@ -33,7 +33,6 @@ export class MerchantMediaController {
         let fileData = await this.merchantService.getMerchantIdentification(merchantId);
         res.attachment(fileData.fileName);
         res.setHeader('Content-Type', fileData.contentType);
-
         // Send the file
         res.sendFile(fileData.filePath);
     }

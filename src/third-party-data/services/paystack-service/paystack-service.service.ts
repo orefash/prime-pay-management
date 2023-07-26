@@ -41,6 +41,7 @@ export class PaystackService {
             // Check the status property in the data and return true if it's valid.
             return data.status;
         } catch (error) {
+            
             // If there's an error during the API call, log the error and return false.
             // You can handle the error differently based on your use case.
             console.error('Account validation error: ', error.message);
