@@ -4,6 +4,7 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOn
 import { MerchantProduct } from "./MerchantProducts";
 import { MerchantPayout } from "./MerchantPayout";
 import { MerchantKey } from "./Keys";
+import { CACDocType } from "src/merchants/dto/SetCAC.dto";
 
 @Entity()
 @Unique(['email', 'accountNo',])
@@ -155,6 +156,8 @@ export class Merchant {
     })
     cacDocs: string[];
 
+    @Column('jsonb', { nullable: true })
+    cacDocuments: CACDocType[];
 
     @Index({ unique: true })
     @Column({

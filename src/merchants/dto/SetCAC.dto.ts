@@ -1,15 +1,44 @@
 import { IDTYPES } from "src/statics/types/IDTypes";
-import {  IsIn, IsNotEmpty, IsOptional, IsString,  } from "class-validator";
+import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString, } from "class-validator";
+import { LoadImageUrl } from "src/types/image.url.interface";
 
 
-export class SetCACDto {
-
-    @IsString()
-    @IsNotEmpty()
-    cacPath: string;
+export class CACDocType {
 
     @IsString()
     @IsNotEmpty()
-    cacMime:string;
+    path: string;
+
+    @IsString()
+    @IsNotEmpty()
+    name: string;
+
+    @IsString()
+    @IsNotEmpty()
+    mimeType: string;
+
+    @IsString()
+    @IsOptional()
+    docUrl?: string;
+
+}
+
+export class updateMerchantCACDocDTO {
+
+    @IsOptional()
+    @IsString()
+    merchantID?: string;
+
+    @IsOptional()
+    @IsArray()
+    docs: CACDocType[];
+
+    @IsOptional()
+    @IsArray()
+    exsitingDocs?: LoadImageUrl[];
+
+    @IsOptional()
+    @IsString()
+    existingDocString?: string;
 
 }

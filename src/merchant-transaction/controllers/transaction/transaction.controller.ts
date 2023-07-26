@@ -175,7 +175,7 @@ export class TransactionController {
         if (queryParams.endDate && isValidDate(queryParams.endDate))
             endDate = queryParams.endDate;
 
-        console.log('st: ', startDate)
+        // console.log('st: ', startDate)
 
         try {
             return await this.transactionService.findEntities(whereConditions, searchQuery, pageNo, itemLimit, startDate, endDate);

@@ -16,7 +16,7 @@ import * as path from 'path';
 import * as mime from 'mime';
 import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dto copy';
 import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
-import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
+import { CACDocType, updateMerchantCACDocDTO } from 'src/merchants/dto/SetCAC.dto';
 import { KeysService } from 'src/keys/services/keys/keys.service';
 import { PaystackService } from 'src/third-party-data/services/paystack-service/paystack-service.service';
 
@@ -140,7 +140,7 @@ export class MerchantsService {
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
-    async setMerchantCAC(id: string, setCAC: SetCACDto) {
+    async setMerchantCAC(id: string, setCAC: CACDocType) {
 
 
         await this.merchantRepository.update(id, setCAC);
@@ -159,6 +159,35 @@ export class MerchantsService {
         }
 
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
+
+    async setMerchantCACDocs(setCACDocs: updateMerchantCACDocDTO) {
+
+        // await this.merchantRepository.update(id, setCAC);
+        const merchant = await this.merchantRepository.findOne({
+            where: {
+                id: setCACDocs.merchantID
+            }
+        });
+
+        if (!merchant)
+            throw new Error(`Merchant with id ${setCACDocs.merchantID} not found!!`)
+
+        // if (setCACDocs.existingDocString && setCACDocs.docs && setCACDocs.docs.length > 0) {
+        //     let existingImgs: LoadImageUrl[] = JSON.parse(updateMerchantProductDto.existingImageString);
+
+        //     merchantProduct.pImages = merchantProduct.pImages.filter((object) =>
+        //         existingImgs.some((otherObject) => otherObject.name === object.name)
+        //     );
+
+        //     // console.log('HF: ', merchantProduct.pImages);
+
+        //     updateMerchantProductDto.images = merchantProduct.pImages.concat(updateMerchantProductDto.images);
+        // }
+
+        merchant.cacDocuments = setCACDocs.docs;
+
+        return await this.merchantRepository.save(merchant);
     }
 
     async updateMerchantBank(id: string, editMerchantBankDto: UpdateMerchantBankDto): Promise<Partial<MerchantEntity>> {
@@ -315,7 +344,7 @@ export class MerchantsService {
         if (docs?.logoPath) {
 
             const fileName = path.basename(docs.logoPath);
-            // console.log('d: ', __dirname)
+            console.log('fn: ', fileName)
             const filePath = await this.fetchUploadPath(fileName);
 
             const contentType = docs.logoMime;
@@ -327,29 +356,73 @@ export class MerchantsService {
 
     }
 
-    async getMerchantCAC(merchantId: string) {
+    async getMerchantCACDocs(merchantId: string, baseUrl: string) {
+
         const docs = await this.merchantRepository.findOne({
             where: {
                 id: merchantId
             },
-            select: ['id', 'cacPath', 'cacMime'],
+            select: ['id', 'cacDocuments'],
 
         });
 
-        if (docs?.cacPath) {
 
-            const fileName = path.basename(docs.cacPath);
-            // console.log('d: ', __dirname)
-            const filePath = await this.fetchUploadPath(fileName);
+        if (docs.cacDocuments && docs.cacDocuments.length > 0) {
 
-            const contentType = docs.cacMime;
-            return { fileName, contentType, filePath: filePath }
+            const updatedCACDocuments = docs.cacDocuments.map((doc) => ({
+                ...doc,
+                docUrl: baseUrl + doc.docUrl,
+            }));
+
+            docs.cacDocuments = updatedCACDocuments;
+
+            return docs
         }
 
-
         throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
-
     }
+
+    async getMerchantCACDocument(merchantId: string, docName: string, mimeType: string) {
+
+        const docs = await this.merchantRepository.findOne({
+            where: {
+                id: merchantId
+            },
+            select: ['id', 'cacDocuments'],
+        });
+
+        if(!docs){
+            throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+        }
+
+        const filePath = await this.fetchUploadPath(docName);
+
+        return { fileName: docName, contentType: mimeType, filePath: filePath };
+    }
+
+    // async getMerchantCAC(merchantId: string) {
+    //     const docs = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: merchantId 
+    //         },
+    //         select: ['id', 'cacPath', 'cacMime'],
+
+    //     });
+
+    //     if (docs?.cacPath) {
+
+    //         const fileName = path.basename(docs.cacPath);
+    //         // console.log('d: ', __dirname)
+    //         const filePath = await this.fetchUploadPath(fileName);
+
+    //         const contentType = docs.cacMime;
+    //         return { fileName, contentType, filePath: filePath }
+    //     }
+
+
+    //     throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
+
+    // }
 
 
     async getMerchantByEmail(email: string): Promise<MerchantEntity> {

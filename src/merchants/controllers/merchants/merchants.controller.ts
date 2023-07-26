@@ -11,7 +11,7 @@ import { unlinkSync } from 'fs';
 import { Address } from 'src/types/address.interface';
 import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dto copy';
 import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
-import { SetCACDto } from 'src/merchants/dto/SetCAC.dto';
+import { CACDocType, updateMerchantCACDocDTO } from 'src/merchants/dto/SetCAC.dto';
 // import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
 import { ConfigService } from '@nestjs/config';
 import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
@@ -91,44 +91,26 @@ export class MerchantsController {
     @Get(':merchantId')
     @UseGuards(JwtAuthenticationGuard)
     async getMerchantById(
-        @Param('merchantId') merchantId: string, 
+        @Param('merchantId') merchantId: string,
         @Req() req) {
         let merchant = await this.merchantService.getMerchantById(merchantId);
 
         const logoUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
         // console.log(`req: ${logoUrl}`)
-        
+
         let data = {
             ...merchant,
-            logoUrl: logoUrl, 
+            logoUrl: logoUrl,
         };
 
         return data;
     }
 
-    @Get(':merchantId/id-card')
-    // @UseGuards(JwtAuthenticationGuard)
-    async getMerchantIdentification(@Param('merchantId') merchantId: string, @Res() res: Response) {
-        let fileData = await this.merchantService.getMerchantIdentification(merchantId);
-        res.attachment(fileData.fileName);
-        res.setHeader('Content-Type', fileData.contentType);
 
-        // Send the file
-        res.sendFile(fileData.filePath);
-    }
 
-    
 
-    @Get(':merchantId/cac')
-    // @UseGuards(JwtAuthenticationGuard)
-    async getMerchantCAC(@Param('merchantId') merchantId: string, @Res() res: Response) {
-        let fileData = await this.merchantService.getMerchantCAC(merchantId);
-        res.attachment(fileData.fileName);
-        res.setHeader('Content-Type', fileData.contentType);
 
-        // Send the file
-        res.sendFile(fileData.filePath);
-    }
+
 
 
     @Post(':merchantId/set-id-card')
@@ -174,46 +156,107 @@ export class MerchantsController {
 
 
     @Post(':merchantId/set-cac')
-    @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(
-        CustomFileInterceptor(
-            'cacDoc',
-            ['image/jpeg', 'image/png', 'application/pdf']
-        ),
+        FilesInterceptor('files', 5, {
+            storage: diskStorage({
+                destination: './uploads',
+                filename: (req, file, callback) => {
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    const extension = file.mimetype.split('/')[1];
+                    callback(null, file.fieldname + '-' + uniqueSuffix + '.' + extension);
+                },
+            }),
+            fileFilter: (req, file, callback) => {
+                // Validate the file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                if (allowedTypes.includes(file.mimetype)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Unsupported file type'), false);
+                }
+            },
+        }),
     )
-    async setMerchantCAC(
-        @Req() req,
-        @UploadedFile() cacDoc: Express.Multer.File,
+    async setMerchantCACDocs(
+        @UploadedFiles() files: Express.Multer.File[],
         @Param('merchantId') merchantId: string,
+        @Body() setCACDocs: updateMerchantCACDocDTO
     ) {
-        if (!cacDoc) {
-            throw new HttpException('CAC Doc not uploaded', HttpStatus.BAD_REQUEST);
-        }
-
+        
         try {
-            let cacDto: SetCACDto = {
-                cacPath: cacDoc.filename,
-                cacMime: cacDoc.mimetype
+
+            let fileList: CACDocType[] = [];
+
+            for (const file of files) {
+                const path = file.path;
+                const name = file.filename;
+                const mimeType = file.mimetype;
+                const url = `/cac/${merchantId}/mm/${mimeType}/doc/${name}`;
+                // Process the file or save it to the database
+                // console.log('Uploaded file:', filePath);
+                // console.log('Uploaded file:', fileName);
+                fileList.push({
+                    name, path, mimeType, docUrl: url
+                })
             }
 
-            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/cac`;
+            setCACDocs.docs = fileList;
+            setCACDocs.merchantID = merchantId;
 
-            // console.log('du: ', downloadUrl)
-            // Save the merchant identification data to the database
-            await this.merchantService.setMerchantCAC(merchantId, cacDto);
+            // let setCACDocs: updateMerchantCACDocDTO = {
+            //     merchantID: merchantId,
+            //     docs: fileList
+            // }
+            // console.log('data: ', setCACDocs);
 
-            // Return the download URL to the client
-            return {
-                message: "Merchant CAC Set Successfully",
-                downloadUrl,
-            };
+            return await this.merchantService.setMerchantCACDocs(setCACDocs);
         } catch (error) {
-            console.log('create error: ', error);
-            // Delete the uploaded file if there is an error
-            unlinkSync(cacDoc.path);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    // @Post(':merchantId/set-cac')
+    // @UseGuards(JwtAuthenticationGuard)
+    // @UseInterceptors(
+    //     CustomFileInterceptor(
+    //         'cacDoc',
+    //         ['image/jpeg', 'image/png', 'application/pdf']
+    //     ),
+    // )
+    // async setMerchantCAC(
+    //     @Req() req,
+    //     @UploadedFile() cacDoc: Express.Multer.File,
+    //     @Param('merchantId') merchantId: string,
+    // ) {
+    //     if (!cacDoc) {
+    //         throw new HttpException('CAC Doc not uploaded', HttpStatus.BAD_REQUEST);
+    //     }
+
+    //     try {
+    //         let cacDto: CACDocType = {
+    //             cacPath: cacDoc.filename,
+    //             cacMime: cacDoc.mimetype
+    //         }
+
+    //         const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/cac`;
+
+    //         // console.log('du: ', downloadUrl)
+    //         // Save the merchant identification data to the database
+    //         await this.merchantService.setMerchantCAC(merchantId, cacDto);
+
+    //         // Return the download URL to the client
+    //         return {
+    //             message: "Merchant CAC Set Successfully",
+    //             downloadUrl,
+    //         };
+    //     } catch (error) {
+    //         console.log('create error: ', error);
+    //         // Delete the uploaded file if there is an error
+    //         unlinkSync(cacDoc.path);
+    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
 
     @Post(':merchantId/set-logo')
