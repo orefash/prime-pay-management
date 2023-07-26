@@ -19,6 +19,7 @@ import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
 import { CACDocType, updateMerchantCACDocDTO } from 'src/merchants/dto/SetCAC.dto';
 import { KeysService } from 'src/keys/services/keys/keys.service';
 import { PaystackService } from 'src/third-party-data/services/paystack-service/paystack-service.service';
+import { LoadImageUrl } from 'src/types/image.url.interface';
 
 @Injectable()
 export class MerchantsService {
@@ -161,7 +162,7 @@ export class MerchantsService {
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
-    async setMerchantCACDocs(setCACDocs: updateMerchantCACDocDTO) {
+    async setMerchantCACDocs(setCACDocs: updateMerchantCACDocDTO, baseUrl: string) {
 
         // await this.merchantRepository.update(id, setCAC);
         const merchant = await this.merchantRepository.findOne({
@@ -171,23 +172,40 @@ export class MerchantsService {
         });
 
         if (!merchant)
-            throw new Error(`Merchant with id ${setCACDocs.merchantID} not found!!`)
+            throw new Error(`Merchant with id ${setCACDocs.merchantID} not found!!`);
 
-        // if (setCACDocs.existingDocString && setCACDocs.docs && setCACDocs.docs.length > 0) {
-        //     let existingImgs: LoadImageUrl[] = JSON.parse(updateMerchantProductDto.existingImageString);
+        console.log("merchantd: ", merchant.cacDocuments)
 
-        //     merchantProduct.pImages = merchantProduct.pImages.filter((object) =>
-        //         existingImgs.some((otherObject) => otherObject.name === object.name)
-        //     );
 
-        //     // console.log('HF: ', merchantProduct.pImages);
+        console.log("menew drchantd: ", setCACDocs.docs)      
 
-        //     updateMerchantProductDto.images = merchantProduct.pImages.concat(updateMerchantProductDto.images);
-        // }
+
+
+        if (setCACDocs.existingDocString && merchant.cacDocuments && merchant.cacDocuments.length > 0) {
+            let exsitingDocs: CACDocType[] = JSON.parse(setCACDocs.existingDocString);
+
+            merchant.cacDocuments = merchant.cacDocuments.filter((object) =>
+                exsitingDocs.some((otherObject) => otherObject.name === object.name)
+            );
+
+            setCACDocs.docs = merchant.cacDocuments.concat(setCACDocs.docs);
+        }
 
         merchant.cacDocuments = setCACDocs.docs;
 
-        return await this.merchantRepository.save(merchant);
+        const updatedCACDocuments = merchant.cacDocuments.map((doc) => ({
+            ...doc,
+            docUrl: doc.docUrl.includes('http')? doc.docUrl : baseUrl + doc.docUrl,
+        }));
+
+        merchant.cacDocuments = updatedCACDocuments;
+
+        let updatedMerchant = await this.merchantRepository.save(merchant);
+
+        return {
+            id: updatedMerchant.id,
+            cacDocuments: updatedMerchant.cacDocuments
+        }
     }
 
     async updateMerchantBank(id: string, editMerchantBankDto: UpdateMerchantBankDto): Promise<Partial<MerchantEntity>> {
@@ -391,7 +409,7 @@ export class MerchantsService {
             select: ['id', 'cacDocuments'],
         });
 
-        if(!docs){
+        if (!docs) {
             throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
         }
 
@@ -399,30 +417,6 @@ export class MerchantsService {
 
         return { fileName: docName, contentType: mimeType, filePath: filePath };
     }
-
-    // async getMerchantCAC(merchantId: string) {
-    //     const docs = await this.merchantRepository.findOne({
-    //         where: {
-    //             id: merchantId 
-    //         },
-    //         select: ['id', 'cacPath', 'cacMime'],
-
-    //     });
-
-    //     if (docs?.cacPath) {
-
-    //         const fileName = path.basename(docs.cacPath);
-    //         // console.log('d: ', __dirname)
-    //         const filePath = await this.fetchUploadPath(fileName);
-
-    //         const contentType = docs.cacMime;
-    //         return { fileName, contentType, filePath: filePath }
-    //     }
-
-
-    //     throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
-
-    // }
 
 
     async getMerchantByEmail(email: string): Promise<MerchantEntity> {

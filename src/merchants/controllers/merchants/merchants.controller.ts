@@ -180,10 +180,14 @@ export class MerchantsController {
     async setMerchantCACDocs(
         @UploadedFiles() files: Express.Multer.File[],
         @Param('merchantId') merchantId: string,
-        @Body() setCACDocs: updateMerchantCACDocDTO
+        @Body() setCACDocs: updateMerchantCACDocDTO,
+        @Req() req
     ) {
         
         try {
+
+
+            const baseUrl = `${req.protocol}://${req.headers.host}/api/merchants`;
 
             let fileList: CACDocType[] = [];
 
@@ -209,54 +213,13 @@ export class MerchantsController {
             // }
             // console.log('data: ', setCACDocs);
 
-            return await this.merchantService.setMerchantCACDocs(setCACDocs);
+            return await this.merchantService.setMerchantCACDocs(setCACDocs, baseUrl);
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
 
 
-    // @Post(':merchantId/set-cac')
-    // @UseGuards(JwtAuthenticationGuard)
-    // @UseInterceptors(
-    //     CustomFileInterceptor(
-    //         'cacDoc',
-    //         ['image/jpeg', 'image/png', 'application/pdf']
-    //     ),
-    // )
-    // async setMerchantCAC(
-    //     @Req() req,
-    //     @UploadedFile() cacDoc: Express.Multer.File,
-    //     @Param('merchantId') merchantId: string,
-    // ) {
-    //     if (!cacDoc) {
-    //         throw new HttpException('CAC Doc not uploaded', HttpStatus.BAD_REQUEST);
-    //     }
-
-    //     try {
-    //         let cacDto: CACDocType = {
-    //             cacPath: cacDoc.filename,
-    //             cacMime: cacDoc.mimetype
-    //         }
-
-    //         const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/cac`;
-
-    //         // console.log('du: ', downloadUrl)
-    //         // Save the merchant identification data to the database
-    //         await this.merchantService.setMerchantCAC(merchantId, cacDto);
-
-    //         // Return the download URL to the client
-    //         return {
-    //             message: "Merchant CAC Set Successfully",
-    //             downloadUrl,
-    //         };
-    //     } catch (error) {
-    //         console.log('create error: ', error);
-    //         // Delete the uploaded file if there is an error
-    //         unlinkSync(cacDoc.path);
-    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
 
 
     @Post(':merchantId/set-logo')

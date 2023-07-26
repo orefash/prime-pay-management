@@ -17,8 +17,8 @@ export class MerchantMediaController {
     async getMerchantLogo(@Param('merchantId') merchantId: string, @Res() res: Response) {
         let fileData = await this.merchantService.getMerchantLogo(merchantId);
 
-        console.log('fileData: ', fileData);
-        
+        // console.log('fileData: ', fileData);
+
         res.attachment(fileData.fileName);
         res.setHeader('Content-Type', fileData.contentType);
 
@@ -58,15 +58,15 @@ export class MerchantMediaController {
     // @UseGuards(JwtAuthenticationGuard)
     async getMerchantCACDocument(@Param('merchantId') merchantId: string, @Param('mimeType1') mimetype1: string, @Param('mimetype2') mimetype2: string, @Param('name') filename: string, @Req() req, @Res() res: Response) {
 
-        console.log("in cac dco fetch");
+        // console.log("in cac dco fetch");
         try {
             let mimeType = `${mimetype1}/${mimetype2}`;
 
-            console.log('mm: ', mimeType)
+            // console.log('mm: ', mimeType)
 
             let cacData = await this.merchantService.getMerchantCACDocument(merchantId, filename, mimeType);
 
-            console.log('cacdata: ', cacData)
+            // console.log('cacdata: ', cacData)
 
             res.attachment(cacData.fileName);
             res.setHeader('Content-Type', cacData.contentType);
