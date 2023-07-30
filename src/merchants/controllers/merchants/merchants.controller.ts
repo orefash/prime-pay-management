@@ -137,7 +137,7 @@ export class MerchantsController {
 
             const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
 
-            console.log('du: ', setMerchantID.promoterIdMime)
+            // console.log('du: ', setMerchantID.promoterIdMime)
             // Save the merchant identification data to the database
             await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
 
