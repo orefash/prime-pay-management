@@ -327,7 +327,7 @@ export class MerchantsService {
             select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
         });
 
-        // console.log('pID: ', docs);
+        console.log('pID: ', docs);
         if (docs?.promoterId) {
 
             const fileName = path.basename(docs.promoterId);
@@ -336,6 +336,32 @@ export class MerchantsService {
 
             const filePath = await this.fetchUploadPath(fileName);
             console.log('fp: ', filePath)
+            return { fileName, contentType, filePath: filePath }
+        }
+
+
+        throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
+    }
+
+
+    async getMerchantIdentificationURL(merchantId: string) {
+        const docs = await this.merchantRepository.findOne({
+            where: {
+                id: merchantId
+            },
+            select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
+        });
+
+        console.log('pID: ', docs);
+
+        if (docs.promoterId) {
+
+            const fileName = path.basename(docs.promoterId);
+
+            const contentType = docs.promoterIdMime;
+
+            const filePath = await this.fetchUploadPath(fileName);
+            console.log('fp: ', fileName)
             return { fileName, contentType, filePath: filePath }
         }
 

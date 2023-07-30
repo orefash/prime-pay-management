@@ -37,8 +37,24 @@ export class MerchantMediaController {
         res.sendFile(fileData.filePath);
     }
 
+
+    @Get(':merchantId/id-card-url')
+    async getMerchantIdentifications(@Param('merchantId') merchantId: string, 
+    @Req() req) {
+
+        let fileData = await this.merchantService.getMerchantIdentification(merchantId);
+
+        delete fileData.filePath;
+
+        const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${fileData.contentType}/${fileData.fileName}`;
+
+        return {
+            ...fileData,
+            imgUrl: downloadUrl
+        }
+    }
+
     @Get(':merchantId/cac')
-    // @UseGuards(JwtAuthenticationGuard)
     async getMerchantCACDocs(@Param('merchantId') merchantId: string, @Req() req) {
 
         try {

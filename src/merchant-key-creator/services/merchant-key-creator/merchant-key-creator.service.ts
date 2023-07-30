@@ -43,14 +43,15 @@ export class MerchantKeyCreatorService {
 
         if (merchant) throw new Error("Merchant with Email already Exists")
 
+
         const IS_TEST: string = this.configService.get<string>('IS_TEST');
-        console.log("ISTESt: ", typeof IS_TEST)
+        // console.log("ISTESt: ", typeof IS_TEST)
 
         if (IS_TEST !== "true") {
             console.log("Acc valid check: ", )
             let isAccountValid = await this.paystackService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
 
-            console.log("Acc valid: ", isAccountValid)
+            // console.log("Acc valid: ", isAccountValid)
             if (!isAccountValid)
                 throw new Error("Invalid Bank Details!!")
         }
@@ -77,7 +78,6 @@ export class MerchantKeyCreatorService {
         newMerchant.bankCode = createMerchantDto.bankCode;
         newMerchant.bankName = createMerchantDto.bankName;
 
-        // console.log("nm: ", newMerchant);
 
         //creating keys
         let createdMerchant = await this.keyService.createMerchantKey(newMerchant);
