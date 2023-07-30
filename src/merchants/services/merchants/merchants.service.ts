@@ -403,18 +403,20 @@ export class MerchantsService {
 
         });
 
+        return docs;
 
-        if (docs.cacDocuments && docs.cacDocuments.length > 0) {
 
-            const updatedCACDocuments = docs.cacDocuments.map((doc) => ({
-                ...doc,
-                docUrl: baseUrl + doc.docUrl,
-            }));
+        // if (docs.cacDocuments && docs.cacDocuments.length > 0) {
 
-            docs.cacDocuments = updatedCACDocuments;
+        //     const updatedCACDocuments = docs.cacDocuments.map((doc) => ({
+        //         ...doc,
+        //         docUrl: baseUrl + doc.docUrl,
+        //     }));
 
-            return docs
-        }
+        //     docs.cacDocuments = updatedCACDocuments;
+
+        //     return docs
+        // }
 
         throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
     }
