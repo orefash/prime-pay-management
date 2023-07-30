@@ -403,6 +403,10 @@ export class MerchantsService {
 
         });
 
+        if(!docs){
+            throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
+        }
+
         return docs;
 
 
@@ -418,7 +422,6 @@ export class MerchantsService {
         //     return docs
         // }
 
-        throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
     }
 
     async getMerchantCACDocument(merchantId: string, docName: string, mimeType: string) {
