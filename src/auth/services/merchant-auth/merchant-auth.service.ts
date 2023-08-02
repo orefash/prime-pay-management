@@ -78,7 +78,7 @@ export class MerchantAuthService {
         // console.log('New token: ', createdToken);
 
         return {
-            token: resetToken,
+            status: "Successful Request",
             mid: merchant.id,
         };
     }
