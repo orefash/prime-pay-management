@@ -6,6 +6,7 @@ import COUNTRY_CODES from '../../types/CountryCodes';
 import PRODUCTCATEGORIES from 'src/statics/types/ProductTypes';
 import { OrderChannel, TransactionStatus } from 'src/merchant-transaction/dto/CreateTransaction.dto';
 import { PTransactionStatus } from 'src/merchant-payout/dto/CreatePayoutTransaction.dto';
+import { PayoutChannels } from 'src/merchant-payout/statics/PayoutChannels';
 
 @Injectable()
 export class StaticsService {
@@ -39,8 +40,12 @@ export class StaticsService {
     }
 
     async getPayoutChannels() : Promise<String[]>{
-        return Object.values(PTransactionStatus);
+        return Object.values(PayoutChannels);
     }
 
+    async getPayoutStatuses() : Promise<String[]>{
+        return Object.values(PTransactionStatus);
+    }
+    
     
 }

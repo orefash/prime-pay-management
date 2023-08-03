@@ -9,49 +9,46 @@ export class StaticsController {
     ){}
 
     @Get('id-types')
-    // @UseGuards(JwtAuthenticationGuard)
     async getIDTypes(){
         return await this.staticsService.getIDTypes();
     }
 
     @Get('service-types')
-    // @UseGuards(JwtAuthenticationGuard)
     async getServiceTypes() {
         return await this.staticsService.getServiceTypes();
     }
 
     @Get('product-categories')
-    // @UseGuards(JwtAuthenticationGuard)
     async getProductCategories() {
         return await this.staticsService.getProductCategories();
     }
 
     @Get('nigeria-states')
-    // @UseGuards(JwtAuthenticationGuard)
     async getNigeriaStatesData() {
         return await this.staticsService.getNigeriaStatesData();
     }
 
     @Get('country-codes')
-    // @UseGuards(JwtAuthenticationGuard)
     async getCountryCodes() {
         return await this.staticsService.getCountryCodes();
     }
 
     @Get('transaction-statuses')
-    // @UseGuards(JwtAuthenticationGuard)
     async getTransactionStatuses() {
         return await this.staticsService.getTransactionStatuses();
     }
 
     @Get('transaction-channels')
-    // @UseGuards(JwtAuthenticationGuard)
     async getTransactionChannels() {
         return await this.staticsService.getTransactionChannels();
     }
 
     @Get('payout-statuses')
-    // @UseGuards(JwtAuthenticationGuard)
+    async getPayoutStatuses() {
+        return await this.staticsService.getPayoutStatuses();
+    }
+
+    @Get('payout-channels')
     async getPayoutChannels() {
         return await this.staticsService.getPayoutChannels();
     }
