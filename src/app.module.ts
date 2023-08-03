@@ -26,6 +26,7 @@ import { KeysController } from './keys/controllers/keys/keys.controller';
 import { MerchantPayoutController } from './merchant-payout/controllers/merchant-payout/merchant-payout.controller';
 import { MerchantProductController } from './merchant-product/controllers/merchant-product/merchant-product.controller';
 import { OverviewController } from './overview/controllers/overview/overview.controller';
+import { MailerModule } from './mailer/mailer.module';
 
 
 
@@ -60,6 +61,7 @@ import { OverviewController } from './overview/controllers/overview/overview.con
     MerchantKeyCreatorModule,
     MerchantProductModule,
     ImagesModule,
+    MailerModule,
  
   ],
   providers: [

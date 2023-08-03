@@ -119,6 +119,14 @@ export class Merchant {
     })
     isActive: boolean;
 
+    @Index({ unique: false })
+    @Column({
+        nullable: false,
+        name: 'is_verified',
+        default: false
+    })
+    isVerified: boolean;
+
     @Column({
         nullable: true,
     })

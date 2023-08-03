@@ -63,6 +63,13 @@ export class MerchantTransaction {
     })
     mid: number;
 
+    
+    @Column({
+        nullable: true,
+    })
+    merchantId: string;
+
+
     @Column({
         nullable: true,
     })
