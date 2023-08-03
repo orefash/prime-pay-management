@@ -16,6 +16,7 @@ import { CACDocType, updateMerchantCACDocDTO } from 'src/merchants/dto/SetCAC.dt
 import { ConfigService } from '@nestjs/config';
 import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
 import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
+import { UpdateMerchantMIDDto } from 'src/merchants/dto/UpdateMerchantMID.dto';
 
 
 @Controller('merchants')
@@ -44,7 +45,6 @@ export class MerchantsController {
 
 
     @Patch('profile/:id')
-    @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)
     async updateMerchant(@Param('id') merchantId: string, @Body() editMerchantDto: EditMerchantDto) {
         try {
@@ -57,7 +57,6 @@ export class MerchantsController {
 
 
     @Patch(':id/systemId/:mid')
-    @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)
     async updateMerchantSystemId(@Param('id') id: string, @Param('mid') systemId: number) {
         try {
@@ -70,7 +69,6 @@ export class MerchantsController {
 
 
     @Patch('bank-details/:id')
-    @UseGuards(JwtAuthenticationGuard)
     @UsePipes(ValidationPipe)
     async updateMerchantBank(@Param('id') merchantId: string, @Body() editMerchantBankDto: UpdateMerchantBankDto) {
         try {
@@ -81,6 +79,35 @@ export class MerchantsController {
         }
     }
 
+    @Patch(':id/systemID')
+    @UsePipes(ValidationPipe)
+    async updateMerchantMID(@Param('id') merchantId: string, @Body() editMerchantMIDDto: UpdateMerchantMIDDto) {
+        try {
+            return this.merchantService.setMerchantMID(merchantId, editMerchantMIDDto);
+        } catch (error) {
+            // console.log('update merchant bank error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Get(':merchantId/balance')
+    async getMerchantBalance(
+        @Param('merchantId') merchantId: string) {
+
+        try {
+            let merchant = await this.merchantService.getMerchantBalance(merchantId);
+
+            let data = {
+                ...merchant,
+            };
+            return data;
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+
+        }
+
+    }
+
     @Get('')
     getAllMerchants() {
         return this.merchantService.getAllMerchants(
@@ -89,7 +116,6 @@ export class MerchantsController {
     }
 
     @Get(':merchantId')
-    @UseGuards(JwtAuthenticationGuard)
     async getMerchantById(
         @Param('merchantId') merchantId: string,
         @Req() req) {
@@ -114,7 +140,6 @@ export class MerchantsController {
 
 
     @Post(':merchantId/set-id-card')
-    @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(
         CustomFileInterceptor(
             'promoterIdDoc',
@@ -183,7 +208,7 @@ export class MerchantsController {
         @Body() setCACDocs: updateMerchantCACDocDTO,
         @Req() req
     ) {
-        
+
         try {
 
 

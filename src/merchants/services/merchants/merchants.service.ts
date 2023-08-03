@@ -20,6 +20,7 @@ import { CACDocType, updateMerchantCACDocDTO } from 'src/merchants/dto/SetCAC.dt
 import { KeysService } from 'src/keys/services/keys/keys.service';
 import { PaystackService } from 'src/third-party-data/services/paystack-service/paystack-service.service';
 import { LoadImageUrl } from 'src/types/image.url.interface';
+import { UpdateMerchantMIDDto } from 'src/merchants/dto/UpdateMerchantMID.dto';
 
 @Injectable()
 export class MerchantsService {
@@ -327,7 +328,7 @@ export class MerchantsService {
             select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
         });
 
-        console.log('pID: ', docs);
+        // console.log('pID: ', docs);
         if (docs?.promoterId) {
 
             const fileName = path.basename(docs.promoterId);
@@ -409,19 +410,6 @@ export class MerchantsService {
 
         return docs;
 
-
-        // if (docs.cacDocuments && docs.cacDocuments.length > 0) {
-
-        //     const updatedCACDocuments = docs.cacDocuments.map((doc) => ({
-        //         ...doc,
-        //         docUrl: baseUrl + doc.docUrl,
-        //     }));
-
-        //     docs.cacDocuments = updatedCACDocuments;
-
-        //     return docs
-        // }
-
     }
 
     async getMerchantCACDocument(merchantId: string, docName: string, mimeType: string) {
@@ -453,5 +441,38 @@ export class MerchantsService {
         return merchants;
     }
 
+    async getMerchantBalance(mid: string): Promise<MerchantEntity> {
+
+        let merchants = await this.merchantRepository.createQueryBuilder('m')
+            .select(['m.id', 'm.systemId', 'm.availableBalance'])
+            .where("id = :mid", { mid })
+            .getOne();
+
+        if(!merchants)
+            throw new Error("Invalid merchant ID")
+
+        return merchants;
+    }
+
+    async setMerchantMID(id: string, setMID: UpdateMerchantMIDDto) {
+
+        await this.merchantRepository.update(id, setMID);
+        const updatedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (updatedMerchant) {
+            const { password, ...merchant } = updatedMerchant;
+            return {
+                id: merchant.id,
+                merchant: merchant,
+                message: "Merchant MID Set"
+            };
+        }
+
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    }
 
 }
