@@ -27,6 +27,7 @@ import { MerchantPayoutController } from './merchant-payout/controllers/merchant
 import { MerchantProductController } from './merchant-product/controllers/merchant-product/merchant-product.controller';
 import { OverviewController } from './overview/controllers/overview/overview.controller';
 import { MailerModule } from './mailer/mailer.module';
+import { MailModule } from './mail/mail.module';
 
 
 
@@ -62,6 +63,7 @@ import { MailerModule } from './mailer/mailer.module';
     MerchantProductModule,
     ImagesModule,
     MailerModule,
+    MailModule,
  
   ],
   providers: [

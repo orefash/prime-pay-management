@@ -164,11 +164,12 @@ export class MerchantsController {
 
             // console.log('du: ', setMerchantID.promoterIdMime)
             // Save the merchant identification data to the database
-            await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
+            let data = await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
 
             // Return the download URL to the client
             return {
                 message: "Merchant ID Set Successfully",
+                idType: data.idType,
                 downloadUrl,
             };
         } catch (error) {

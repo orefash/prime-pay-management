@@ -114,6 +114,7 @@ export class MerchantsService {
             const { password, ...merchant } = updatedMerchant;
             return {
                 id: merchant.id,
+                idType: merchant.promoterIdType,
                 message: "Merchant Identification Set"
             };
         }
@@ -337,7 +338,7 @@ export class MerchantsService {
 
             const filePath = await this.fetchUploadPath(fileName);
             console.log('fp: ', filePath)
-            return { fileName, contentType, filePath: filePath }
+            return { fileName, contentType, filePath: filePath, idType: docs.promoterIdType }
         }
 
 
@@ -412,7 +413,7 @@ export class MerchantsService {
 
     }
 
-    
+
     async getMerchantCACDocument(merchantId: string, docName: string, mimeType: string) {
 
         const docs = await this.merchantRepository.findOne({
