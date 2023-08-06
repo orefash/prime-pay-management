@@ -40,12 +40,24 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
     
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('REDIS_HOST'),
-          port: Number(configService.get('REDIS_PORT')),
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+
+        const isProduction = configService.get<number>('IS_LOCAL') === 0;
+  
+        const redisConfig: any = {
+          host: configService.get<string>('REDIS_HOST'),
+          port: Number(configService.get<number>('REDIS_PORT')),
+        };
+
+        if (isProduction) {
+          // Add the 'password' property to the Redis configuration only in production
+          redisConfig.redis.password = configService.get<string>('REDIS_PASSWORD');
+        }
+
+        return {
+          redis: redisConfig,
+        };
+      },
       inject: [ConfigService],
     }),
 

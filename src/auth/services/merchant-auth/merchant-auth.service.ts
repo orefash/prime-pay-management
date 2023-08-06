@@ -148,12 +148,13 @@ export class MerchantAuthService {
         if (!merchantToken)
             throw new Error("Token is Invalid")
 
+            
         console.log("MID: ", merchantToken)
 
         await this.merchantRepository.update(merchantToken.merchant.id, {
             isConfirmed: true
         });
-        
+
         const isLocal = this.configService.get<number>('IS_LOCAL');
 
         let bUrl = "";
