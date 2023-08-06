@@ -23,6 +23,7 @@ export class MerchantLocalStrategy extends PassportStrategy(Strategy, 'merchant-
             throw new HttpException("Incorrect Email or Password", HttpStatus.UNAUTHORIZED);
         }
 
+        
         if(!merchant.isConfirmed){
             // throw new UnauthorizedException();
             throw new HttpException("Email invalid, Please reset password", HttpStatus.UNAUTHORIZED);
