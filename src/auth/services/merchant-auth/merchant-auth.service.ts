@@ -44,7 +44,7 @@ export class MerchantAuthService {
 
     async validateMerchant(email: string, password: string) {
         const merchant: Merchant = await this.merchantService.getMerchantByEmail(email);
-        console.log('in ver merhcant: ', merchant)
+        // console.log('in ver merhcant: ', merchant)
         if (merchant && comparePasswords(password, merchant.password)) {
             const { password, ...result } = merchant;
             return result;
