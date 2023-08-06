@@ -436,7 +436,7 @@ export class MerchantsService {
     async getMerchantByEmail(email: string): Promise<MerchantEntity> {
 
         let merchants = await this.merchantRepository.createQueryBuilder('m')
-            .select(['m.id', 'm.systemId', 'm.email', 'm.name', 'm.logoUrl', 'm.promoterFname', 'm.promoterLname', 'm.bvn', 'm.businessType', 'm.isRegistered', 'm.isActive', 'm.isVerified', 'm.promoterIdType', 'm.websiteUrl', 'm.phone', 'm.address', 'm.avgMonthlySales', 'm.accountNo', 'm.bankCode', 'm.bankName', 'm.socials', 'm.regDate', 'm.modifiedDate', 'm.availableBalance', 'm.password'])
+            .select(['m.id', 'm.systemId', 'm.email', 'm.name', 'm.logoUrl', 'm.promoterFname', 'm.promoterLname', 'm.bvn', 'm.businessType', 'm.isRegistered', 'm.isActive', 'm.isVerified',  'm.isConfirmed', 'm.promoterIdType', 'm.websiteUrl', 'm.phone', 'm.address', 'm.avgMonthlySales', 'm.accountNo', 'm.bankCode', 'm.bankName', 'm.socials', 'm.regDate', 'm.modifiedDate', 'm.availableBalance', 'm.password'])
             .where("LOWER(email) = LOWER(:email)", { email })
             .getOne();
 

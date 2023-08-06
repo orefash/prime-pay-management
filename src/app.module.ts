@@ -110,6 +110,7 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
   controllers: [MailerController],
 })
 
+
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtExpirationMiddleware)

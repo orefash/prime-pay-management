@@ -44,6 +44,7 @@ export class MerchantKeyCreatorService {
     ) { }
 
     async testMailer() {
+        console.log("In test mailer")
 
         const job = await this.mailQueue.add('test_mail');
 

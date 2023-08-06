@@ -18,6 +18,7 @@ export class MailProcessor {
     @Process('test_mail')
     async handleMailerTest(){
 
+        console.log("in mail handler");
         let merchant = new Merchant();
         merchant.name = 'Ore';
         await this.mailService.sendUserConfirmation(merchant, 'token');
@@ -29,7 +30,7 @@ export class MailProcessor {
     async confirmEmailHandler(job: Job<any>){
 
         const data: ConfirmEmail = job.data;
-        
+
         await this.mailService.sendEmailConfirmation(data);
 
         return "done it "
