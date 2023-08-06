@@ -37,13 +37,18 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    
+
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
 
-        const isProduction = configService.get<number>('IS_LOCAL') === 0;
-  
+        console.log("in redis config");
+        const isLocal = parseInt(configService.get('IS_LOCAL'));
+        console.log("isLocal: ", isLocal);
+
+        const isProduction = isLocal === 0? true : false;
+
+        console.log("in prod: ", isProduction);
         const redisConfig: any = {
           host: configService.get<string>('REDIS_HOST'),
           port: Number(configService.get<number>('REDIS_PORT')),
@@ -90,7 +95,7 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
     ImagesModule,
     // MailerModule,
     MailModule,
- 
+
   ],
   providers: [
     {
@@ -104,7 +109,7 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtExpirationMiddleware)
-    // .exclude('api/merchants/:merchantId/logo')
-    .forRoutes(TransactionController, MerchantsController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
+      // .exclude('api/merchants/:merchantId/logo')
+      .forRoutes(TransactionController, MerchantsController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
   }
 }
