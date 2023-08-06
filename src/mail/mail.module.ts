@@ -19,10 +19,11 @@ import { MailController } from './controllers/mail/mail.controller';
         },
       },
       defaults: {
-        from: '"No Reply" <noreply@prime-pay.africa>',
+        from: '"Primepay" <ofaseru@prime-pay.africa>',
       },
       
       template: {
+        // dir: `${process.cwd()}/templates`,
         dir: join(__dirname, 'templates'),
         adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
         options: {
@@ -30,7 +31,9 @@ import { MailController } from './controllers/mail/mail.controller';
         },
       },
     }),
+
   ],
+  exports: [MailService],
   providers: [MailService],
   controllers: [MailController]
 })

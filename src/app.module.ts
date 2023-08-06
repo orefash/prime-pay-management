@@ -26,8 +26,10 @@ import { KeysController } from './keys/controllers/keys/keys.controller';
 import { MerchantPayoutController } from './merchant-payout/controllers/merchant-payout/merchant-payout.controller';
 import { MerchantProductController } from './merchant-product/controllers/merchant-product/merchant-product.controller';
 import { OverviewController } from './overview/controllers/overview/overview.controller';
-import { MailerModule } from './mailer/mailer.module';
+// import { MailerModule } from './mailer/mailer.module';
 import { MailModule } from './mail/mail.module';
+import { BullModule } from '@nestjs/bull';
+import { MailerController } from './mailer-modules/contollers/mailer/mailer.controller';
 
 
 
@@ -35,6 +37,18 @@ import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: Number(configService.get('REDIS_PORT')),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+
     MerchantsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -62,7 +76,7 @@ import { MailModule } from './mail/mail.module';
     MerchantKeyCreatorModule,
     MerchantProductModule,
     ImagesModule,
-    MailerModule,
+    // MailerModule,
     MailModule,
  
   ],
@@ -72,6 +86,7 @@ import { MailModule } from './mail/mail.module';
       useClass: UnauthorizedExceptionFilter,
     },
   ],
+  controllers: [MailerController],
 })
 
 export class AppModule {

@@ -77,10 +77,19 @@ export class MerchantAuthService {
 
         // console.log('New token: ', createdToken);
 
-        return {
-            status: "Successful Request",
-            mid: merchant.id,
-        };
+        try {
+
+
+            return {
+                status: "Successful Request",
+                success: true,
+            };
+
+        } catch (error) {
+            throw new Error("Error in Mail Sending")
+        }
+
+
     }
 
 
@@ -115,8 +124,8 @@ export class MerchantAuthService {
             }
         });
 
-        if(updatedMerchant){
-            
+        if (updatedMerchant) {
+
             await this.tokenRepository.delete(token.id);
             return {
                 message: "Password updated successfully",
@@ -126,6 +135,40 @@ export class MerchantAuthService {
 
         throw new Error("Password update failed");
 
+    }
+
+
+    async confirmEmail(token: string) {
+
+        let merchantToken = await this.tokenRepository.findOne({
+            where: { token: token },
+            relations: ['merchant'],
+        });
+
+        if (!merchantToken)
+            throw new Error("Token is Invalid")
+
+        console.log("MID: ", merchantToken)
+
+        await this.merchantRepository.update(merchantToken.merchant.id, {
+            isConfirmed: true
+        });
+        
+        const isLocal = this.configService.get<number>('IS_LOCAL');
+
+        let bUrl = "";
+        if(isLocal == 1){
+            bUrl = this.configService.get<string>('BASE_URL_UAT')
+        }else{
+            bUrl = this.configService.get<string>('BASE_URL_LIVE')
+        }
+
+        await this.tokenRepository.delete(merchantToken.id);
+
+        return {
+            status: true,
+            redirectUrl: bUrl
+        };
     }
 
 }

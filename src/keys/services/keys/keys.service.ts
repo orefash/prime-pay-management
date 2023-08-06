@@ -44,6 +44,7 @@ export class KeysService {
     async createMerchantKey(merchant: Merchant): Promise<Merchant> {
         try {
 
+            console.log("In key and merchant create")
             const key = new MerchantKey();
             key.live_private_key = this.generateKey(true, false);
             key.live_public_key = this.generateKey(true, true);

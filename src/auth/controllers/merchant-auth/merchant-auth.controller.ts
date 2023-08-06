@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Param, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { RequestPasswordResetDto } from 'src/auth/dto/RequestPasswordReset.dto';
@@ -85,6 +85,21 @@ export class MerchantAuthController {
         } catch (error) {
             // console.log('Password Reset error')
             // console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Get('confirm/:token')
+    async confirmToken (@Param('token') token: string, @Res() res: Response){
+        try {
+            
+            let confirmed =  await this.merchantAuthService.confirmEmail(token);
+
+            if(confirmed.redirectUrl){
+                return res.redirect(confirmed.redirectUrl);
+            }
+            
+        } catch (error) {
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }

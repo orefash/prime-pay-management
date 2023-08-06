@@ -111,6 +111,13 @@ export class Merchant {
     })
     isRegistered: boolean;
 
+    @Column({
+        nullable: false,
+        name: 'is_confirmed',
+        default: false
+    })
+    isConfirmed: boolean;
+
     @Index({ unique: false })
     @Column({
         nullable: false,

@@ -3,7 +3,10 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": ["**/*.hbs"],
-    "watchAssets": true 
+    "webpack": false,
+    "assets": [
+      "**/*.hbs"
+    ],
+    "watchAssets": true
   }
 }

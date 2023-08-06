@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MerchantKeyCreatorService } from 'src/merchant-key-creator/services/merchant-key-creator/merchant-key-creator.service';
 import { CreateMerchantDto } from 'src/merchants/dto/CreateMerchant.dto';
 
@@ -24,4 +24,51 @@ export class MerchantKeyCreatorController {
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @Post('test-mail')
+    async testMail() {
+        try {
+            return await this.merchantProfileService.testMailer();
+
+        } catch (error) {
+            // console.log('create Merchant Profile error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Post('test-token/:mid')
+    async testToken(@Param('mid') mid: string) {
+        try {
+
+            return await this.merchantProfileService.testToken(mid);
+
+        } catch (error) {
+            // console.log('create Merchant Profile error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Get('test/:id')
+    async getJobResult(@Param('id') id: string) {
+
+        try {
+            const job =  await this.merchantProfileService.getTestJob(id);
+
+            const isCompleted = await job.isCompleted();
+
+            if(!isCompleted)
+                throw new Error("Is not complete")
+
+            
+            
+
+            return job;
+
+        } catch (error) {
+            // console.log('create Merchant Profile error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
 }
