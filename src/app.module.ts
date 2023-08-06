@@ -45,6 +45,10 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
         console.log("in redis config");
         const isLocal = parseInt(configService.get('IS_LOCAL'));
         console.log("isLocal: ", isLocal);
+        const redis_password: string = configService.get<string>('REDIS_PASSWORD')
+
+
+        console.log("redis pass: ", redis_password);
 
         const isProduction = isLocal === 0? true : false;
 
@@ -56,7 +60,7 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
 
         if (isProduction) {
           // Add the 'password' property to the Redis configuration only in production
-          redisConfig.redis.password = configService.get<string>('REDIS_PASSWORD');
+          redisConfig.password = redis_password;
         }
 
         return {

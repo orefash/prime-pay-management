@@ -150,7 +150,7 @@ export class MerchantAuthService {
 
         console.log("MID: ", merchantToken)
 
-        
+    
         await this.merchantRepository.update(merchantToken.merchant.id, {
             isConfirmed: true
         });
