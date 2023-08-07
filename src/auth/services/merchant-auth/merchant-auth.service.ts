@@ -77,7 +77,7 @@ export class MerchantAuthService {
         let resetToken = generateToken();
         let tokenHash = encodePassword(resetToken);
 
-        const newToken = this.tokenRepository.create({ token: tokenHash, merchant });
+        const newToken = this.tokenRepository.create({ token: resetToken, merchant });
         const createdToken = await this.tokenRepository.save(newToken);
 
         // console.log('New token: ', createdToken);
@@ -90,7 +90,7 @@ export class MerchantAuthService {
             bUrl = this.configService.get<string>('BASE_URL_LIVE')
         }
 
-        bUrl = `${bUrl}/request-password-reset/${tokenHash}/${merchant.id}`
+        bUrl = `${bUrl}/request-password-reset/${resetToken}/${merchant.id}`
        
 
         let resetPasswordData: ConfirmEmail = {

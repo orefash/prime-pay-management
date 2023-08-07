@@ -39,6 +39,8 @@ export class MailProcessor {
     @Process('reset_password')
     async resetPasswordHandler(job: Job<any>){
 
+        console.log("in reset handler")
+
         const data: ConfirmEmail = job.data;
 
         await this.mailService.sendResetPasswordEmail(data);
