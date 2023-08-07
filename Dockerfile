@@ -42,6 +42,10 @@ RUN npm ci --omit=dev
 # Copy production build
 COPY --from=development /app/dist/ ./dist/
 
+# Copy the templates directory into the production image
+COPY --from=development /app/src/mail/templates/ ./dist/mail/templates/
+
+
 # Expose application port
 EXPOSE 3500
 
