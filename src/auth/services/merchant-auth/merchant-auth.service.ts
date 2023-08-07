@@ -1,9 +1,12 @@
+import { InjectQueue } from '@nestjs/bull';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Queue } from 'bull';
 import { RequestPasswordResetDto } from 'src/auth/dto/RequestPasswordReset.dto';
 import { ResetPasswordDto } from 'src/auth/dto/ResetPassword.dto';
+import { ConfirmEmail } from 'src/mail/types/confirm_email.type';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
 import { Merchant, ResetToken } from 'src/typeorm';
 import { comparePasswords, encodePassword, generateToken } from 'src/utils/bcrypt';
@@ -21,7 +24,9 @@ export class MerchantAuthService {
         @Inject(JwtService)
         private readonly jwtService: JwtService,
         @Inject(ConfigService)
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        @InjectQueue('send_mail')
+        private readonly mailQueue: Queue,
     ) { }
 
     public getCookieWithJwtToken(merchantId: string) {
@@ -77,18 +82,36 @@ export class MerchantAuthService {
 
         // console.log('New token: ', createdToken);
 
-        try {
+        const isLocal = this.configService.get<number>('IS_LOCAL');
+        let bUrl = "";
+        if (isLocal == 1) {
+            bUrl = this.configService.get<string>('BASE_URL_UAT')
+        } else {
+            bUrl = this.configService.get<string>('BASE_URL_LIVE')
+        }
 
+        bUrl = `${bUrl}/request-password-reset/${tokenHash}/${merchant.id}`
+       
+
+        let resetPasswordData: ConfirmEmail = {
+            name: merchant.name,
+            email: merchant.email,
+            redirect_url: bUrl
+        }
+
+        // console.log("CDATA: ", confirmEmailData)
+
+        try {
+            console.log("In email confirmation send")
+            const job = await this.mailQueue.add('reset_password', resetPasswordData);
 
             return {
                 status: "Successful Request",
                 success: true,
             };
-
         } catch (error) {
-            throw new Error("Error in Mail Sending")
+            console.log("Error in email confirmation send")
         }
-
 
     }
 
@@ -148,7 +171,7 @@ export class MerchantAuthService {
         if (!merchantToken)
             throw new Error("Token is Invalid")
 
-        console.log("MID: ", merchantToken)
+        // console.log("MID: ", merchantToken)
 
     
         await this.merchantRepository.update(merchantToken.merchant.id, {

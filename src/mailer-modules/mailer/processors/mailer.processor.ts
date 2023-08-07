@@ -33,7 +33,17 @@ export class MailProcessor {
 
         await this.mailService.sendEmailConfirmation(data);
 
-        return "done it "
+        return "done send cconfirm"
+    }
+
+    @Process('reset_password')
+    async resetPasswordHandler(job: Job<any>){
+
+        const data: ConfirmEmail = job.data;
+
+        await this.mailService.sendResetPasswordEmail(data);
+
+        return "done reset-password"
     }
 
 }

@@ -22,7 +22,7 @@ export class MailService {
       },
     });
   }
-  
+
 
   async sendEmailConfirmation(userConfirm: ConfirmEmail) {
     const url = userConfirm.redirect_url;
@@ -33,6 +33,23 @@ export class MailService {
       // from: '"Support Team" <support@example.com>', // override default from
       subject: 'Confirm your Email with Primepay',
       template: './confirmation', //
+      context: { // ✏️ filling curly brackets with content
+        name: userConfirm.name,
+        url,
+      },
+    });
+  }
+
+
+  async sendResetPasswordEmail(userConfirm: ConfirmEmail) {
+    const url = userConfirm.redirect_url;
+
+    await this.mailerService.sendMail({
+      to: userConfirm.email,
+    //   to: user.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: 'Reset your Password',
+      template: './reset-password', //
       context: { // ✏️ filling curly brackets with content
         name: userConfirm.name,
         url,

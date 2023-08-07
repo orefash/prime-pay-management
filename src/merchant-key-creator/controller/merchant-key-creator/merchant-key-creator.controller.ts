@@ -17,7 +17,12 @@ export class MerchantKeyCreatorController {
 
         try {
 
-            return await this.merchantProfileService.createMerchantProfile(createMerchantDto);
+            let created = await this.merchantProfileService.createMerchantProfile(createMerchantDto);
+
+            return {
+                message: "Check your email for confirmation",
+                success: true
+            }
 
         } catch (error) {
             // console.log('create Merchant Profile error: ', error)

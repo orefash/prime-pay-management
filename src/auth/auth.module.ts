@@ -11,10 +11,14 @@ import { MerchantAuthService } from './services/merchant-auth/merchant-auth.serv
 import { JwtStrategy } from './utils/JWTStrategy';
 // import { JwtStrategy } from './utils/JWTStrategy';
 import { MerchantLocalStrategy } from './utils/MerchantLocalStrategy';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
     PassportModule,
+    BullModule.registerQueue({
+      name: 'send_mail',
+    }),
     TypeOrmModule.forFeature([Merchant, ResetToken]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
