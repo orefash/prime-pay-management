@@ -160,6 +160,7 @@ export class MerchantsService {
             };
         }
 
+        
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 

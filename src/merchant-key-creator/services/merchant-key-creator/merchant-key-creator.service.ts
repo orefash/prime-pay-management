@@ -1,4 +1,6 @@
 import { InjectQueue } from '@nestjs/bull';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+// import { InjectQueue } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -13,10 +15,12 @@ import { ThirdPartyDataService } from 'src/third-party-data/services/third-party
 import { Merchant, MerchantKey, ResetToken } from 'src/typeorm';
 import { encodePassword } from 'src/utils/bcrypt';
 import { Repository } from 'typeorm';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class MerchantKeyCreatorService {
     constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
         @Inject(MerchantsService)
         private readonly merchantService: MerchantsService,
         @Inject(KeysService)
@@ -44,7 +48,16 @@ export class MerchantKeyCreatorService {
     ) { }
 
     async testMailer() {
-        console.log("In test mailer")
+        console.log('test mailer')
+        await this.cacheManager.set("tv", 6);
+        const value = await this.cacheManager.get("tv");
+        if (!value) {
+            console.log("not found: ", value)
+            await this.cacheManager.set("tv", 4);
+        } else {
+            console.log("found: ", value)
+
+        }
 
         const job = await this.mailQueue.add('test_mail');
 
@@ -63,7 +76,7 @@ export class MerchantKeyCreatorService {
         });
 
         if (!merchant)
-            throw new Error("Nerchant invalid!!")
+            throw new Error("Merchant invalid!!")
 
 
         const payload: TokenPayload = {
@@ -105,6 +118,7 @@ export class MerchantKeyCreatorService {
 
     async createMerchantProfile(createMerchantDto: CreateMerchantDto): Promise<Merchant> {
 
+        console.log("in register merchant")
         createMerchantDto.password = createMerchantDto.password.trim();
         createMerchantDto.email = createMerchantDto.email.trim();
 
@@ -118,17 +132,31 @@ export class MerchantKeyCreatorService {
         if (merchant) throw new Error("Merchant with Email already Exists")
 
 
+
         const IS_TEST: string = this.configService.get<string>('IS_TEST');
         // console.log("ISTESt: ", typeof IS_TEST)
 
         if (IS_TEST !== "true") {
-            console.log("Acc valid check: ",)
+            console.log("In Acc valid check: ",)
             let isAccountValid = await this.paystackService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
 
             // console.log("Acc valid: ", isAccountValid)
             if (!isAccountValid)
                 throw new Error("Invalid Bank Details!!")
         }
+
+
+        let lastMid: number = await this.cacheManager.get('last_mid');
+
+        if (!lastMid) {
+            lastMid = -1;
+        } else {
+            lastMid = lastMid - 1;
+        }
+
+        console.log("lm: ", lastMid)
+        await this.cacheManager.set('last_mid', lastMid);
+
 
         console.log("after")
         const password = encodePassword(createMerchantDto.password);
@@ -137,6 +165,7 @@ export class MerchantKeyCreatorService {
         const newMerchant: Merchant = new Merchant();
         // newMerchant = { ...createMerchantDto, password };
 
+        newMerchant.systemId = lastMid;
         newMerchant.accountNo = createMerchantDto.accountNo;
         newMerchant.name = createMerchantDto.name;
         newMerchant.promoterFname = createMerchantDto.promoterFname;

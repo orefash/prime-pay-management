@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+
+import type { RedisClientOptions } from 'redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -30,29 +32,82 @@ import { OverviewController } from './overview/controllers/overview/overview.con
 import { MailModule } from './mail/mail.module';
 import { BullModule } from '@nestjs/bull';
 import { MailerController } from './mailer-modules/contollers/mailer/mailer.controller';
+import { RedisModule } from './redis/redis.module';
+// import * as redisStore from 'cache-manager-redis-store';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet'; 
 
+// import { CacheModule as CacheModule_ } from "@nestjs/cache-manager";
 
 
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      // useFactory: async (configService: ConfigService) => {
+
+
+      //   const isLocal = parseInt(configService.get('IS_LOCAL'));
+
+      //   store: redisStore,
+      //   host: 'localhost', //default host
+      //   port: 6379,
+      //   ttl: 0,
+
+      //   return {
+
+      //   }
+      // },
+      useFactory: async (configService: ConfigService) => {  
+
+        console.log("in redis cache config");
+        const isLocal = parseInt(configService.get('IS_LOCAL'));
+        console.log("isLocal: ", isLocal);
+        const redis_password: string = configService.get<string>('REDIS_PASSWORD')
+
+        // console.log("redis pass: ", redis_password);
+
+        const isProduction = isLocal === 0 ? true : false;
+        console.log("isProd: ", isProduction);
+        const redisConfig: any = {
+          host: configService.get<string>('REDIS_HOST'),
+          port: Number(configService.get<number>('REDIS_PORT')),
+        };
+
+        if (isProduction) {
+          // Add the 'password' property to the Redis configuration only in production
+          redisConfig.password = redis_password;
+          redisConfig.passphrase = redis_password;
+        }
+        return {
+          store: await redisStore({  
+            socket: redisConfig    
+          }),  
+        }
+           
+      }, 
+
+      inject: [ConfigService],
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
 
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
 
-        console.log("in redis config");
+        // console.log("in redis config");
         const isLocal = parseInt(configService.get('IS_LOCAL'));
-        console.log("isLocal: ", isLocal);
+        // console.log("isLocal: ", isLocal);
         const redis_password: string = configService.get<string>('REDIS_PASSWORD')
 
 
-        console.log("redis pass: ", redis_password);
+        // console.log("redis pass: ", redis_password);
 
-        const isProduction = isLocal === 0? true : false;
+        const isProduction = isLocal === 0 ? true : false;
 
-        console.log("in prod: ", isProduction);
+        // console.log("in prod: ", isProduction);
         const redisConfig: any = {
           host: configService.get<string>('REDIS_HOST'),
           port: Number(configService.get<number>('REDIS_PORT')),
@@ -99,6 +154,7 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
     ImagesModule,
     // MailerModule,
     MailModule,
+    RedisModule,
 
   ],
   providers: [
