@@ -165,6 +165,7 @@ export class MerchantKeyCreatorService {
 
         const newMerchant: Merchant = new Merchant();
         // newMerchant = { ...createMerchantDto, password };
+        
 
         newMerchant.systemId = lastMid;
         newMerchant.accountNo = createMerchantDto.accountNo;
