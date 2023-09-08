@@ -35,7 +35,14 @@ import { MailerController } from './mailer-modules/contollers/mailer/mailer.cont
 import { RedisModule } from './redis/redis.module';
 // import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet'; 
+// import { redisStore } from 'cache-manager-redis-yet';
+
+import * as redisStore from 'cache-manager-ioredis';
+
+// import * as redisStore from 'cache-manager-redis-store';
+
+// import { CacheModule, CacheService } from '@nestjs/common'; // Import CacheModule and CacheService
+
 
 // import { CacheModule as CacheModule_ } from "@nestjs/cache-manager";
 
@@ -43,55 +50,19 @@ import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
-    CacheModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      // useFactory: async (configService: ConfigService) => {
 
 
-      //   const isLocal = parseInt(configService.get('IS_LOCAL'));
-
-      //   store: redisStore,
-      //   host: 'localhost', //default host
-      //   port: 6379,
-      //   ttl: 0,
-
-      //   return {
-
-      //   }
-      // },
-      useFactory: async (configService: ConfigService) => {  
-
-        console.log("in redis cache config");
-        const isLocal = parseInt(configService.get('IS_LOCAL'));
-        console.log("isLocal: ", isLocal);
-        const redis_password: string = configService.get<string>('REDIS_PASSWORD')
-
-        // console.log("redis pass: ", redis_password);
-
-        const isProduction = isLocal === 0 ? true : false;
-        console.log("isProd: ", isProduction);
-        const redisConfig: any = {
-          host: configService.get<string>('REDIS_HOST'),
-          port: Number(configService.get<number>('REDIS_PORT')),
-        };
-
-        if (isProduction) {
-          // Add the 'password' property to the Redis configuration only in production
-          redisConfig.password = redis_password;
-          redisConfig.passphrase = redis_password;
-        }
-        return {
-          store: await redisStore({  
-            socket: redisConfig    
-          }),  
-        }
-           
-      }, 
-
-      inject: [ConfigService],
-    }),
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: 'prime-redis-app.bots.prime-pay.africa', 
+      port: 6379,
+      username: "",
+      password: 'prime456',
+      // url: 'redis://prime456@prime-redis-app.bots.prime-pay.africa:6379',
+      // no_ready_check: true,
+    }),
 
     BullModule.forRootAsync({
       imports: [ConfigModule],
@@ -114,6 +85,7 @@ import { redisStore } from 'cache-manager-redis-yet';
         };
 
         if (isProduction) {
+          console.log('in prod, bull')
           // Add the 'password' property to the Redis configuration only in production
           redisConfig.password = redis_password;
         }

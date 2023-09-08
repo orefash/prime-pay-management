@@ -36,6 +36,7 @@ export class MerchantKeyCreatorController {
             return await this.merchantProfileService.testMailer();
 
         } catch (error) {
+            console.log(error)
             console.log('in test mail 1 ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }

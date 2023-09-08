@@ -33,6 +33,7 @@ export class MerchantKeyCreatorService {
         private readonly merchantKeyRepository: Repository<MerchantKey>,
         @Inject(ThirdPartyDataService)
         private readonly thirdPartyService: ThirdPartyDataService,
+        
         @Inject(PaystackService)
         private readonly paystackService: PaystackService,
 
