@@ -4,6 +4,7 @@ import { Strategy } from "passport-local";
 import { MerchantAuthService } from "../services/merchant-auth/merchant-auth.service";
 
 
+
 @Injectable()
 export class MerchantLocalStrategy extends PassportStrategy(Strategy, 'merchant-local') {
     constructor(
