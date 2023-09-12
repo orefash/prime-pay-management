@@ -12,6 +12,44 @@ export class PaystackService {
         private configService: ConfigService
     ) { }
 
+
+    async getPaystackBank(bankName: string): Promise<string> {
+
+        // Get the Paystack API key based on the environment (test or live).
+        const PAYSTACK_ENV = this.configService.get<string>('PAYSTACK_ENV');
+        const paystack_key =
+            PAYSTACK_ENV === 'test'
+                ? this.configService.get<string>('PAYSTACK_TEST_SKEY')
+                : this.configService.get<string>('PAYSTACK_LIVE_SKEY');
+
+        try {
+            const payUrl = `https://api.paystack.co/bank?currency=NGN`;
+
+            // Make the API call to Paystack and extract the data property from the response.
+            const { data } = await lastValueFrom(
+                this.http.get(payUrl, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${paystack_key}`,
+                    },
+                })
+            );
+
+            console.log("Data; ", data)
+
+            // Check the status property in the data and return true if it's valid.
+            return data.status;
+        } catch (error) {
+            
+            // If there's an error during the API call, log the error and return false.
+            // You can handle the error differently based on your use case.
+            console.error('Bank list fetch error: ', error.message);
+            return null;
+        }
+
+
+    }
+
     async validateBankAccount(accountNo: string, bankCode: string): Promise<boolean> {
         // Ensure the bankCode is a 3-character code (if it's longer).
         if (bankCode.length > 3) {
