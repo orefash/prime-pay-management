@@ -32,7 +32,6 @@ async function bootstrap() {
     // methods: ["GET", "POST"],
     credentials: true,
   });
-  // app.useGlobalFilters(false)
   app.use(compression());
 
   app.use(passport.initialize())
