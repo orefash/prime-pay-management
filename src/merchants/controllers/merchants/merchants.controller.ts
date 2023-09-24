@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
 import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 import { UpdateMerchantMIDDto } from 'src/merchants/dto/UpdateMerchantMID.dto';
+import { generateUniqueFilename } from 'src/utils/file-upload';
 
 
 @Controller('merchants')
@@ -31,18 +32,31 @@ export class MerchantsController {
 
 
 
-    @Post('activate-merchant/:id')
+    @Post('toggle-merchant-active/:id')
     @UseGuards(JwtAuthenticationGuard)
     async activateMerchant(@Param('id') merchantId: string) {
         try {
-            return await this.merchantService.setMerchantActive(merchantId);
+            return await this.merchantService.toggleMerchantActive(merchantId);
         } catch (error) {
-            console.log('create error: ', error)
+            console.log('toggle active error: ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
 
+    
+    @Post('verify-merchant/:id')
+    @UseGuards(JwtAuthenticationGuard)
+    async verifyMerchant(@Param('id') merchantId: string) {
+        try {
+            return await this.merchantService.verifyMerchant(merchantId);
+        } catch (error) {
+            console.log('verify error: ', error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
 
+    
+    
 
     @Patch('profile/:id')
     @UsePipes(ValidationPipe)
@@ -56,16 +70,16 @@ export class MerchantsController {
     }
 
 
-    @Patch(':id/systemId/:mid')
-    @UsePipes(ValidationPipe)
-    async updateMerchantSystemId(@Param('id') id: string, @Param('mid') systemId: number) {
-        try {
-            return this.merchantService.updateMerchantSystemId(id, systemId);
-        } catch (error) {
-            console.log('update systemid error: ', error)
-            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-        }
-    }
+    // @Patch(':id/systemId/:mid')
+    // @UsePipes(ValidationPipe)
+    // async updateMerchantSystemId(@Param('id') id: string, @Param('mid') systemId: number) {
+    //     try {
+    //         return this.merchantService.updateMerchantSystemId(id, systemId);
+    //     } catch (error) {
+    //         console.log('update systemid error: ', error)
+    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
 
     @Patch('bank-details/:id')
@@ -79,16 +93,7 @@ export class MerchantsController {
         }
     }
 
-    @Patch(':id/systemID')
-    @UsePipes(ValidationPipe)
-    async updateMerchantMID(@Param('id') merchantId: string, @Body() editMerchantMIDDto: UpdateMerchantMIDDto) {
-        try {
-            return this.merchantService.setMerchantMID(merchantId, editMerchantMIDDto);
-        } catch (error) {
-            // console.log('update merchant bank error: ', error)
-            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-        }
-    }
+    
 
     @Get(':merchantId/balance')
     async getMerchantBalance(
@@ -108,12 +113,7 @@ export class MerchantsController {
 
     }
 
-    @Get('')
-    getAllMerchants() {
-        return this.merchantService.getAllMerchants(
-
-        );
-    }
+    
 
     @Get(':merchantId')
     async getMerchantById(
@@ -131,12 +131,6 @@ export class MerchantsController {
 
         return data;
     }
-
-
-
-
-
-
 
 
     @Post(':merchantId/set-id-card')
@@ -157,12 +151,17 @@ export class MerchantsController {
         }
 
         try {
-            setMerchantID.promoterId = promoterIdDoc.filename;
+            let uFileName = await generateUniqueFilename("ID", promoterIdDoc.filename);
+            // console.log("uf: ", uFileName);
+
+            setMerchantID.promoterId = uFileName;
             setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
 
             const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
 
-            // console.log('du: ', setMerchantID.promoterIdMime)
+            const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+
+            // console.log('file-obj: ', setMerchantID)
             // Save the merchant identification data to the database
             let data = await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
 
@@ -171,9 +170,10 @@ export class MerchantsController {
                 message: "Merchant ID Set Successfully",
                 idType: data.idType,
                 downloadUrl,
+                previewUrl
             };
         } catch (error) {
-            console.log('create error: ', error);
+            console.log('set ID error: ', error);
             // Delete the uploaded file if there is an error
             unlinkSync(promoterIdDoc.path);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -189,7 +189,7 @@ export class MerchantsController {
                 filename: (req, file, callback) => {
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     const extension = file.mimetype.split('/')[1];
-                    callback(null, file.fieldname + '-' + uniqueSuffix + '.' + extension);
+                    callback(null, 'CAC'+ '-' + uniqueSuffix + '.' + extension);
                 },
             }),
             fileFilter: (req, file, callback) => {
@@ -267,8 +267,11 @@ export class MerchantsController {
         }
 
         try {
+
+            let uFileName = await generateUniqueFilename("ID", logoDoc.filename);
+
             let setLogoDto: SetMerchantLogoDto = {
-                logoPath: logoDoc.filename,
+                logoPath: uFileName,
                 logoMime: logoDoc.mimetype
             }
 

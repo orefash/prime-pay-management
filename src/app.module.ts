@@ -84,6 +84,8 @@ import * as redisStore from 'cache-manager-ioredis';
           port: Number(configService.get<number>('REDIS_PORT')),
         };
 
+        console.log("in bull: ", redisConfig)
+
         if (isProduction) {
           console.log('in prod, bull')
           // Add the 'password' property to the Redis configuration only in production
@@ -142,7 +144,7 @@ import * as redisStore from 'cache-manager-ioredis';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtExpirationMiddleware)
-      // .exclude('api/merchants/:merchantId/logo')
-      .forRoutes(TransactionController, MerchantsController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
+      .exclude('api/merchants/upload')
+      .forRoutes(MerchantsController, TransactionController, CustomerController, KeysController, MerchantPayoutController, MerchantProductController, OverviewController);
   }
 }

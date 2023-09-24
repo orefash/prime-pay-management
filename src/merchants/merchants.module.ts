@@ -14,6 +14,8 @@ import { diskStorage } from 'multer';
 import { KeysModule } from 'src/keys/keys.module';
 // import { CustomFileInterceptor } from 'src/interceptors/file-upload.interceptor';
 import { MerchantMediaController } from './controllers/merchant-media/merchant-media.controller';
+import { SuperAdminService } from './services/super-admin/super-admin.service';
+import { SuperAdminController } from './controllers/super-admin/super-admin.controller';
 
 @Module({
   imports: [
@@ -23,9 +25,10 @@ import { MerchantMediaController } from './controllers/merchant-media/merchant-m
     ConfigModule,
   ],
   exports: [MerchantsService],
-  controllers: [MerchantsController, MerchantMediaController],
+  controllers: [MerchantsController, MerchantMediaController, SuperAdminController],
   providers: [
     MerchantsService,
+    SuperAdminService,
     // CustomFileInterceptor
   ]
 

@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { MerchantsService } from 'src/merchants/services/merchants/merchants.service';
 
+import * as fs from 'fs';
+
 @Controller('merchants')
 export class MerchantMediaController {
     constructor(
@@ -27,7 +29,6 @@ export class MerchantMediaController {
     }
 
     @Get(':merchantId/id-card/mm/:mime1/:mime2/:name')
-    // @UseGuards(JwtAuthenticationGuard)
     async getMerchantIdentification(@Param('merchantId') merchantId: string, @Res() res: Response) {
 
         let fileData = await this.merchantService.getMerchantIdentification(merchantId);
@@ -35,6 +36,19 @@ export class MerchantMediaController {
         res.setHeader('Content-Type', fileData.contentType);
         // Send the file
         res.sendFile(fileData.filePath);
+    }
+
+    @Get(':merchantId/id-card-preview/mm/:mime1/:mime2/:name')
+    async getMerchantIdentificationPreview(@Param('merchantId') merchantId: string, @Res() res: Response) {
+
+        let fileData = await this.merchantService.getMerchantIdentification(merchantId);
+        const fileStream = fs.createReadStream(fileData.filePath);
+    
+        // res.attachment(fileData.fileName);
+        res.setHeader('Content-Type', fileData.contentType);
+        // Send the file
+        // res.sendFile(fileData.filePath);
+        fileStream.pipe(res);
     }
 
 
@@ -47,10 +61,13 @@ export class MerchantMediaController {
         delete fileData.filePath;
 
         const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${fileData.contentType}/${fileData.fileName}`;
+        const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${fileData.contentType}/${fileData.fileName}`;
+        
 
         return {
             ...fileData,
-            imgUrl: downloadUrl
+            imgUrl: downloadUrl,
+            previewUrl: previewUrl
         }
     }
 

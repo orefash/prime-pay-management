@@ -1,5 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as fs from 'fs';
 
 import { CreateMerchantDto } from '../../dto/CreateMerchant.dto';
 import { Merchant as MerchantEntity } from 'src/typeorm';
@@ -123,6 +124,30 @@ export class MerchantsService {
     }
 
 
+
+    // async setMerchantConfirmed(id: string) {
+
+    //     await this.merchantRepository.update(id, {
+    //         isConfirmed: true
+    //     });
+    //     const updatedMerchant = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: id
+    //         }
+    //     });
+
+    //     if (updatedMerchant) {
+    //         const { password, ...merchant } = updatedMerchant;
+    //         return {
+    //             id: merchant.id,
+    //             message: "Merchant Confirmed"
+    //         };
+    //     }
+
+    //     throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    // }
+
+
     async setMerchantLogo(id: string, setLogo: SetMerchantLogoDto) {
         await this.merchantRepository.update(id, setLogo);
         const updatedMerchant = await this.merchantRepository.findOne({
@@ -239,7 +264,7 @@ export class MerchantsService {
     }
 
     //if merchant with ID exists, create merchant on the core banking and update the mid and active status
-    async setMerchantActive(id: string): Promise<Partial<MerchantEntity>> {
+    async verifyMerchant(id: string): Promise<Partial<MerchantEntity>> {
 
         const fetchedMerchant = await this.merchantRepository.findOne({
             where: {
@@ -247,15 +272,16 @@ export class MerchantsService {
             }
         });
 
-        console.log('Fetched Merchant: ', fetchedMerchant);
+        // console.log('Fetched Merchant: ', fetchedMerchant);
 
         if (fetchedMerchant) {
+            // note : review paystack and bank
 
             let PPAY_STATUS = this.configService.get<number>('PPAY');
 
             console.log("in merchant activate pp", PPAY_STATUS)
 
-            let mid = 11;
+            let mid = null;
 
             if (PPAY_STATUS == 0) {
                 let regMerchantData: RegisterMerchantDto = {
@@ -265,11 +291,14 @@ export class MerchantsService {
                 }
                 const merchantId = await this.thirdPartDataService.registerMerchant(regMerchantData);
 
+                console.log("from ppay: ", merchantId)
+
                 mid = merchantId;
             }
 
             await this.merchantRepository.update(id, {
                 isActive: true,
+                isVerified: true,
                 systemId: mid
             });
 
@@ -288,13 +317,42 @@ export class MerchantsService {
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
-    async getAllMerchants(): Promise<MerchantEntity[]> {
-        return this.merchantRepository.find({
-            select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
-            // select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'promoterIdUrl', 'promoterId', 'websiteUrl', 'cacUrl', 'cacDocs', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
+    async toggleMerchantActive(id: string): Promise<Partial<MerchantEntity>> {
 
+        const fetchedMerchant = await this.merchantRepository.findOne({
+            where: {
+                id: id
+            }
         });
+
+        // console.log('Fetched Merchant: ', fetchedMerchant);
+
+        if (fetchedMerchant) {
+            // note : review paystack and bank
+
+
+
+            await this.merchantRepository.update(id, {
+                isActive: !fetchedMerchant.isActive,
+                
+            });
+
+            const updatedMerchant = await this.merchantRepository.findOne({
+                where: {
+                    id: id
+                }
+            });
+
+            if (updatedMerchant) {
+                const { password, ...merchant } = updatedMerchant;
+                return merchant;
+            };
+        }
+
+        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
+
+    
 
     async getMerchantById(merchantId: string): Promise<MerchantEntity> {
         return this.merchantRepository.findOne({
@@ -457,26 +515,6 @@ export class MerchantsService {
         return merchants;
     }
 
-    async setMerchantMID(id: string, setMID: UpdateMerchantMIDDto) {
-
-        await this.merchantRepository.update(id, setMID);
-
-        const updatedMerchant = await this.merchantRepository.findOne({
-            where: {
-                id: id
-            }
-        });
-
-        if (updatedMerchant) {
-            const { password, ...merchant } = updatedMerchant;
-            return {
-                id: merchant.id,
-                merchant: merchant,
-                message: "Merchant MID Set"
-            };
-        }
-
-        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
-    }
+    
 
 }

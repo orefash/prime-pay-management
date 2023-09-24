@@ -1,21 +1,18 @@
 
 import { ConfigService } from '@nestjs/config';
 
-// export async function fetchUploadPath(fileName: string) {
-//     const isLocal = this.configService.get<boolean>('IS_LOCAL_STORAGE');
-//     console.log('islocal: ', isLocal);
+export async function generateUniqueFilename(prefix, originalFilename) {
+    // Extract the file extension from the original filename
+    const fileExtension = originalFilename.split('.').pop();
 
-//     if (isLocal) {
-//         const destination = this.configService.get<string>('UPLOADED_FILES_DESTINATION');
+    // Generate a unique timestamp
+    const timestamp = new Date().getTime();
 
-//         const filePath = path.join(__dirname, '..', '..', '..', '..', destination, fileName);
-//         return filePath;
-//     }
+    // Generate a random number
+    const randomNumber = Math.floor(Math.random() * 1000000);
 
-//     const destination = this.configService.get<string>('DOCKER_UPLOAD_DIR');
+    // Combine the prefix, timestamp, random number, and file extension
+    const uniqueFilename = `${prefix}-${timestamp}-${randomNumber}.${fileExtension}`;
 
-//     return path.join(destination, fileName);
-
-// }
-
-
+    return uniqueFilename;
+}
