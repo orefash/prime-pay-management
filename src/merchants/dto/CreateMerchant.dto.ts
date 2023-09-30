@@ -126,6 +126,6 @@ export class CreateMerchantDto {
 
     @IsOptional()
     @IsString()
-    bankName?: string;
+    bankName: string;
 
 }

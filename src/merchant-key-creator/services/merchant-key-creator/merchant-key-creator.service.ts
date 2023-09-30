@@ -117,6 +117,22 @@ export class MerchantKeyCreatorService {
 
     }
 
+    async syncBankList(bankName: string) {
+        const paystackBankList = await this.paystackService.getBankList();
+
+        if(!paystackBankList)
+            throw new Error("bank sync error");
+
+        let selectedBank = paystackBankList.find(bank => bank.name.toLowerCase().includes(bankName.toLowerCase()));
+
+        if(!selectedBank)
+            throw new Error("bank sync error");
+
+        
+
+
+    }
+
     async createMerchantProfile(createMerchantDto: CreateMerchantDto): Promise<Merchant> {
 
         console.log("in register merchant")
@@ -165,7 +181,7 @@ export class MerchantKeyCreatorService {
 
         const newMerchant: Merchant = new Merchant();
         // newMerchant = { ...createMerchantDto, password };
-        
+
 
         newMerchant.systemId = lastMid;
         newMerchant.accountNo = createMerchantDto.accountNo;

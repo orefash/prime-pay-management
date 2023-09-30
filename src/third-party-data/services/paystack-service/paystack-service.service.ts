@@ -40,7 +40,7 @@ export class PaystackService {
             // Check the status property in the data and return true if it's valid.
             return data.status;
         } catch (error) {
-            
+
             // If there's an error during the API call, log the error and return false.
             // You can handle the error differently based on your use case.
             console.error('Bank list fetch error: ', error.message);
@@ -48,6 +48,39 @@ export class PaystackService {
         }
 
 
+    }
+
+    async getBankList(): Promise<any> {
+
+        try {
+            // Get the Paystack API key based on the environment (test or live).
+            const PAYSTACK_ENV = this.configService.get<string>('PAYSTACK_ENV');
+            const paystack_key =
+                PAYSTACK_ENV === 'test'
+                    ? this.configService.get<string>('PAYSTACK_TEST_SKEY')
+                    : this.configService.get<string>('PAYSTACK_LIVE_SKEY');
+
+            const getBankUrl = 'https://api.paystack.co/bank?currency=NGN';
+
+            const { data } = await lastValueFrom(
+                this.http.get(getBankUrl, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${paystack_key}`,
+                    },
+                })
+            );
+
+            if(data.status){
+                return data.data
+            }else{
+                throw new Error("Bank fetch error")
+            }            
+
+        } catch (error) {
+            console.log("get bank error: ", error)
+            return null;
+        }
     }
 
     async validateBankAccount(accountNo: string, bankCode: string): Promise<boolean> {
@@ -79,7 +112,7 @@ export class PaystackService {
             // Check the status property in the data and return true if it's valid.
             return data.status;
         } catch (error) {
-            
+
             // If there's an error during the API call, log the error and return false.
             // You can handle the error differently based on your use case.
             console.error('Account validation error: ', error.message);
@@ -130,7 +163,8 @@ export class PaystackService {
 
             let response_data: TransferRecipient = {
                 status: data.status
-            }
+            };
+
             if (data.status) {
                 response_data.recipient_code = data.data.recipient_code;
             }
@@ -155,6 +189,8 @@ export class PaystackService {
             PAYSTACK_ENV === 'test'
                 ? this.configService.get<string>('PAYSTACK_TEST_SKEY')
                 : this.configService.get<string>('PAYSTACK_LIVE_SKEY');
+
+        
 
         try {
             const payUrl = `https://api.paystack.co/transfer`;

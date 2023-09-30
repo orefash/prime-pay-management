@@ -21,6 +21,10 @@ export class CACDocType {
     @IsOptional()
     docUrl?: string;
 
+    @IsString()
+    @IsOptional()
+    previewUrl?: string;
+
 }
 
 export class updateMerchantCACDocDTO {

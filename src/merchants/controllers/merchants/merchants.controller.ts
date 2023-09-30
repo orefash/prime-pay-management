@@ -7,7 +7,7 @@ import { UpdateMerchantBankDto } from 'src/merchants/dto/UpdateMerchantBank.dto'
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { CreateProductDto } from 'src/merchants/dto/Upload.dto';
-import { unlinkSync } from 'fs';
+import { renameSync, unlinkSync } from 'fs';
 import { Address } from 'src/types/address.interface';
 import { SetMerchantIdDTO } from 'src/merchants/dto/SetMerchantIdentification.dto copy';
 import { SetMerchantLogoDto } from 'src/merchants/dto/SetMerchantLogo.dto';
@@ -18,6 +18,7 @@ import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';
 import JwtAuthenticationGuard from 'src/auth/utils/JWTAuthGuard';
 import { UpdateMerchantMIDDto } from 'src/merchants/dto/UpdateMerchantMID.dto';
 import { generateUniqueFilename } from 'src/utils/file-upload';
+import { dirname, join } from 'path';
 
 
 @Controller('merchants')
@@ -43,7 +44,7 @@ export class MerchantsController {
         }
     }
 
-    
+
     @Post('verify-merchant/:id')
     @UseGuards(JwtAuthenticationGuard)
     async verifyMerchant(@Param('id') merchantId: string) {
@@ -55,8 +56,8 @@ export class MerchantsController {
         }
     }
 
-    
-    
+
+
 
     @Patch('profile/:id')
     @UsePipes(ValidationPipe)
@@ -93,7 +94,7 @@ export class MerchantsController {
         }
     }
 
-    
+
 
     @Get(':merchantId/balance')
     async getMerchantBalance(
@@ -113,7 +114,7 @@ export class MerchantsController {
 
     }
 
-    
+
 
     @Get(':merchantId')
     async getMerchantById(
@@ -133,6 +134,53 @@ export class MerchantsController {
     }
 
 
+    // @Post(':merchantId/set-id-card')
+    // @UseInterceptors(
+    //     CustomFileInterceptor(
+    //         'promoterIdDoc',
+    //         ['image/jpeg', 'image/png', 'application/pdf']
+    //     ),
+    // )
+    // async setMerchantIdentification(
+    //     @Req() req,
+    //     @Body() setMerchantID: SetMerchantIdDTO,
+    //     @UploadedFile() promoterIdDoc: Express.Multer.File,
+    //     @Param('merchantId') merchantId: string,
+    // ) {
+    //     if (!promoterIdDoc) {
+    //         throw new HttpException('Means of ID not uploaded', HttpStatus.BAD_REQUEST);
+    //     }
+
+    //     try {
+    //         let uFileName = await generateUniqueFilename("ID", promoterIdDoc.filename);
+    //         // console.log("uf: ", uFileName);
+
+    //         setMerchantID.promoterId = uFileName;
+    //         setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
+
+    //         const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+
+    //         const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+
+    //         // console.log('file-obj: ', setMerchantID)
+    //         // Save the merchant identification data to the database
+    //         let data = await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
+
+    //         // Return the download URL to the client
+    //         return {
+    //             message: "Merchant ID Set Successfully",
+    //             idType: data.idType,
+    //             downloadUrl,
+    //             previewUrl
+    //         };
+    //     } catch (error) {
+    //         console.log('set ID error: ', error);
+    //         // Delete the uploaded file if there is an error
+    //         unlinkSync(promoterIdDoc.path);
+    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
+
     @Post(':merchantId/set-id-card')
     @UseInterceptors(
         CustomFileInterceptor(
@@ -151,17 +199,24 @@ export class MerchantsController {
         }
 
         try {
+            // Generate a unique filename
             let uFileName = await generateUniqueFilename("ID", promoterIdDoc.filename);
-            // console.log("uf: ", uFileName);
+
+            // Get the directory of the original file
+            const fileDir = dirname(promoterIdDoc.path);
+
+            // Create the new file path by joining the original directory and the new filename
+            const newFilePath = join(fileDir, uFileName);
+
+            // Rename the uploaded file to the new filename while preserving the directory structure
+            renameSync(promoterIdDoc.path, newFilePath);
 
             setMerchantID.promoterId = uFileName;
             setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
 
             const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
-
             const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
 
-            // console.log('file-obj: ', setMerchantID)
             // Save the merchant identification data to the database
             let data = await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
 
@@ -173,7 +228,7 @@ export class MerchantsController {
                 previewUrl
             };
         } catch (error) {
-            console.log('set ID error: ', error);
+            console.error('set ID error: ', error);
             // Delete the uploaded file if there is an error
             unlinkSync(promoterIdDoc.path);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -189,7 +244,7 @@ export class MerchantsController {
                 filename: (req, file, callback) => {
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     const extension = file.mimetype.split('/')[1];
-                    callback(null, 'CAC'+ '-' + uniqueSuffix + '.' + extension);
+                    callback(null, 'CAC' + '-' + uniqueSuffix + '.' + extension);
                 },
             }),
             fileFilter: (req, file, callback) => {
@@ -222,11 +277,12 @@ export class MerchantsController {
                 const name = file.filename;
                 const mimeType = file.mimetype;
                 const url = `/cac/${merchantId}/mm/${mimeType}/doc/${name}`;
+                const previewUrl = `/cac-preview/${merchantId}/mm/${mimeType}/doc/${name}`;
                 // Process the file or save it to the database
                 // console.log('Uploaded file:', filePath);
                 // console.log('Uploaded file:', fileName);
                 fileList.push({
-                    name, path, mimeType, docUrl: url
+                    name, path, mimeType, docUrl: url, previewUrl
                 })
             }
 

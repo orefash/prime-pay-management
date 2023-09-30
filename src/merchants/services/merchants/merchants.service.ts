@@ -217,6 +217,7 @@ export class MerchantsService {
         const updatedCACDocuments = merchant.cacDocuments.map((doc) => ({
             ...doc,
             docUrl: doc.docUrl.includes('http') ? doc.docUrl : baseUrl + doc.docUrl,
+            previewUrl: doc.previewUrl.includes('http') ? doc.previewUrl : baseUrl + doc.previewUrl,
         }));
 
         merchant.cacDocuments = updatedCACDocuments;

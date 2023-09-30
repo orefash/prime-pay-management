@@ -19,8 +19,8 @@ export class ThirdPartyDataController {
     @Get('paystack-banks')
     // @UseGuards(JwtAuthenticationGuard)
     async getPaystackBankList(){
-        // return await this.paystackService.getPaystackBank();
-        return "done"
+        return await this.paystackService.getBankList();
+        // return "done"
     }
 
 }
