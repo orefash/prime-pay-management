@@ -214,9 +214,14 @@ export class MerchantsController {
             setMerchantID.promoterId = uFileName;
             setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
 
-            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
-            const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+            // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+            // const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
 
+
+            const downloadUrl = `https://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+            const previewUrl = `https://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
+
+            console.log("in setID: ", previewUrl);
             // Save the merchant identification data to the database
             let data = await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
 
@@ -268,7 +273,8 @@ export class MerchantsController {
         try {
 
 
-            const baseUrl = `${req.protocol}://${req.headers.host}/api/merchants`;
+            const baseUrl = `https://${req.headers.host}/api/merchants`;
+            // const baseUrl = `${req.protocol}://${req.headers.host}/api/merchants`;
 
             let fileList: CACDocType[] = [];
 
@@ -326,18 +332,34 @@ export class MerchantsController {
 
             let uFileName = await generateUniqueFilename("ID", logoDoc.filename);
 
+            // Get the directory of the original file
+            const fileDir = dirname(logoDoc.path);
+
+            // Create the new file path by joining the original directory and the new filename
+            const newFilePath = join(fileDir, uFileName);
+
+            console.log(`oldp: ${logoDoc.path} || newp: ${newFilePath}`)
+
+
+            renameSync(logoDoc.path, newFilePath);
+
+            
             let setLogoDto: SetMerchantLogoDto = {
-                logoPath: uFileName,
+                logoPath: newFilePath,
                 logoMime: logoDoc.mimetype
             }
 
             console.log('logodto: ', setLogoDto)
 
-            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
+            const downloadUrl = `https://${req.headers.host}/api/merchants/${merchantId}/logo`;
+            // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
 
             console.log('du: ', downloadUrl)
             // Save the merchant identification data to the database
             await this.merchantService.setMerchantLogo(merchantId, setLogoDto);
+
+            // renameSync(logoDoc.path, uFileName);
+
 
             // Return the download URL to the client
             return {

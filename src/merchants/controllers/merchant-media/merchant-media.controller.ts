@@ -33,13 +33,12 @@ export class MerchantMediaController {
             res.sendFile(fileData.filePath);
         } catch (error) {
             console.error('Error in getMerchantLogo:', error);
-            if (error instanceof HttpException) {
-                res.status(error.getStatus()).json({ message: error.message });
-            } else {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                    message: 'Internal server error',
-                });
-            }
+            res.status(error.getStatus()).json({ message: error.message });
+            // } else {
+            //     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            //         message: 'Internal server error',
+            //     });
+            // }
         }
     }
 
@@ -120,10 +119,14 @@ export class MerchantMediaController {
                 merchantId,
             );
 
-            delete fileData.filePath;
+            // delete fileData.filePath;
 
-            const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${fileData.contentType}/${fileData.fileName}`;
-            const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${fileData.contentType}/${fileData.fileName}`;
+            // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${fileData.contentType}/${fileData.fileName}`;
+            // const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${fileData.contentType}/${fileData.fileName}`;
+
+            const downloadUrl = `https://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${fileData.contentType}/${fileData.fileName}`;
+            const previewUrl = `https://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${fileData.contentType}/${fileData.fileName}`;
+
 
             return {
                 ...fileData,
@@ -139,7 +142,7 @@ export class MerchantMediaController {
     @Get(':merchantId/cac')
     async getMerchantCACDocs(@Param('merchantId') merchantId: string, @Req() req) {
         try {
-            const baseUrl = `${req.protocol}://${req.headers.host}/api/merchants`;
+            const baseUrl = `https://${req.headers.host}/api/merchants`;
 
             const cacData = await this.merchantService.getMerchantCACDocs(
                 merchantId,
