@@ -96,11 +96,7 @@ export class Merchant {
     bvn: string;
 
 
-    @Column({
-        nullable: true,
-        name: 'business_type'
-    })
-    businessType: string;
+    // @spe: string;
 
     @Column({
         nullable: false,
@@ -135,39 +131,39 @@ export class Merchant {
     @Column({
         nullable: true,
     })
-    promoterIdType: string;
+    IdType: string;
 
     @Column({
         nullable: true,
     })
-    promoterIdUrl: string;
+    IdUrl: string;
 
     @Column({
         nullable: true,
     })
-    promoterId: string;
+    agentId: string;
 
     @Column({
         nullable: true,
     })
-    promoterIdMime: string;
+    IdMime: string;
 
-    @Column({
-        nullable: true,
-    })
-    websiteUrl: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // websiteUrl: string;
 
 
-    @Column({
-        nullable: true,
-    })
-    cacUrl: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // cacUrl: string;
 
-    @Column("text", {
-        nullable: true,
-        array: true
-    })
-    cacDocs: string[];
+    // @Column("text", {
+    //     nullable: true,
+    //     array: true
+    // })
+    // cacDocs: string[];
 
     @Index({ unique: true })
     @Column({
@@ -193,11 +189,11 @@ export class Merchant {
     })
     address: Address;
 
-    @Column({
-        name: 'avg_monthly_sales',
-        nullable: true
-    })
-    avgMonthlySales: number;
+    // @Column({
+    //     name: 'avg_monthly_sales',
+    //     nullable: true
+    // })
+    // avgMonthlySales: number;
 
     @Column({
         nullable: true,
@@ -215,12 +211,12 @@ export class Merchant {
     })
     bankName: string;
 
-    @Column({
-        type: 'jsonb',
-        nullable: true,
-        name: 'socials'
-    })
-    socials: Socials;
+    // @Column({
+    //     type: 'jsonb',
+    //     nullable: true,
+    //     name: 'socials'
+    // })
+    // socials: Socials;
 
    
 
