@@ -5,6 +5,7 @@ import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } 
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { MerchantsService } from '../../merchants/services/merchants/merchants.service';
+import { TokenPayload } from '../types/tokenPayload.interface';
  
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

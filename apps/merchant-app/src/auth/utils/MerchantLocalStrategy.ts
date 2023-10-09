@@ -29,7 +29,7 @@ export class MerchantLocalStrategy extends PassportStrategy(Strategy, 'merchant-
         
         if(!merchant.isConfirmed){
             // throw new UnauthorizedException();
-            throw new HttpException("Email invalid, Please reset password", HttpStatus.UNAUTHORIZED);
+            throw new HttpException("Email not confirmed, Please reset password", HttpStatus.UNAUTHORIZED);
         }
         return merchant;
     }

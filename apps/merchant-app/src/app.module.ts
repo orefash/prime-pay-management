@@ -32,12 +32,12 @@ import { OverviewController } from './overview/controllers/overview/overview.con
 import { MailModule } from './mail/mail.module';
 import { BullModule } from '@nestjs/bull';
 import { MailerController } from './mailer-modules/contollers/mailer/mailer.controller';
-import { RedisModule } from './redis/redis.module';
 // import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
 // import { redisStore } from 'cache-manager-redis-yet';
 
 import * as redisStore from 'cache-manager-ioredis';
+import { AuthLibModule } from '@app/auth';
 
 // import * as redisStore from 'cache-manager-redis-store';
 
@@ -51,7 +51,7 @@ import * as redisStore from 'cache-manager-ioredis';
 @Module({
   imports: [
 
-
+    // AuthLibModule,
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.register({
       isGlobal: true,
@@ -128,7 +128,6 @@ import * as redisStore from 'cache-manager-ioredis';
     ImagesModule,
     // MailerModule,
     MailModule,
-    RedisModule,
 
   ],
   providers: [

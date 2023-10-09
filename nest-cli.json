@@ -30,6 +30,33 @@
       "compilerOptions": {
         "tsConfigPath": "apps/agent-app/tsconfig.app.json"
       }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
+    "db-lib": {
+      "type": "library",
+      "root": "libs/db-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/db-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/db-lib/tsconfig.lib.json"
+      }
+    },
+    "utils": {
+      "type": "library",
+      "root": "libs/utils",
+      "entryFile": "index",
+      "sourceRoot": "libs/utils/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/utils/tsconfig.lib.json"
+      }
     }
   }
 }

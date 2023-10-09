@@ -16,6 +16,7 @@ import { Merchant, MerchantKey, ResetToken } from '../../../typeorm';
 import { encodePassword } from '../../../utils/bcrypt';
 import { Repository } from 'typeorm';
 import { Cache } from 'cache-manager';
+import { TokenPayload } from '../../../auth/types/tokenPayload.interface';
 
 @Injectable()
 export class MerchantKeyCreatorService {

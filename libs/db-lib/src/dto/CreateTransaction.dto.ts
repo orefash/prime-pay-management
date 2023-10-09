@@ -61,6 +61,10 @@ export class CreateTransactionDto {
     refCode: string;
 
     @IsString()
+    @IsOptional()
+    agentCode: string;
+
+    @IsString()
     @IsNotEmpty()
     customerName: string;
 

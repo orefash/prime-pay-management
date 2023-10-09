@@ -1,9 +1,10 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Query, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import JwtAuthenticationGuard from '../../../auth/utils/JWTAuthGuard';
-import { CreateTransactionDto } from '../../dto/CreateTransaction.dto';
+// import { CreateTransactionDto } from '../../dto/CreateTransaction.dto';
 import { TransactionService } from '../../services/transaction/transaction.service';
 import RequestWithMerchant from '../../../auth/types/requestWithMerchant.interface';
 import { isValidDate } from '../../../utils/date-functions';
+import { CreateTransactionDto } from '@app/db-lib/dto/CreateTransaction.dto';
 
 @Controller('transactions')
 export class TransactionController {

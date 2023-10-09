@@ -1,8 +1,9 @@
-import { Address } from "../types/address.interface";
+
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 // import { MerchantProduct } from "./MerchantProducts";
 // import { MerchantPayout } from "./MerchantPayout";
-import { MerchantKey } from "./Keys";
+// import { MerchantKey } from "./Keys";
+import { Address } from "../types/address.interface";
 
 @Entity()
 @Unique(['email', 'accountNo',])
@@ -147,22 +148,7 @@ export class Merchant {
     })
     IdMime: string;
 
-    // @Column({
-    //     nullable: true,
-    // })
-    // websiteUrl: string;
-
-
-    // @Column({
-    //     nullable: true,
-    // })
-    // cacUrl: string;
-
-    // @Column("text", {
-    //     nullable: true,
-    //     array: true
-    // })
-    // cacDocs: string[];
+   
 
     @Index({ unique: true })
     @Column({
@@ -210,6 +196,11 @@ export class Merchant {
     })
     bankName: string;
 
+    @Column({
+        nullable: true,
+    })
+    marketSector: string;
+
     // @Column({
     //     type: 'jsonb',
     //     nullable: true,
@@ -231,7 +222,7 @@ export class Merchant {
 
 
 
-    @OneToOne(type => MerchantKey, key => key.merchant)
-    keys: MerchantKey;
+    // @OneToOne(type => MerchantKey, key => key.merchant)
+    // keys: MerchantKey;
 
 }

@@ -5,13 +5,14 @@ import { CustomerService } from '../../../merchant-customer/services/customer/cu
 import { CreatePayoutDto, PTransactionStatus } from '../../../merchant-payout/dto/CreatePayoutTransaction.dto';
 import { MerchantPayoutService } from '../../../merchant-payout/services/merchant-payout/merchant-payout.service';
 import { PayoutChannels } from '../../../merchant-payout/statics/PayoutChannels';
-import { CreateTransactionDto, TransactionStatus } from '../../dto/CreateTransaction.dto';
+// import { CreateTransactionDto, TransactionStatus } from '../../dto/CreateTransaction.dto';
 import { FindTransactionData } from '../../types/TransactionTypes';
 import { ThirdPartyDataService } from '../../../third-party-data/services/third-party-data/third-party-data.service';
 import { MerchantTransaction as TransactionEntity } from '../../../typeorm';
 import { mCustomer } from '../../../types/mCustomer.interface';
 import { mTransaction } from '../../../types/mTransaction.interface';
 import { Repository } from 'typeorm';
+import { CreateTransactionDto, TransactionStatus } from '@app/db-lib/dto/CreateTransaction.dto';
 
 @Injectable()
 export class TransactionService {

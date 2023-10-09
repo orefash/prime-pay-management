@@ -11,6 +11,7 @@ import { MerchantsService } from '../../../merchants/services/merchants/merchant
 import { Merchant, ResetToken } from '../../../typeorm';
 import { comparePasswords, encodePassword, generateToken } from '../../../utils/bcrypt';
 import { Repository } from 'typeorm';
+import { TokenPayload } from '../../types/tokenPayload.interface';
 
 @Injectable()
 export class MerchantAuthService {
