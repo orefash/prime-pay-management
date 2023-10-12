@@ -15,7 +15,7 @@ export class OverviewService {
 
     ) { }
 
-    async getOverviewData(agentCode: string, isTest: boolean): Promise<BaseOverview> {
+    async getOverviewData(agentCode: string): Promise<BaseOverview> {
 
         let overviewdata: BaseOverview = {
             salesCount: 0,

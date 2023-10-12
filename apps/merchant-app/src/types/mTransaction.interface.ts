@@ -17,4 +17,6 @@ export interface mTransaction {
 
     isTest: boolean;
 
+    agentCode?: string;
+
 }

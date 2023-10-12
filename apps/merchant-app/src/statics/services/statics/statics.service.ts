@@ -4,9 +4,10 @@ import { IDTYPES } from '../../types/IDTypes'
 import statesData from '../../types/NigeriaStateTypes';
 import COUNTRY_CODES from '../../types/CountryCodes';
 import PRODUCTCATEGORIES from '../../types/ProductTypes';
-import { OrderChannel, TransactionStatus } from '../../../merchant-transaction/dto/CreateTransaction.dto';
+// import { OrderChannel, TransactionStatus } from '../../../merchant-transaction/dto/CreateTransaction.dto';
 import { PTransactionStatus } from '../../../merchant-payout/dto/CreatePayoutTransaction.dto';
 import { PayoutChannels } from '../../../merchant-payout/statics/PayoutChannels';
+import { OrderChannel, TransactionStatus } from '@app/db-lib/dto/CreateTransaction.dto';
 
 @Injectable()
 export class StaticsService {

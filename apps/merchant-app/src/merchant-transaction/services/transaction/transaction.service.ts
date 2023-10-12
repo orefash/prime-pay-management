@@ -65,7 +65,8 @@ export class TransactionService {
             description: createTransactionDto.description,
             mid: createTransactionDto.mid,
             customer: savedCustomer,
-            loanTenor: createTransactionDto.loanTenor
+            loanTenor: createTransactionDto.loanTenor,
+            agentCode: createTransactionDto.agentCode
         }
 
         // console.log('ts: ', transactionData)
@@ -85,7 +86,7 @@ export class TransactionService {
 
         const savedCustomer = await this.customerService.createCustomer(customerData);
 
-        console.log('in tr: ', savedCustomer)
+        // console.log('in tr: ', savedCustomer)
 
         const transactionData: mTransaction = {
             amount: createTransactionDto.amount,
@@ -94,10 +95,11 @@ export class TransactionService {
             mid: createTransactionDto.mid,
             isTest: true,
             customer: savedCustomer,
-            loanTenor: createTransactionDto.loanTenor
+            loanTenor: createTransactionDto.loanTenor,
+            agentCode: createTransactionDto.agentCode
         }
 
-        console.log('ts: ', transactionData)
+        // console.log('ts: ', transactionData)
 
         const newTransaction = this.transactionRepository.create(transactionData);
         return await this.transactionRepository.save(newTransaction);

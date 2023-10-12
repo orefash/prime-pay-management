@@ -168,4 +168,18 @@ export class AgentsService {
         }
 
     }
+
+
+    async getAllAgents(): Promise<Agent[]> {
+        try {
+            return this.agentRepository.find({
+                
+                // select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
+
+            });
+        } catch (error) {
+            throw error;
+        }
+
+    }
 }
