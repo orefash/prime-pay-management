@@ -10,7 +10,6 @@ export class TransactionsController {
 
 
     @Get('agent/:agentCode')
-    // @UseGuards(JwtAuthenticationGuard)
     async getAllTransactions(@Param('agentCode') agentCode: string, @Query() queryParams: any) {
 
         let whereConditions = {};
@@ -64,16 +63,12 @@ export class TransactionsController {
     }
 
     @Get(':id')
-    // @UseGuards(JwtAuthenticationGuard)
     async getTransaction(@Param('id') id: string) {
-
-
         try {
             return await this.transactionService.getTransactionById(id);
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 }

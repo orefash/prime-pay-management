@@ -8,6 +8,7 @@ import { TypeOrmConfigService } from './config/TypeOrmConfig';
 import { AuthModule } from './auth/auth.module';
 import { OverviewModule } from './overview/overview.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
   imports: [
@@ -21,8 +22,9 @@ import { TransactionsModule } from './transactions/transactions.module';
       inject: [ConfigService],
     }),
     OverviewModule,
+    CustomersModule,
   ],
   controllers: [AgentAppController],
   providers: [AgentAppService],
 })
-export class AgentAppModule {}
+export class AgentAppModule { }
