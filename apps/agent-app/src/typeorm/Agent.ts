@@ -89,7 +89,7 @@ export class Agent {
     agentLname: string;
 
     @Column({
-        nullable: true,
+        nullable: false,
         name: 'bvn',
         length: 11
     })
@@ -200,6 +200,11 @@ export class Agent {
         nullable: true,
     })
     marketSector: string;
+
+    @Column({
+        nullable: false,
+    })
+    stateOfOrigin: string;
 
     // @Column({
     //     type: 'jsonb',

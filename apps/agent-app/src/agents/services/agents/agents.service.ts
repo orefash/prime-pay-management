@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Agent } from '../../../typeorm';
 import { Repository } from 'typeorm';
@@ -9,6 +9,11 @@ import { TokenPayload } from '../../../auth/types/tokenPayload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ResetToken } from '../../../typeorm/ResetToken';
 import { ConfirmEmail } from '@app/db-lib/types/confirm_email.type';
+import { UpdateBankDto } from '@app/db-lib/dto/UpdateBankDetails.dto';
+import { SetAgentLogoDto } from 'apps/agent-app/src/dto/SetAgentLogo.dto';
+import { SetAgentIdentificationDto } from 'apps/agent-app/src/dto/SetAgentIdentification.dto';
+import { EditAgentDto } from 'apps/agent-app/src/dto/EditAgent.dto';
+import { Address } from '@app/db-lib/types/address.interface';
 
 @Injectable()
 export class AgentsService {
@@ -83,6 +88,7 @@ export class AgentsService {
         newAgent.agentFname = createAgentDto.agentFname;
         newAgent.agentLname = createAgentDto.agentLname;
         newAgent.marketSector = createAgentDto.marketSector;
+        newAgent.stateOfOrigin = createAgentDto.stateOfOrigin;
         // newAgent.isRegistered = createAgentDto.isRegistered;
         newAgent.bvn = createAgentDto.bvn;
         newAgent.email = createAgentDto.email;
@@ -154,15 +160,54 @@ export class AgentsService {
         return createdAgent;
     }
 
+    async updateAgentProfile(id: string, editAgentDto: EditAgentDto): Promise<Partial<Agent>> {
+
+        let {  street, streetNo, country, state, landmark, lga, ...updateDto } = editAgentDto;
+        
+
+        let address: Address = {
+            street: street,
+            no: streetNo,
+            country: country,
+            state: state,
+            landmark: landmark,
+            lga: lga
+        }
+
+        updateDto.address = address;
+
+        await this.agentRepository.update(id, updateDto);
+        const updatedAgent = await this.agentRepository.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (updatedAgent) {
+            console.log('Updated: ', updatedAgent)
+            const { password, ...agent } = updatedAgent;
+            return agent;
+        }
+
+        throw new HttpException('agent not found', HttpStatus.NOT_FOUND);
+    }
+
     async getAgentByField(field: string, value: string): Promise<Agent> {
         try {
-            return this.agentRepository.findOne({
+
+            let agent = await this.agentRepository.findOne({
                 where: {
                     [field]: value
                 },
                 // select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
 
             });
+
+            // if (agent)
+            //     delete agent.password;
+
+            return agent;
+
         } catch (error) {
             throw error;
         }
@@ -173,7 +218,7 @@ export class AgentsService {
     async getAllAgents(): Promise<Agent[]> {
         try {
             return this.agentRepository.find({
-                
+
                 // select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
 
             });
@@ -182,4 +227,59 @@ export class AgentsService {
         }
 
     }
+
+    async getAgentBalance(id: string): Promise<Agent> {
+
+        let agents = await this.agentRepository.createQueryBuilder('m')
+            .select(['m.id', 'm.agentCode', 'm.availableBalance'])
+            .where("id = :id", { id })
+            .getOne();
+
+        if (!agents)
+            throw new Error("Invalid AGent ID")
+
+        delete agents.password;
+
+        return agents;
+    }
+
+
+    async updateAgentBank(id: string, editBankDto: UpdateBankDto): Promise<Partial<Agent>> {
+        try {
+            // Validate the bank account using thirdPartDataService.
+            let IS_TEST = this.configService.get<boolean>('IS_TEST');
+
+            // if (!IS_TEST) {
+            //     const isAccountValid = await this.paystackService.validateBankAccount(editMerchantBankDto.accountNo, editMerchantBankDto.bankCode);
+
+            //     if (!isAccountValid) {
+            //         throw new BadRequestException('Invalid Bank Details!!');
+            //     }
+            // }
+
+
+            // Perform the update in the database.
+            await this.agentRepository.update(id, editBankDto);
+
+            // Fetch the updated merchant record from the database.
+            const updatedAgent = await this.agentRepository.findOne({
+                where: { id: id }
+            });
+
+            if (updatedAgent) {
+                // Remove the password field from the result before returning.
+                const { password, ...agent } = updatedAgent;
+                return agent;
+            }
+
+            throw new HttpException('Agent not found', HttpStatus.NOT_FOUND);
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
+
+
 }

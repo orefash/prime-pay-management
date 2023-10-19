@@ -2,7 +2,6 @@ import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, 
 
 import { EditMerchantDto } from '../../dto/UpdateMerchant.dto';
 import { MerchantsService } from '../../services/merchants/merchants.service';
-import { UpdateMerchantBankDto } from '../../dto/UpdateMerchantBank.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { renameSync, unlinkSync } from 'fs';
@@ -15,6 +14,7 @@ import CustomFileInterceptor from '../../../interceptors/file-upload.interceptor
 import JwtAuthenticationGuard from '../../../auth/utils/JWTAuthGuard';
 import { generateUniqueFilename } from '../../../utils/file-upload';
 import { dirname, join } from 'path';
+import { UpdateBankDto } from '@app/db-lib/dto/UpdateBankDetails.dto';
 
 
 @Controller('merchants')
@@ -67,21 +67,9 @@ export class MerchantsController {
     }
 
 
-    // @Patch(':id/systemId/:mid')
-    // @UsePipes(ValidationPipe)
-    // async updateMerchantSystemId(@Param('id') id: string, @Param('mid') systemId: number) {
-    //     try {
-    //         return this.merchantService.updateMerchantSystemId(id, systemId);
-    //     } catch (error) {
-    //         console.log('update systemid error: ', error)
-    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
-
-
     @Patch('bank-details/:id')
     @UsePipes(ValidationPipe)
-    async updateMerchantBank(@Param('id') merchantId: string, @Body() editMerchantBankDto: UpdateMerchantBankDto) {
+    async updateMerchantBank(@Param('id') merchantId: string, @Body() editMerchantBankDto: UpdateBankDto) {
         try {
             return this.merchantService.updateMerchantBank(merchantId, editMerchantBankDto);
         } catch (error) {
@@ -130,52 +118,6 @@ export class MerchantsController {
     }
 
 
-    // @Post(':merchantId/set-id-card')
-    // @UseInterceptors(
-    //     CustomFileInterceptor(
-    //         'promoterIdDoc',
-    //         ['image/jpeg', 'image/png', 'application/pdf']
-    //     ),
-    // )
-    // async setMerchantIdentification(
-    //     @Req() req,
-    //     @Body() setMerchantID: SetMerchantIdDTO,
-    //     @UploadedFile() promoterIdDoc: Express.Multer.File,
-    //     @Param('merchantId') merchantId: string,
-    // ) {
-    //     if (!promoterIdDoc) {
-    //         throw new HttpException('Means of ID not uploaded', HttpStatus.BAD_REQUEST);
-    //     }
-
-    //     try {
-    //         let uFileName = await generateUniqueFilename("ID", promoterIdDoc.filename);
-    //         // console.log("uf: ", uFileName);
-
-    //         setMerchantID.promoterId = uFileName;
-    //         setMerchantID.promoterIdMime = promoterIdDoc.mimetype;
-
-    //         const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
-
-    //         const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
-
-    //         // console.log('file-obj: ', setMerchantID)
-    //         // Save the merchant identification data to the database
-    //         let data = await this.merchantService.setMerchantIdentification(merchantId, setMerchantID);
-
-    //         // Return the download URL to the client
-    //         return {
-    //             message: "Merchant ID Set Successfully",
-    //             idType: data.idType,
-    //             downloadUrl,
-    //             previewUrl
-    //         };
-    //     } catch (error) {
-    //         console.log('set ID error: ', error);
-    //         // Delete the uploaded file if there is an error
-    //         unlinkSync(promoterIdDoc.path);
-    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
 
     @Post(':merchantId/set-id-card')
     @UseInterceptors(
@@ -241,7 +183,7 @@ export class MerchantsController {
     @UseInterceptors(
         FilesInterceptor('files', 5, {
             storage: diskStorage({
-                destination: './uploads',
+                destination: process.env.IS_LOCAL_STORAGE === 'true' ? process.env.UPLOADED_FILES_DESTINATION : process.env.DOCKER_UPLOAD_DIR,
                 filename: (req, file, callback) => {
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     const extension = file.mimetype.split('/')[1];
@@ -348,9 +290,11 @@ export class MerchantsController {
             console.log('logodto: ', setLogoDto)
 
             const downloadUrl = `https://${req.headers.host}/api/merchants/${merchantId}/logo`;
+            const previewUrl = `https://${req.headers.host}/api/merchants/${merchantId}/preview-logo`;
             // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
 
             console.log('du: ', downloadUrl)
+            console.log('prv: ', previewUrl)
             // Save the merchant identification data to the database
             await this.merchantService.setMerchantLogo(merchantId, setLogoDto);
 
@@ -361,9 +305,10 @@ export class MerchantsController {
             return {
                 message: "Merchant Logo Set Successfully",
                 downloadUrl,
+                previewUrl
             };
         } catch (error) {
-            console.log('create error: ', error);
+            console.log('set Logo error: ', error);
             // Delete the uploaded file if there is an error
             unlinkSync(logoDoc.path);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

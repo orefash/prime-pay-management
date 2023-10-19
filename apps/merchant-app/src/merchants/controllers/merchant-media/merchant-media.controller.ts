@@ -27,6 +27,9 @@ export class MerchantMediaController {
                 throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
             }
 
+
+            // console.log("Filepath: ", fileData)
+
             res.attachment(fileData.fileName);
             res.setHeader('Content-Type', fileData.contentType);
 
@@ -39,6 +42,43 @@ export class MerchantMediaController {
             //         message: 'Internal server error',
             //     });
             // }
+        }
+    }
+
+
+    @Get(':merchantId/preview-logo')
+    async getMerchantLogoPreview(
+        @Param('merchantId') merchantId: string,
+        @Res() res: Response,
+    ) {
+        try {
+            const fileData = await this.merchantService.getMerchantLogo(merchantId);
+
+            if (!fileData) {
+                throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
+            }
+
+            // console.log("Filepath: ", fileData)
+
+            const fileStream = fs.createReadStream(fileData.filePath);
+
+            res.setHeader('Content-Type', fileData.contentType);
+
+            fileStream.pipe(res);
+
+            fileStream.on('error', (error) => {
+                console.error('Error streaming the file:', error);
+                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+        } catch (error) {
+            console.error('Error in get Merchant Logo Preview:', error);
+            if (error instanceof HttpException) {
+                res.status(error.getStatus()).json({ message: error.message });
+            } else if (error instanceof HttpException) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                    message: 'Internal server error',
+                });
+            }
         }
     }
 
@@ -56,15 +96,21 @@ export class MerchantMediaController {
                 throw new HttpException('File not found', HttpStatus.NOT_FOUND);
             }
 
-            res.attachment(fileData.fileName);
+            const fileStream = fs.createReadStream(fileData.filePath);
+
             res.setHeader('Content-Type', fileData.contentType);
 
-            res.sendFile(fileData.filePath);
+            fileStream.pipe(res);
+
+            fileStream.on('error', (error) => {
+                console.error('Error streaming the file:', error);
+                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+            });
         } catch (error) {
-            console.error('Error in getMerchantIdentification:', error);
+            console.error('Error in getMerchantIdentificationPreview:', error);
             if (error instanceof HttpException) {
                 res.status(error.getStatus()).json({ message: error.message });
-            } else {
+            } else if (error instanceof HttpException) {
                 res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                     message: 'Internal server error',
                 });

@@ -11,12 +11,14 @@ import { BullModule } from '@nestjs/bull';
 import { MailProcessor } from '../mailer-modules/mailer/processors/mailer.processor';
 import { MailModule } from '../mail/mail.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     BullModule.registerQueue({
       name: 'send_mail',
     }),
+    // CacheModule,
     MailModule,
     MerchantsModule,
     KeysModule,

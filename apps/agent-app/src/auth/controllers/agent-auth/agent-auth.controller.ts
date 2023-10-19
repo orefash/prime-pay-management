@@ -1,10 +1,11 @@
-import { Body, Controller, HttpCode, HttpException, HttpStatus, Inject, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AgentAuthService } from '../../services/agent-auth/agent-auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import RequestWithAgent from '../../types/requestWithAgent.interface';
 import { CreateAgentDto } from '../../../dto/CreateAgent.dto';
 import { AgentsService } from '../../../agents/services/agents/agents.service';
+import JwtAuthenticationGuard from '../../utils/JWTAuthGuard';
 
 @Controller('auth')
 export class AgentAuthController {
@@ -13,6 +14,14 @@ export class AgentAuthController {
         private readonly agentAuthService: AgentAuthService,
         private readonly agentService: AgentsService,
     ) { }
+
+    @UseGuards(JwtAuthenticationGuard)
+    @Get()
+    authenticate(@Req() request: RequestWithAgent) {
+        const agent = request.user;
+        agent.password = undefined;
+        return agent;
+    }
 
     @Post('register')
     @UsePipes(ValidationPipe)
@@ -54,7 +63,14 @@ export class AgentAuthController {
     }
 
 
+    @UseGuards(JwtAuthenticationGuard)
+    @Post('logout')
+    async logOut(@Req() request: RequestWithAgent, @Res() response: Response) {
+        // console.log('User: ', request.user)
+        response.setHeader('Set-Cookie', this.agentAuthService.getCookieForLogOut());
+        return response.sendStatus(200);
+    }
 
-
+    
 
 }

@@ -1,7 +1,7 @@
 
 import { IsNotEmpty, IsString, Length, MinLength } from "class-validator";
 
-export class UpdateMerchantBankDto {
+export class UpdateBankDto {
 
     @IsNotEmpty()
     @IsString()

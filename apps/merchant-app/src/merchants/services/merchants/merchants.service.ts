@@ -6,7 +6,7 @@ import { EditMerchantDto } from '../../dto/UpdateMerchant.dto';
 import { ThirdPartyDataService } from '../../../third-party-data/services/third-party-data/third-party-data.service';
 import { RegisterMerchantDto } from '../../../third-party-data/dto/RegisterMerchant.dto';
 import { ConfigService } from '@nestjs/config';
-import { UpdateMerchantBankDto } from '../../dto/UpdateMerchantBank.dto';
+import { UpdateBankDto } from '../../../../../../libs/db-lib/src/dto/UpdateBankDetails.dto';
 import { Socials } from '../../../types/socials.interface';
 import { Address } from '../../../types/address.interface';
 import * as path from 'path';
@@ -161,7 +161,6 @@ export class MerchantsService {
 
     async setMerchantCAC(id: string, setCAC: CACDocType) {
 
-
         await this.merchantRepository.update(id, setCAC);
         const updatedMerchant = await this.merchantRepository.findOne({
             where: {
@@ -177,7 +176,6 @@ export class MerchantsService {
             };
         }
 
-        
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
@@ -222,7 +220,7 @@ export class MerchantsService {
         }
     }
 
-    async updateMerchantBank(id: string, editMerchantBankDto: UpdateMerchantBankDto): Promise<Partial<MerchantEntity>> {
+    async updateMerchantBank(id: string, editMerchantBankDto: UpdateBankDto): Promise<Partial<MerchantEntity>> {
         try {
             // Validate the bank account using thirdPartDataService.
             let IS_TEST = this.configService.get<boolean>('IS_TEST');
@@ -358,19 +356,24 @@ export class MerchantsService {
     }
 
     async fetchUploadPath(fileName: string) {
-        const isLocal = this.configService.get<boolean>('IS_LOCAL_STORAGE');
-        console.log('islocal: ', isLocal);
+        const isLocal = this.configService.get<string>('IS_LOCAL_STORAGE') === 'true';
+        // console.log('in fetcher - islocal: ', isLocal);
+        // console.log('islocal - type: ', typeof isLocal);
 
         if (isLocal) {
             const destination = this.configService.get<string>('UPLOADED_FILES_DESTINATION');
 
-            const filePath = path.join(__dirname, '..', '..', '..', '..', destination, fileName);
+            const filePath = path.join(__dirname, '..', '..', '..', destination, fileName);
+            // console.log("FilePath: ", filePath);
             return filePath;
         }
 
         const destination = this.configService.get<string>('DOCKER_UPLOAD_DIR');
 
-        return path.join(destination, fileName);
+        const filePath: string = path.join(destination, fileName);
+
+        // console.log('in file path manager fp: ', filePath)
+        return filePath;
     }
 
     async getMerchantIdentification(merchantId: string) {
@@ -389,7 +392,6 @@ export class MerchantsService {
             const contentType = docs.promoterIdMime;
 
             const filePath = await this.fetchUploadPath(fileName);
-            console.log('fp: ', filePath)
             return { fileName, contentType, filePath: filePath, idType: docs.promoterIdType }
         }
 

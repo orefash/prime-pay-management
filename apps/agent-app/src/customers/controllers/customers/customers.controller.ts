@@ -65,7 +65,7 @@ export class CustomersController {
                 endDate = queryParams.endDate;
 
             // console.log('st: ', startDate)
-            const customers = await this.customerService.getAllCustomersByMid(agentCode, searchQuery, pageNo, itemLimit, startDate, endDate);
+            const customers = await this.customerService.getAllCustomersByAgentCode(agentCode, searchQuery, pageNo, itemLimit, startDate, endDate);
             return customers;
         } catch (error) {
 

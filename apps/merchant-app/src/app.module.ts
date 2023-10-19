@@ -53,51 +53,70 @@ import { AuthLibModule } from '@app/auth';
 
     // AuthLibModule,
     ConfigModule.forRoot({ isGlobal: true }),
+
     CacheModule.register({
       isGlobal: true,
       store: redisStore,
-      host: 'prime-redis-app.bots.prime-pay.africa', 
-      port: 6379,
-      username: "",
-      password: 'prime456',
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+      password: process.env.REDIS_PASSWORD,
+      username: process.env.REDIS_USERNAME,
       // url: 'redis://prime456@prime-redis-app.bots.prime-pay.africa:6379',
       // no_ready_check: true,
     }),
 
+
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: Number(configService.get('REDIS_PORT')),
+          password: configService.get('REDIS_PASSWORD'),
+          username: configService.get('REDIS_USERNAME'),
+          // host: parseInt(configService.get('IS_LOCAL')) === 0 ? ,
+          // port: 5005
 
-        // console.log("in redis config");
-        const isLocal = parseInt(configService.get('IS_LOCAL'));
-        // console.log("isLocal: ", isLocal);
-        const redis_password: string = configService.get<string>('REDIS_PASSWORD')
-
-
-        // console.log("redis pass: ", redis_password);
-
-        const isProduction = isLocal === 0 ? true : false;
-
-        // console.log("in prod: ", isProduction);
-        const redisConfig: any = {
-          host: configService.get<string>('REDIS_HOST'),
-          port: Number(configService.get<number>('REDIS_PORT')),
-        };
-
-        console.log("in bull: ", redisConfig)
-
-        if (isProduction) {
-          console.log('in prod, bull')
-          // Add the 'password' property to the Redis configuration only in production
-          redisConfig.password = redis_password;
-        }
-
-        return {
-          redis: redisConfig,
-        };
-      },
-      inject: [ConfigService],
+        },
+      }),
+      inject: [ConfigService]
     }),
+
+    // BullModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => {
+
+
+    //     // console.log("in redis config");
+    //     const isLocal = parseInt(configService.get('IS_LOCAL'));
+    //     // console.log("isLocal: ", isLocal);
+    //     const redis_password: string = configService.get<string>('REDIS_PASSWORD')
+
+
+    //     // console.log("redis pass: ", redis_password);
+
+    //     const isProduction = isLocal === 0 ? true : false;
+
+    //     // console.log("in prod: ", isProduction);
+    //     const redisConfig: any = {
+    //       host: configService.get<string>('REDIS_HOST'),
+    //       port: Number(configService.get<number>('REDIS_PORT')),
+    //     };
+
+    //     console.log("in bull: ", redisConfig)
+
+    //     if (isProduction) {
+    //       console.log('in prod, bull')
+    //       // Add the 'password' property to the Redis configuration only in production
+    //       redisConfig.password = redis_password;
+    //     }
+
+    //     return {
+    //       redis: redisConfig,
+    //     };
+    //   },
+    //   inject: [ConfigService],
+    // }),
 
     MerchantsModule,
     TypeOrmModule.forRootAsync({

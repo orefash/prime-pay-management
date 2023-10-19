@@ -1,12 +1,13 @@
 
 // import { Transform } from "class-transformer";
+import { Address } from "@app/db-lib/types/address.interface";
 import { IsArray, IsBoolean, IsBooleanString, IsEmail, IsIn, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl, Length, MaxLength, MinLength, ValidateIf } from "class-validator";
 
 // import SERVICETYPES from "../../statics/types/ServiceTypes";
 
 
 
-export class CreateAgentDto {
+export class EditAgentDto {
 
     // @IsString()
     // @IsNotEmpty()
@@ -35,7 +36,7 @@ export class CreateAgentDto {
     @Length(11)
     @MaxLength(11)
     @MinLength(11)
-    @IsNotEmpty()
+    @IsOptional()
     bvn?: string;
 
     // @IsNotEmpty()
@@ -61,49 +62,49 @@ export class CreateAgentDto {
     // @IsOptional()
     // cacDocs: string[];
 
-    
 
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
+
+    // @IsEmail()
+    // @IsNotEmpty()
+    // email: string;
 
 
     @IsNotEmpty()
     @IsString()
     phone: string;
 
-    @IsNotEmpty()
-    @MinLength(3)
-    password: string;
+    // @IsNotEmpty()
+    // @MinLength(3)
+    // password: string;
 
     // @IsOptional()
     // address: Address;
- 
-    // @IsNotEmpty()
-    // @IsNumber()
-    // streetNo: string;
 
-    // @IsNotEmpty()
-    // @IsString()
-    // street: string;
-
-    // @IsOptional()
-    // @IsString()
-    // landmark: string;
+    @IsNotEmpty()
+    @IsNumber()
+    streetNo: number;
 
     @IsNotEmpty()
     @IsString()
-    stateOfOrigin: string;
+    street: string;
 
-    // @IsNotEmpty()
-    // @IsString()
-    // lga: string;
+    @IsOptional()
+    @IsString()
+    landmark: string;
+
+    @IsNotEmpty()
+    @IsString()
+    state: string;
+
+    @IsNotEmpty()
+    @IsString()
+    lga: string;
 
     @IsNotEmpty()
     @IsString()
     country: string;
 
-    
+
     // @IsNumber()
     // @IsOptional()
     // avgMonthlySales: number;
@@ -113,18 +114,25 @@ export class CreateAgentDto {
     // systemId: number;
 
 
-    @IsNotEmpty()
-    @IsNumberString()
-    @Length(10)
-    accountNo: string;
+    // @IsNotEmpty()
+    // @IsNumberString()
+    // @Length(10)
+    // accountNo: string;
+
+    // @IsNotEmpty()
+    // @IsString()
+    // @MinLength(2)
+    // bankCode: string;
+
+    // @IsOptional()
+    // @IsString()
+    // bankName: string;
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(2)
-    bankCode: string;
+    stateOfOrigin: string;
 
     @IsOptional()
-    @IsString()
-    bankName: string;
+    address: Address;
 
 }

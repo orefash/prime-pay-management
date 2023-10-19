@@ -7,6 +7,10 @@ import { Agent } from '../typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ResetToken } from '../typeorm/ResetToken';
+import { AdminService } from './services/admin/admin.service';
+import { MediaService } from './services/media/media.service';
+import { MediaController } from './controllers/media/media.controller';
+import { AdminController } from './controllers/admin/admin.controller';
 
 @Module({
   imports: [
@@ -28,8 +32,8 @@ import { ResetToken } from '../typeorm/ResetToken';
 
     TypeOrmModule.forFeature([Agent, ResetToken]),
   ],
-  providers: [AgentsService],
+  providers: [AgentsService, AdminService, MediaService],
   exports: [AgentsService],
-  controllers: [AgentsController]
+  controllers: [AgentsController, MediaController, AdminController]
 })
 export class AgentsModule {}

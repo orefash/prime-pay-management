@@ -20,7 +20,7 @@ export class CustomersService {
     // };
 
 
-    async getAllCustomersByMid(agentCode: string, searchQuery: string, pageNo: number, itemLimit: number, startDate: string, endDate: string): Promise<MerchantCustomer[]> {
+    async getAllCustomersByAgentCode(agentCode: string, searchQuery: string, pageNo: number, itemLimit: number, startDate: string, endDate: string): Promise<MerchantCustomer[]> {
 
         let customerData = this.transactionRepository
             .createQueryBuilder('merchant_transaction')
