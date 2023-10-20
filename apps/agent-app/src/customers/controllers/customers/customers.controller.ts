@@ -66,7 +66,7 @@ export class CustomersController {
 
             // console.log('st: ', startDate)
             const customers = await this.customerService.getAllCustomersByAgentCode(agentCode, searchQuery, pageNo, itemLimit, startDate, endDate);
-            return customers;
+            return { success: true, data: customers };
         } catch (error) {
 
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

@@ -59,7 +59,7 @@ export class AgentAuthController {
         //     merchant.logoUrl = logoUrl;
         // }
         
-        return response.send({ agent, token });
+        return response.send({ success: true, agent, token });
     }
 
 
