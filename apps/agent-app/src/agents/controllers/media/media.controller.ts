@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MediaService } from '../../services/media/media.service';
 import CustomFileInterceptor from 'apps/agent-app/src/interceptors/file-upload.interceptor';
 import { SetAgentIdentificationDto } from 'apps/agent-app/src/dto/SetAgentIdentification.dto';
@@ -6,7 +6,10 @@ import { generateUniqueFilename } from '@app/utils/utils/file-upload';
 import JwtAuthenticationGuard from 'apps/agent-app/src/auth/utils/JWTAuthGuard';
 import { dirname, join } from 'path';
 import { renameSync } from 'fs';
+import { Response } from 'express';
 import { SetAgentLogoDto } from 'apps/agent-app/src/dto/SetAgentLogo.dto';
+
+import * as fs from 'fs';
 
 @Controller('agents')
 export class MediaController {
@@ -119,7 +122,7 @@ export class MediaController {
             console.log('logodto: ', setLogoDto)
 
             const downloadUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/logo`;
-            const previewUrl = `https://${req.headers.host}/agent-api/agent/${agentId}/preview-logo`;
+            const previewUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/preview-logo`;
             // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
 
             console.log('du: ', downloadUrl)
@@ -141,6 +144,150 @@ export class MediaController {
             // Delete the uploaded file if there is an error
             // unlinkSync(logoDoc.path);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @Get(':agentId/logo')
+    async getAgentLogo(
+        @Param('agentId') agentId: string,
+        @Res() res: Response,
+    ) {
+        try {
+
+            // console.log("id: ", agentId)
+            const fileData = await this.agentService.getAgentLogo(agentId);
+
+            if (!fileData) {
+                throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
+            }
+
+
+            // console.log("Filepath: ", fileData)
+
+            res.attachment(fileData.fileName);
+            res.setHeader('Content-Type', fileData.contentType);
+
+            res.sendFile(fileData.filePath);
+        } catch (error) {
+            console.error('Error in getAgentLogo:', error);
+            res.status(error.getStatus()).json({ message: error.message });
+            // } else {
+            //     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            //         message: 'Internal server error',
+            //     });
+            // }
+        }
+    }
+
+
+    @Get(':agentId/preview-logo')
+    async getAgentLogoPreview(
+        @Param('agentId') agentId: string,
+        @Res() res: Response,
+    ) {
+        try {
+            const fileData = await this.agentService.getAgentLogo(agentId);
+
+            if (!fileData) {
+                throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
+            }
+
+            // console.log("Filepath: ", fileData)
+
+            const fileStream = fs.createReadStream(fileData.filePath);
+
+            res.setHeader('Content-Type', fileData.contentType);
+
+            fileStream.pipe(res);
+
+            fileStream.on('error', (error) => {
+                console.error('Error streaming the file:', error);
+                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+        } catch (error) {
+            console.error('Error in get Merchant Logo Preview:', error);
+            if (error instanceof HttpException) {
+                res.status(error.getStatus()).json({ message: error.message });
+            } else if (error instanceof HttpException) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                    message: 'Internal server error',
+                });
+            }
+        }
+    }
+
+
+
+    @Get(':agentId/id-card/mm/:mime1/:mime2/:name')
+    async getAgentIdentification(
+        @Param('agentId') agentId: string,
+        @Res() res: Response,
+    ) {
+        try {
+            const fileData = await this.agentService.getAgentIdentification(
+                agentId,
+            );
+
+            if (!fileData) {
+                throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+            }
+
+            const fileStream = fs.createReadStream(fileData.filePath);
+
+            res.setHeader('Content-Type', fileData.contentType);
+
+            fileStream.pipe(res);
+
+            fileStream.on('error', (error) => {
+                console.error('Error streaming the file:', error);
+                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+        } catch (error) {
+            console.error('Error in getAgentIdentificationPreview:', error);
+            if (error instanceof HttpException) {
+                res.status(error.getStatus()).json({ message: error.message });
+            } else if (error instanceof HttpException) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                    message: 'Internal server error',
+                });
+            }
+        }
+    }
+
+    @Get(':agentId/id-card-preview/mm/:mime1/:mime2/:name')
+    async getAgentIdentificationPreview(
+        @Param('agentId') agentId: string,
+        @Res() res: Response,
+    ) {
+        try {
+            const fileData = await this.agentService.getAgentIdentification(
+                agentId,
+            );
+
+            if (!fileData) {
+                throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+            }
+
+            const fileStream = fs.createReadStream(fileData.filePath);
+
+            res.setHeader('Content-Type', fileData.contentType);
+
+            fileStream.pipe(res);
+
+            fileStream.on('error', (error) => {
+                console.error('Error streaming the file:', error);
+                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+        } catch (error) {
+            console.error('Error in getAgentIdentificationPreview:', error);
+            if (error instanceof HttpException) {
+                res.status(error.getStatus()).json({ message: error.message });
+            } else if (error instanceof HttpException) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                    message: 'Internal server error',
+                });
+            }
         }
     }
 
