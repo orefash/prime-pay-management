@@ -1,4 +1,5 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {  HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Agent } from '../../../typeorm';
 import { Repository } from 'typeorm';
@@ -15,10 +16,14 @@ import { SetAgentIdentificationDto } from 'apps/agent-app/src/dto/SetAgentIdenti
 import { EditAgentDto } from 'apps/agent-app/src/dto/EditAgent.dto';
 import { Address } from '@app/db-lib/types/address.interface';
 
+import { Cache } from 'cache-manager';
+
 @Injectable()
 export class AgentsService {
     constructor
         (
+
+            @Inject(CACHE_MANAGER) private cacheManager: Cache,
             @InjectRepository(Agent)
             private readonly agentRepository: Repository<Agent>,
             // @Inject(ThirdPartyDataService)
@@ -63,16 +68,19 @@ export class AgentsService {
         // }
 
 
-        // let lastMid: number = await this.cacheManager.get('last_mid');
+        let lastMid: number = await this.cacheManager.get('last_acode');
 
-        // if (!lastMid) {
-        //     lastMid = -1;
-        // } else {
-        //     lastMid = lastMid - 1;
-        // }
 
-        // console.log("lm: ", lastMid)
-        // await this.cacheManager.set('last_mid', lastMid);
+        // console.log("fetch lm: ", lastMid)
+
+        if (!lastMid) {
+            lastMid = -1;
+        } else {
+            lastMid = lastMid - 1;
+        }
+
+        // console.log("before set lm: ", lastMid)
+        await this.cacheManager.set('last_acode', lastMid);
 
 
         console.log("after")
@@ -94,11 +102,11 @@ export class AgentsService {
         newAgent.email = createAgentDto.email;
         newAgent.phone = createAgentDto.phone;
         newAgent.password = password;
-        newAgent.address = { country: createAgentDto.country, no: null, lga: "", state: "", street: "" };
+        newAgent.address = { country: createAgentDto.country, lga: "", state: "", street: "" };
         newAgent.accountNo = createAgentDto.accountNo;
         newAgent.bankCode = createAgentDto.bankCode;
         newAgent.bankName = createAgentDto.bankName;
-        newAgent.agentCode = "agent"
+        newAgent.agentCode = lastMid+"";
 
 
         //creating keys
@@ -161,36 +169,43 @@ export class AgentsService {
     }
 
     async updateAgentProfile(id: string, editAgentDto: EditAgentDto): Promise<Partial<Agent>> {
-
-        let {  street, streetNo, country, state, landmark, lga, ...updateDto } = editAgentDto;
-        
-
-        let address: Address = {
-            street: street,
-            no: streetNo,
-            country: country,
-            state: state,
-            landmark: landmark,
-            lga: lga
-        }
-
-        updateDto.address = address;
-
-        await this.agentRepository.update(id, updateDto);
-        const updatedAgent = await this.agentRepository.findOne({
-            where: {
-                id: id
+        try {
+            console.log("in edit");
+            let { street, country, state, landmark, lga, ...updateDto } = editAgentDto;
+    
+            let address: Address = {
+                street: street,
+                // no: streetNo,
+                country: country,
+                state: state,
+                landmark: landmark,
+                lga: lga
             }
-        });
-
-        if (updatedAgent) {
-            console.log('Updated: ', updatedAgent)
-            const { password, ...agent } = updatedAgent;
-            return agent;
+    
+            updateDto.address = address;
+    
+            await this.agentRepository.update(id, updateDto);
+            const updatedAgent = await this.agentRepository.findOne({
+                where: {
+                    id: id
+                }
+            });
+    
+            if (updatedAgent) {
+                console.log('Updated: ', updatedAgent)
+                const { password, ...agent } = updatedAgent;
+                return agent;
+            }
+    
+            throw new HttpException('Agent not found', HttpStatus.NOT_FOUND);
+        } catch (error) {
+            // Handle the exception here (e.g., log the error, send a custom error response)
+            console.error('Error occurred while updating agent profile:', error);
+            console.error('Error occurred while updating agent profile:', error.detail);
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        throw new HttpException('agent not found', HttpStatus.NOT_FOUND);
     }
+    
 
     async getAgentByField(field: string, value: string): Promise<Agent> {
         try {

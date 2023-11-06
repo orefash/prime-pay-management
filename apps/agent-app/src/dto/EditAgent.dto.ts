@@ -80,9 +80,9 @@ export class EditAgentDto {
     // @IsOptional()
     // address: Address;
 
-    @IsNotEmpty()
-    @IsNumber()
-    streetNo: number;
+    // @IsNotEmpty()
+    // @IsNumber()
+    // streetNo: number;
 
     @IsNotEmpty()
     @IsString()

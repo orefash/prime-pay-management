@@ -27,6 +27,7 @@ export class AgentAuthController {
     @UsePipes(ValidationPipe)
     async createMerchant(@Body() createAgentDto: CreateAgentDto,) {
 
+        console.log("in register")
         try {
 
             let created = await this.agentService.createAgentProfile(createAgentDto);
@@ -38,7 +39,7 @@ export class AgentAuthController {
             }
 
         } catch (error) {
-            // console.log('create Merchant Profile error: ', error)
+            console.log('create Agent Profile error: ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
