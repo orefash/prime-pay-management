@@ -36,7 +36,12 @@ export class AgentsController {
     @UsePipes(ValidationPipe)
     async updateAgent(@Param('id') agentId: string, @Body() editAgentDto: EditAgentDto) {
         try {
-            return this.agentService.updateAgentProfile(agentId, editAgentDto);
+            let updatedAgent = await this.agentService.updateAgentProfile(agentId, editAgentDto);
+
+            return {
+                success: true,
+                agent: updatedAgent
+            }
         } catch (error) {
             console.log('update agent error: ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -48,7 +53,12 @@ export class AgentsController {
     @UsePipes(ValidationPipe)
     async updateAgentBank(@Param('id') agentId: string, @Body() editAgentBankDto: UpdateBankDto) {
         try {
-            return this.agentService.updateAgentBank(agentId, editAgentBankDto);
+            let updatedAgent = await this.agentService.updateAgentBank(agentId, editAgentBankDto);
+
+            return {
+                success: true,
+                agent: updatedAgent
+            }
         } catch (error) {
             // console.log('update merchant bank error: ', error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
