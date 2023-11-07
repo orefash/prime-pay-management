@@ -2,7 +2,8 @@
 const IDTYPES = [
     "Drivers License",
     "International Passport",
-    "National Identity Number"
+    "National Identity Number",
+    "Voter's Card"
 ]
 
 
