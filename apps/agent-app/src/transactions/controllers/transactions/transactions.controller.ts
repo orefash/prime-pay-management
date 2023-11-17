@@ -22,7 +22,7 @@ export class TransactionsController {
         }
 
         if (queryParams.isTest) {
-            whereConditions['isTest'] = queryParams.isTest;
+            whereConditions['isTest'] = false;
         }
 
         if (queryParams.search) {

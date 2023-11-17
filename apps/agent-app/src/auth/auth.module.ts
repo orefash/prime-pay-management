@@ -9,14 +9,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './utils/LocalStrategy';
 import { JwtStrategy } from './utils/JWTStrategy';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
 
     PassportModule,
-    // BullModule.registerQueue({
-    //   name: 'send_mail',
-    // }),
+    BullModule.registerQueue({
+      name: 'send_mail',
+    }),
     TypeOrmModule.forFeature([Agent, ResetToken]),
     AgentsModule,
     JwtModule.registerAsync({

@@ -71,7 +71,7 @@ export class AgentsService {
         let lastMid: number = await this.cacheManager.get('last_acode');
 
 
-        // console.log("fetch lm: ", lastMid)
+        console.log("fetch lm: ", lastMid)
 
         if (!lastMid) {
             lastMid = -1;
@@ -79,7 +79,7 @@ export class AgentsService {
             lastMid = lastMid - 1;
         }
 
-        // console.log("before set lm: ", lastMid)
+        console.log("before set lm: ", lastMid)
         await this.cacheManager.set('last_acode', lastMid);
 
 
@@ -218,8 +218,13 @@ export class AgentsService {
 
             });
 
-            // if (agent)
-            //     delete agent.password;
+            if (agent){
+                // delete agent.password;
+                
+            }
+            else{
+                throw new Error("Invalid Agent ID")
+            }
 
             return agent;
 

@@ -93,7 +93,7 @@ export class TransactionService {
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
             mid: createTransactionDto.mid,
-            isTest: true,
+            isTest: createTransactionDto.isTest,
             customer: savedCustomer,
             loanTenor: createTransactionDto.loanTenor,
             agentCode: createTransactionDto.agentCode

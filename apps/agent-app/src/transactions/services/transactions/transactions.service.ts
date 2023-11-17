@@ -104,7 +104,7 @@ export class TransactionsService {
         // Count the total number of entities that match the conditions
         const totalCount = await queryBuilder.getCount();
 
-        // console.log('cnt: ', totalCount)
+        console.log('cnt: ', totalCount)
 
         // Calculate the total number of pages based on the total count and the item limit
         const totalPages = Math.ceil(totalCount / itemLimit);

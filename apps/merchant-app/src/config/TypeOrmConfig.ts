@@ -13,7 +13,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
 
         const isDevelopment: boolean = this.configService.get('NODE_ENV') == 'development' ? true : false;
         console.log('isdev: ', isDevelopment)
-        // console.log("DB: ", this.configService.get('POSTGRES_DB'))
+        console.log("DB: ", this.configService.get('POSTGRES_DB_DEV'))
         // console.log("HOST: ", this.configService.get('POSTGRES_HOST'))
         return {
             type: 'postgres',

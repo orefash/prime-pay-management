@@ -36,6 +36,8 @@ export class AgentsController {
     @UsePipes(ValidationPipe)
     async updateAgent(@Param('id') agentId: string, @Body() editAgentDto: EditAgentDto) {
         try {
+
+            console.log("eidt: ", editAgentDto)
             let updatedAgent = await this.agentService.updateAgentProfile(agentId, editAgentDto);
 
             return {
@@ -43,7 +45,7 @@ export class AgentsController {
                 agent: updatedAgent
             }
         } catch (error) {
-            console.log('update agent error: ', error)
+            console.log('update agent error: ', error.message)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }

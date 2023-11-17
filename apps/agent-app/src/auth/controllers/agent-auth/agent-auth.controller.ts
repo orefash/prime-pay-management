@@ -6,6 +6,8 @@ import RequestWithAgent from '../../types/requestWithAgent.interface';
 import { CreateAgentDto } from '../../../dto/CreateAgent.dto';
 import { AgentsService } from '../../../agents/services/agents/agents.service';
 import JwtAuthenticationGuard from '../../utils/JWTAuthGuard';
+import { RequestPasswordResetDto } from '../../dto/RequestPasswordReset.dto';
+import { ResetPasswordDto } from '../../dto/ResetPassword.dto';
 
 @Controller('auth')
 export class AgentAuthController {
@@ -72,6 +74,27 @@ export class AgentAuthController {
         return response.sendStatus(200);
     }
 
+
+    @Post('request-password-reset')
+    async requestPasswordReset(@Body() requestPasswordDto: RequestPasswordResetDto) {
+        try {
+            return await this.agentAuthService.requestPasswordReset(requestPasswordDto)
+        } catch (error) {
+            // console.log('request Password Reset error')
+            // console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
     
+    @Post('reset-password')
+    async resetPassword(@Body() resetPassword: ResetPasswordDto) {
+        try {
+            return await this.agentAuthService.resetPassword(resetPassword)
+        } catch (error) {
+            // console.log('Password Reset error')
+            // console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }

@@ -6,7 +6,7 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOn
 // import { MerchantKey } from "./Keys";
 
 @Entity()
-@Unique(['email', 'accountNo',])
+@Unique(['email'])
 export class Agent {
 
     @PrimaryGeneratedColumn("uuid")

@@ -27,8 +27,8 @@ export class AgentAuthService {
         private readonly jwtService: JwtService,
         @Inject(ConfigService)
         private readonly configService: ConfigService,
-        // @InjectQueue('send_mail')
-        // private readonly mailQueue: Queue,
+        @InjectQueue('send_mail')
+        private readonly mailQueue: Queue,
     ) { }
 
 
@@ -52,7 +52,7 @@ export class AgentAuthService {
 
     async validateAgent(email: string, password: string) {
         const agent: Agent = await this.agentService.getAgentByField("email", email);
-        // console.log('in ver merhcant: ', merchant)
+        console.log('in ver agent: ', agent)
         if (agent && comparePasswords(password, agent.password)) {
             const { password, ...result } = agent;
             return result;
@@ -88,9 +88,9 @@ export class AgentAuthService {
         const isLocal = this.configService.get<number>('IS_LOCAL');
         let bUrl = "";
         if (isLocal == 1) {
-            bUrl = this.configService.get<string>('BASE_URL_UAT')
+            bUrl = this.configService.get<string>('BASE_AGENT_URL_UAT')
         } else {
-            bUrl = this.configService.get<string>('BASE_URL_LIVE')
+            bUrl = this.configService.get<string>('BASE_AGENT_URL_LIVE')
         }
 
         bUrl = `${bUrl}/request-password-reset/${resetToken}/${agent.id}`
@@ -102,19 +102,19 @@ export class AgentAuthService {
             redirect_url: bUrl
         }
 
-        // console.log("CDATA: ", confirmEmailData)
+        console.log("CDATA: ", resetPasswordData)
 
-        // try {
-        //     console.log("In email confirmation send")
-        //     const job = await this.mailQueue.add('reset_password', resetPasswordData);
+        try {
+            console.log("In email req pass send")
+            const job = await this.mailQueue.add('reset_password', resetPasswordData);
 
-        //     return {
-        //         status: "Successful Request",
-        //         success: true,
-        //     };
-        // } catch (error) {
-        //     console.log("Error in email confirmation send")
-        // }
+            return {
+                status: "Successful Request",
+                success: true,
+            };
+        } catch (error) {
+            console.log("Error in reset password email send")
+        }
 
     }
 
@@ -145,13 +145,13 @@ export class AgentAuthService {
             password: passwordHash
         });
 
-        const updatedMerchant = await this.agentRepository.findOne({
+        const updatedAgent = await this.agentRepository.findOne({
             where: {
                 id: resetPassword.mid
             }
         });
 
-        if (updatedMerchant) {
+        if (updatedAgent) {
 
             await this.tokenRepository.delete(token.id);
             return {

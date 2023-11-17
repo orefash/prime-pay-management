@@ -149,6 +149,8 @@ export class AdminService {
         if (updatedAgent) {
             const { password, ...agent } = updatedAgent;
             return {
+                success: true,
+                // agentCode: setAgentCode.agentCode,
                 id: agent.id,
                 agent: agent,
                 message: "Agent Code Set"

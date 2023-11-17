@@ -11,6 +11,8 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { CustomersModule } from './customers/customers.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
+import { BullModule } from '@nestjs/bull';
+import { QueuesModule } from './queues/queues.module';
 
 @Module({
   imports: [
@@ -26,6 +28,21 @@ import * as redisStore from 'cache-manager-ioredis';
       // url: 'redis://prime456@prime-redis-app.bots.prime-pay.africa:6379',
       // no_ready_check: true,
     }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: Number(configService.get('REDIS_PORT')),
+          password: configService.get('REDIS_PASSWORD'),
+          username: configService.get('REDIS_USERNAME'),
+          // host: parseInt(configService.get('IS_LOCAL')) === 0 ? ,
+          // port: 5005
+
+        },
+      }),
+      inject: [ConfigService]
+    }),
     AuthModule,
     TransactionsModule,
     TypeOrmModule.forRootAsync({
@@ -35,6 +52,7 @@ import * as redisStore from 'cache-manager-ioredis';
     }),
     OverviewModule,
     CustomersModule,
+    QueuesModule,
   ],
   controllers: [AgentAppController],
   providers: [AgentAppService],

@@ -1,6 +1,7 @@
 
 // import { Transform } from "class-transformer";
 import { Address } from "@app/db-lib/types/address.interface";
+import { Transform } from "class-transformer";
 import { IsArray, IsBoolean, IsBooleanString, IsEmail, IsIn, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, IsUrl, Length, MaxLength, MinLength, ValidateIf } from "class-validator";
 
 // import SERVICETYPES from "../../statics/types/ServiceTypes";
@@ -134,5 +135,8 @@ export class EditAgentDto {
 
     @IsOptional()
     address: Address;
+
+    @Transform(({ value }) => undefined, { toClassOnly: true })
+    unwantedField: any;
 
 }
