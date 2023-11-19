@@ -22,18 +22,18 @@ import { TokenPayload } from '../../../auth/types/tokenPayload.interface';
 export class MerchantKeyCreatorService {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        @Inject(MerchantsService)
-        private readonly merchantService: MerchantsService,
+        // @Inject(MerchantsService)
+        // private readonly merchantService: MerchantsService,
         @Inject(KeysService)
         private readonly keyService: KeysService,
         @Inject(ConfigService)
         private readonly configService: ConfigService,
         @InjectRepository(Merchant)
         private readonly merchantRepository: Repository<Merchant>,
-        @InjectRepository(MerchantKey)
-        private readonly merchantKeyRepository: Repository<MerchantKey>,
-        @Inject(ThirdPartyDataService)
-        private readonly thirdPartyService: ThirdPartyDataService,
+        // @InjectRepository(MerchantKey)
+        // private readonly merchantKeyRepository: Repository<MerchantKey>,
+        // @Inject(ThirdPartyDataService)
+        // private readonly thirdPartyService: ThirdPartyDataService,
         
         @Inject(PaystackService)
         private readonly paystackService: PaystackService,

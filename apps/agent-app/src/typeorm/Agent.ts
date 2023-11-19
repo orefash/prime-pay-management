@@ -26,13 +26,6 @@ export class Agent {
     availableBalance: number;
 
 
-    @Column({
-        nullable: false,
-        default: 0
-    })
-    actualBalance: number;
-
-
     // @Column({
     //     nullable: false,
     // })

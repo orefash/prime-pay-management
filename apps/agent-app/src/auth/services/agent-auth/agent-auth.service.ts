@@ -186,9 +186,9 @@ export class AgentAuthService {
 
         let bUrl = "";
         if(isLocal == 1){
-            bUrl = this.configService.get<string>('BASE_URL_UAT')
+            bUrl = this.configService.get<string>('BASE_AGENT_URL_UAT')
         }else{
-            bUrl = this.configService.get<string>('BASE_URL_LIVE')
+            bUrl = this.configService.get<string>('BASE_AGENT_URL_LIVE')
         }
 
         await this.tokenRepository.delete(agentToken.id);

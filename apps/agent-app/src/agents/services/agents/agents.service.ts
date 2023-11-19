@@ -17,12 +17,15 @@ import { EditAgentDto } from 'apps/agent-app/src/dto/EditAgent.dto';
 import { Address } from '@app/db-lib/types/address.interface';
 
 import { Cache } from 'cache-manager';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class AgentsService {
     constructor
         (
-
+            @InjectQueue('send_mail')
+            private readonly mailQueue: Queue,
             @Inject(CACHE_MANAGER) private cacheManager: Cache,
             @InjectRepository(Agent)
             private readonly agentRepository: Repository<Agent>,
@@ -142,12 +145,12 @@ export class AgentsService {
 
         let bUrl = "";
         if (isLocal == 1) {
-            bUrl = this.configService.get<string>('API_URL_TEST')
+            bUrl = this.configService.get<string>('AGENT_API_URL_TEST')
         } else {
-            bUrl = this.configService.get<string>('API_URL_LIVE')
+            bUrl = this.configService.get<string>('AGENT_API_URL_LIVE')
         }
 
-        bUrl = `${bUrl}/api/auth/merchant/confirm/${token}`
+        bUrl = `${bUrl}/agent-api/auth/confirm/${token}`
 
         let confirmEmailData: ConfirmEmail = {
             name: createdAgent.agentFname + " " + createdAgent.agentLname,
@@ -155,14 +158,14 @@ export class AgentsService {
             redirect_url: bUrl
         }
 
-        // console.log("CDATA: ", confirmEmailData)
+        console.log("Agent Confirm DATA: ", confirmEmailData)
 
-        // try {
-        //     console.log("In email confirmation send")
-        //     const job = await this.mailQueue.add('confirm_mail', confirmEmailData);
-        // } catch (error) {
-        //     console.log("Error in email confirmation send")
-        // }
+        try {
+            console.log("In email confirmation send")
+            const job = await this.mailQueue.add('confirm_mail', confirmEmailData);
+        } catch (error) {
+            console.log("Error in email confirmation send")
+        }
 
         delete createdAgent.password
         return createdAgent;

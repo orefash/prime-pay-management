@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Inject, Param, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AgentAuthService } from '../../services/agent-auth/agent-auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
@@ -93,6 +93,22 @@ export class AgentAuthController {
         } catch (error) {
             // console.log('Password Reset error')
             // console.log(error)
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @Get('confirm/:token')
+    async confirmToken (@Param('token') token: string, @Res() res: Response){
+        try {
+            
+            let confirmed =  await this.agentAuthService.confirmEmail(token);
+
+            if(confirmed.redirectUrl){
+                return res.redirect(confirmed.redirectUrl);
+            }
+            
+        } catch (error) {
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }

@@ -13,6 +13,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { BullModule } from '@nestjs/bull';
 import { QueuesModule } from './queues/queues.module';
+import { PayoutsModule } from './payouts/payouts.module';
+import { ExternalApisModule } from './external-apis/external-apis.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { QueuesModule } from './queues/queues.module';
     OverviewModule,
     CustomersModule,
     QueuesModule,
+    PayoutsModule,
+    ExternalApisModule,
   ],
   controllers: [AgentAppController],
   providers: [AgentAppService],

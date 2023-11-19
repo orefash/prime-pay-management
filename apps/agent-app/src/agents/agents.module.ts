@@ -11,10 +11,15 @@ import { AdminService } from './services/admin/admin.service';
 import { MediaService } from './services/media/media.service';
 import { MediaController } from './controllers/media/media.controller';
 import { AdminController } from './controllers/admin/admin.controller';
+import { BullModule } from '@nestjs/bull';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Agent]),
+    BullModule.registerQueue({
+      name: 'send_mail',
+    }),
+    MailModule,
     HttpModule,
     // ThirdPartyDataModule,
     ConfigModule,
