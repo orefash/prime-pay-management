@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": false,
-    "outDir": "../../dist/apps/agent-app"
+    "declaration": true,
+    "outDir": "../../dist/libs/paystack-lib"
   },
-  "include": ["src/**/*", "../libs"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

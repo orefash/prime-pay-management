@@ -105,56 +105,6 @@ export class MerchantPayoutService {
     }
 
 
-    // async withdrawFromBalance(mid: string, withdrawDto: WithdrawPayoutDto): Promise<MerchantPayout> {
-
-    //     if(withdrawDto.isTest){
-    //         throw new Error('Withdrawal Not Allowed in Test Mode')
-    //     }
-
-    //     const merchant = await this.merchantRepository.findOne({
-    //         where: {
-    //             id: mid
-    //         }
-    //     });
-
-    //     if(!merchant){
-    //         throw new NotFoundException(`Merchant with id ${mid} not found`);
-    //     }
-
-    //     if(!merchant.recepientCode){
-    //         let recepientCodeData: TransferRecipient = await this.paystackService.createTransferRecipient(merchant.name, merchant.accountNo, merchant.bankCode);
-    //         if(!recepientCodeData.status){
-    //             throw new Error('Error creating Paystack Recepient code')
-    //         }
-
-    //         await this.merchantRepository.update(mid, {
-    //             recepientCode: recepientCodeData.recipient_code
-    //         });
-
-    //         merchant.recepientCode = recepientCodeData.recipient_code;
-    //     }
-
-
-    //     const withdrawPaystackResponse: WithdrawResponse = await this.paystackService.initiatePaystackTransfer(withdrawDto.amount, merchant.recepientCode, merchant.name);
-
-    //     if(!withdrawPaystackResponse.status){
-    //         throw new Error('Error with Paystack Withdraw')
-    //     }
-
-    //     let payout: CreatePayoutDto = {
-    //         amount: withdrawDto.amount,
-    //         status: withdrawPaystackResponse.withdraw_status === "success" ? PTransactionStatus.SUCCESS : PTransactionStatus.PENDING,
-    //         // status: capitalizeString(withdrawPaystackResponse.withdraw_status),
-    //         channel: PayoutChannels.PAYSTACK,
-    //         isWithdraw: true,
-    //         currency: 'NGN',
-    //         mid: merchant.systemId
-    //     }
-
-
-    //     return this.addTransactionToList(payout);
-    // }
-
     async addTransactionToList(transactionData: CreatePayoutDto): Promise<MerchantPayout> {
         const merchant = await this.merchantRepository.findOne({
             where: {

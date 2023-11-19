@@ -57,6 +57,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/utils/tsconfig.lib.json"
       }
+    },
+    "paystack-lib": {
+      "type": "library",
+      "root": "libs/paystack-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/paystack-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/paystack-lib/tsconfig.lib.json"
+      }
     }
   }
 }

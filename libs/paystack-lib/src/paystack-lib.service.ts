@@ -6,13 +6,11 @@ import { lastValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class PaystackService {
-
+export class PaystackLibService {
     constructor(
         private http: HttpService,
         private configService: ConfigService
     ) { }
-
 
     async getPaystackBank(bankName: string): Promise<string> {
 
@@ -174,8 +172,7 @@ export class PaystackService {
         } catch (error) {
             console.log("transferRecipient error: ", error.message)
             return {
-                status: false,
-                message: error.message
+                status: false
             };
         }
     }

@@ -15,7 +15,6 @@ import { BullModule } from '@nestjs/bull';
 import { QueuesModule } from './queues/queues.module';
 import { PayoutsModule } from './payouts/payouts.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
-
 @Module({
   imports: [
     AgentsModule,

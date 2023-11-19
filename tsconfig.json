@@ -35,6 +35,12 @@
       ],
       "@app/utils/*": [
         "libs/utils/src/*"
+      ],
+      "@app/paystack-lib": [
+        "libs/paystack-lib/src"
+      ],
+      "@app/paystack-lib/*": [
+        "libs/paystack-lib/src/*"
       ]
     }
   }

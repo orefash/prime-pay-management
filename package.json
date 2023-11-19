@@ -82,6 +82,7 @@
     "@types/nodemailer": "^6.4.9",
     "@types/passport-local": "^1.0.35",
     "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
     "eslint": "^8.40.0",
@@ -120,7 +121,8 @@
     "moduleNameMapper": {
       "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^@app/db-lib(|/.*)$": "<rootDir>/libs/db-lib/src/$1",
-      "^@app/utils(|/.*)$": "<rootDir>/libs/utils/src/$1"
+      "^@app/utils(|/.*)$": "<rootDir>/libs/utils/src/$1",
+      "^@app/paystack-lib(|/.*)$": "<rootDir>/libs/paystack-lib/src/$1"
     }
   }
 }
