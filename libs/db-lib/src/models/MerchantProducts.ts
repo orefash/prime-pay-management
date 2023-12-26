@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Merchant } from './Merchant';
-import { ProductImageDto } from '../merchant-product/dto/Upload.dto';
+import { ProductImageDto } from '../../../../apps/merchant-app/src/merchant-product/dto/Upload.dto';
 
 @Entity()
 export class MerchantProduct {

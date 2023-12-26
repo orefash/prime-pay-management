@@ -7,6 +7,11 @@ export enum TransactionStatus {
     CONFIRMED = 'Confirmed'
 }
 
+export enum TransactionType {
+    INSTANT_LOAN = 'Instant Loan',
+    EXTENDED_LOAN = 'Extended Loan',
+    PAY_MERCHANT = 'Pay Merchant'
+}
 
 export enum OrderChannel {
     WEB = 'Web',
@@ -26,6 +31,11 @@ export class CreateTransactionDto {
     @IsEnum(TransactionStatus)
     @IsOptional()
     status: TransactionStatus;
+
+    @IsString()
+    @IsEnum(TransactionType)
+    @IsOptional()
+    transactionType?: string;
 
     @IsString()
     @IsEnum(OrderChannel)

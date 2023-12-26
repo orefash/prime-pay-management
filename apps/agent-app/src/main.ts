@@ -17,18 +17,19 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       // 'https://prim-pay-merchant.netlify.app',
-      // 'http://localhost:5173',
+      'http://localhost:5173',
       // 'http://localhost:3001',
       // 'http://127.0.0.1:3001',
       // 'http://127.0.0.1:5500',
       // 'http://127.0.0.1:5502',
-      'https://uat.merchant.prime-pay.africa',
-      'https://www.uat.merchant.prime-pay.africa',
+      // 'https://uat.merchant.prime-pay.africa',
+      'https://prime-pay-agent.vercel.app',
       'http://127.0.0.1:5173',
-      'https://checkout.prime-pay.africa',
-      'https://uat.prime-pay.africa',
-      'https://www.uat.prime-pay.africa',
-      'https://prime-pay-merchant-lgr079o1v-orefash.vercel.app'
+      // 'https://prime-merchant-v.bots.prime-pay.africa'
+      // 'https://checkout.prime-pay.africa',
+      // 'https://uat.prime-pay.africa',
+      // 'https://www.uat.prime-pay.africa',
+      // 'https://prime-pay-merchant-lgr079o1v-orefash.vercel.app'
     ],
     // methods: ["GET", "POST"],
     credentials: true,

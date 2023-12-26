@@ -20,7 +20,8 @@ export class KeysService {
     generateKey(isLive: boolean, isPub: boolean): string {
 
         // console.log(`islive: ${isLive} |  isPub: ${isPub}`)
-        let uniqueKey = uuidv4({ nodash: true }).replace(/-/g, '');
+        // let uniqueKey = uuidv4({ nodash: true }).replace(/-/g, '');
+        let uniqueKey = uuidv4().replace(/-/g, '');
 
         let init = 'prm';
 

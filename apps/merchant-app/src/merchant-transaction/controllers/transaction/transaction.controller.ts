@@ -4,7 +4,7 @@ import JwtAuthenticationGuard from '../../../auth/utils/JWTAuthGuard';
 import { TransactionService } from '../../services/transaction/transaction.service';
 import RequestWithMerchant from '../../../auth/types/requestWithMerchant.interface';
 import { isValidDate } from '../../../utils/date-functions';
-import { CreateTransactionDto } from '@app/db-lib/dto/CreateTransaction.dto';
+import { CreateTransactionDto, TransactionType } from '@app/db-lib/dto/CreateTransaction.dto';
 
 @Controller('transactions')
 export class TransactionController {
@@ -18,6 +18,7 @@ export class TransactionController {
     @UsePipes(ValidationPipe)
     async createTransaction(@Body() createTransactionDto: CreateTransactionDto) {
         try {
+            createTransactionDto.transactionType = TransactionType.PAY_MERCHANT;
             const transaction = await this.transactionService.createTransaction(createTransactionDto);
             return {
                 status: HttpStatus.OK,
@@ -35,13 +36,13 @@ export class TransactionController {
     @UsePipes(ValidationPipe)
     async createDemoTransaction(@Body() createTransactionDto: CreateTransactionDto) {
         try {
+            createTransactionDto.transactionType = TransactionType.PAY_MERCHANT;
             return await this.transactionService.createDemoTransaction(createTransactionDto);
         } catch (error) {
             console.log('create transaction error')
             console.log(error)
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @Post(':id/toggle-delivered')

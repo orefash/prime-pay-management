@@ -4,9 +4,13 @@ import {  IsIn, IsNotEmpty, IsOptional, IsString,  } from "class-validator";
 
 export class SetAgentLogoDto {
 
+    // @IsString()
+    // @IsNotEmpty()
+    // logoPath: string;
+
     @IsString()
     @IsNotEmpty()
-    logoPath: string;
+    logoUrl: string;
 
     @IsString()
     @IsNotEmpty()

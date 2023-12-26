@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, } from "typeorm";
-import { Merchant } from "./Merchant";
+import { Merchant } from "../../../../libs/db-lib/src/models/Merchant";
 
 
 @Entity()

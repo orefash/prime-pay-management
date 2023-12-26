@@ -1,24 +1,22 @@
-import { Address } from "../types/address.interface";
-import { Socials } from "../types/socials.interface";
+
+import { Address } from "@app/db-lib/types/address.interface";
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { MerchantProduct } from "./MerchantProducts";
-import { MerchantPayout } from "./MerchantPayout";
-import { MerchantKey } from "./Keys";
-import { CACDocType } from "../merchants/dto/SetCAC.dto";
+// import { MerchantProduct } from "./MerchantProducts";
+// import { MerchantPayout } from "./MerchantPayout";
+// import { MerchantKey } from "./Keys";
 
 @Entity()
-@Unique(['email', 'accountNo',])
-export class Merchant {
+@Unique(['email'])
+export class Agent {
 
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Index({ unique: false })
+    @Index({ unique: true })
     @Column({
         nullable: false,
-        default: -99
     })
-    systemId: number;
+    agentCode: string;
 
 
     @Column({
@@ -28,17 +26,10 @@ export class Merchant {
     availableBalance: number;
 
 
-    @Column({
-        nullable: false,
-        default: 0
-    })
-    actualBalance: number;
-
-
-    @Column({
-        nullable: false,
-    })
-    name: string;
+    // @Column({
+    //     nullable: false,
+    // })
+    // name: string;
 
     @Column({
         nullable: true,
@@ -47,11 +38,6 @@ export class Merchant {
     logoUrl: string;
 
 
-    @Column({
-        nullable: true,
-        name: 'logo_doc'
-    })
-    logoPath: string;
 
     
     @Column({
@@ -60,16 +46,16 @@ export class Merchant {
     logoMime: string;
 
 
-    @Column({
-        nullable: true,
-    })
-    cacPath: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // cacPath: string;
 
 
-    @Column({
-        nullable: true,
-    })
-    cacMime: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // cacMime: string;
 
     @Column({
         nullable: true,
@@ -79,37 +65,33 @@ export class Merchant {
 
     @Column({
         nullable: false,
-        name: 'promoter_fname'
+        name: 'agent_fname'
     })
-    promoterFname: string;
+    agentFname: string;
 
 
     @Column({
         nullable: false,
-        name: 'promoter_lname'
+        name: 'agent_lname'
     })
-    promoterLname: string;
+    agentLname: string;
 
     @Column({
-        nullable: true,
+        nullable: false,
         name: 'bvn',
         length: 11
     })
     bvn: string;
 
 
-    @Column({
-        nullable: true,
-        name: 'business_type'
-    })
-    businessType: string;
+    // @spe: string;
 
-    @Column({
-        nullable: false,
-        name: 'is_registered',
-        default: false
-    })
-    isRegistered: boolean;
+    // @Column({
+    //     nullable: false,
+    //     name: 'is_registered',
+    //     default: false
+    // })
+    // isRegistered: boolean;
 
     @Column({
         nullable: false,
@@ -137,42 +119,24 @@ export class Merchant {
     @Column({
         nullable: true,
     })
-    promoterIdType: string;
+    IdType: string;
 
     @Column({
         nullable: true,
     })
-    promoterIdUrl: string;
+    IdUrl: string;
+
+    // @Column({
+    //     nullable: true,
+    // })
+    // agentId: string;
 
     @Column({
         nullable: true,
     })
-    promoterId: string;
+    IdMime: string;
 
-    @Column({
-        nullable: true,
-    })
-    promoterIdMime: string;
-
-    @Column({
-        nullable: true,
-    })
-    websiteUrl: string;
-
-
-    @Column({
-        nullable: true,
-    })
-    cacUrl: string;
-
-    @Column("text", {
-        nullable: true,
-        array: true
-    })
-    cacDocs: string[];
-
-    @Column('jsonb', { nullable: true })
-    cacDocuments: CACDocType[];
+   
 
     @Index({ unique: true })
     @Column({
@@ -198,11 +162,11 @@ export class Merchant {
     })
     address: Address;
 
-    @Column({
-        name: 'avg_monthly_sales',
-        nullable: true
-    })
-    avgMonthlySales: number;
+    // @Column({
+    //     name: 'avg_monthly_sales',
+    //     nullable: true
+    // })
+    // avgMonthlySales: number;
 
     @Column({
         nullable: true,
@@ -221,14 +185,23 @@ export class Merchant {
     bankName: string;
 
     @Column({
-        type: 'jsonb',
         nullable: true,
-        name: 'socials'
     })
-    socials: Socials;
+    marketSector: string;
 
-    @OneToMany(() => MerchantProduct, product => product.merchant)
-    products: MerchantProduct[];
+    @Column({
+        nullable: false,
+    })
+    stateOfOrigin: string;
+
+    // @Column({
+    //     type: 'jsonb',
+    //     nullable: true,
+    //     name: 'socials'
+    // })
+    // socials: Socials;
+
+   
 
     @CreateDateColumn({
         nullable: false,
@@ -240,11 +213,9 @@ export class Merchant {
     })
     modifiedDate: Date;
 
-    @OneToMany( type => MerchantPayout , payout => payout.merchant)
-    payouts: MerchantPayout[];
 
 
-    @OneToOne(type => MerchantKey, key => key.merchant)
-    keys: MerchantKey;
+    // @OneToOne(type => MerchantKey, key => key.merchant)
+    // keys: MerchantKey;
 
 }

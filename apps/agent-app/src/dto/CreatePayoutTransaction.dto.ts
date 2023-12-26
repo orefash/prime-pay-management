@@ -41,7 +41,7 @@ export class CreatePayoutDto {
 
     @IsString()
     @IsNotEmpty()
-    id: string;
+    agentId: string;
 
     // @IsNumber()
     // @IsOptional()

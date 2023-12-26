@@ -11,8 +11,9 @@ import { RequestPasswordResetDto } from '../../dto/RequestPasswordReset.dto';
 import { comparePasswords, encodePassword, generateToken } from '@app/utils/utils/bcrypt';
 import { ConfirmEmail } from '@app/db-lib/types/confirm_email.type';
 import { ResetPasswordDto } from '../../dto/ResetPassword.dto';
-import { TokenPayload } from '../../types/tokenPayload.interface';
+// import { TokenPayload } from '../../types/tokenPayload.interface';
 import { AgentsService } from 'apps/agent-app/src/agents/services/agents/agents.service';
+import { TokenPayload } from '@app/db-lib/types/tokenPayload.interface';
 
 @Injectable()
 export class AgentAuthService {
@@ -32,14 +33,14 @@ export class AgentAuthService {
     ) { }
 
 
-    public getCookieWithJwtToken(uid: string) {
-        const payload: TokenPayload = { uid };
+    public getCookieWithJwtToken(uid: string, role: string) {
+        const payload: TokenPayload = { uid, role };
         const token = this.jwtService.sign(payload);
         return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRATION_TIME')}`;
     }
 
-    public getJwtToken(uid: string) {
-        const payload: TokenPayload = { uid };
+    public getJwtToken(uid: string, role: string) {
+        const payload: TokenPayload = { uid, role };
         const token = this.jwtService.sign(payload);
 
         // console.log("dcd: ", this.jwtService.decode(token))

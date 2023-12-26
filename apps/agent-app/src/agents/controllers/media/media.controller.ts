@@ -5,22 +5,25 @@ import { SetAgentIdentificationDto } from 'apps/agent-app/src/dto/SetAgentIdenti
 import { generateUniqueFilename } from '@app/utils/utils/file-upload';
 import JwtAuthenticationGuard from 'apps/agent-app/src/auth/utils/JWTAuthGuard';
 import { dirname, join } from 'path';
-import { renameSync } from 'fs';
+import { renameSync, unlinkSync } from 'fs';
 import { Response } from 'express';
 import { SetAgentLogoDto } from 'apps/agent-app/src/dto/SetAgentLogo.dto';
 
 import * as fs from 'fs';
+import { SpacesService } from 'apps/agent-app/src/digital-ocean/services/spaces/spaces.service';
+import SpacesFileInterceptor from 'apps/agent-app/src/interceptors/spaces-upload.interceptor';
 
 @Controller('agents')
 export class MediaController {
     constructor(
         private readonly agentService: MediaService,
+        private readonly doSpacesService: SpacesService
 
     ) { }
 
     @Post(':agentId/set-id-card')
     @UseInterceptors(
-        CustomFileInterceptor(
+        SpacesFileInterceptor(
             'idDoc',
             ['image/jpeg', 'image/png', 'application/pdf']
         ),
@@ -36,31 +39,20 @@ export class MediaController {
         }
 
         try {
-            console.log("ID Doc: ", idDoc);
+            // console.log("ID Doc: ", idDoc);
             // Generate a unique filename
-            let uFileName = await generateUniqueFilename("AG-ID", idDoc.filename);
+            let uFileName = await generateUniqueFilename("AG-ID", idDoc.originalname);
             // let uFileName = idDoc.filename;
 
-            // Get the directory of the original file
-            const fileDir = dirname(idDoc.path);
+            let spaceFilename = `agent-id/${uFileName}`;
 
-            // Create the new file path by joining the original directory and the new filename
-            const newFilePath = join(fileDir, uFileName);
+            let fileUrl = await this.doSpacesService.uploadFile(idDoc.buffer, spaceFilename);
 
-            // Rename the uploaded file to the new filename while preserving the directory structure
-            renameSync(idDoc.path, newFilePath);
 
-            setAgentID.agentId = uFileName;
+            setAgentID.IdUrl = fileUrl;
             setAgentID.IdMime = idDoc.mimetype;
 
-            // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
-            // const previewUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/id-card-preview/mm/${setMerchantID.promoterIdMime}/${setMerchantID.promoterId}`;
-
-
-            const downloadUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/id-card/mm/${setAgentID.IdMime}/${setAgentID.agentId}`;
-            const previewUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/id-card-preview/mm/${setAgentID.IdMime}/${setAgentID.agentId}`;
-
-            console.log("in agent setID: ", previewUrl);
+            
             // Save the merchant identification data to the database
             let data = await this.agentService.setAgentIdentification(agentId, setAgentID);
 
@@ -68,8 +60,7 @@ export class MediaController {
             return {
                 message: "Agent ID Set Successfully",
                 idType: data.idType,
-                downloadUrl,
-                previewUrl
+                previewUrl: fileUrl
             };
         } catch (error) {
             console.error('set ID error: ', error);
@@ -82,7 +73,7 @@ export class MediaController {
     @Post(':agentId/set-logo')
     @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(
-        CustomFileInterceptor(
+        SpacesFileInterceptor(
             'logoDoc',
             ['image/jpeg', 'image/png',]
         ),
@@ -99,34 +90,30 @@ export class MediaController {
 
         try {
 
-            console.log("In logo set: ", logoDoc)
-            let uFileName = await generateUniqueFilename("AG-LO", logoDoc.filename);
+            // console.log("In logo set: ", logoDoc)
+            let uFileName = await generateUniqueFilename("AG-LO", logoDoc.originalname);
 
-            // Get the directory of the original file
-            const fileDir = dirname(logoDoc.path);
+            let spaceFilename = `agent-logo/${uFileName}`;
 
-            // Create the new file path by joining the original directory and the new filename
-            const newFilePath = join(fileDir, uFileName);
-
-            console.log(`oldp: ${logoDoc.path} || newp: ${newFilePath}`)
+            let fileUrl = await this.doSpacesService.uploadFile(logoDoc.buffer, spaceFilename);
 
 
-            renameSync(logoDoc.path, newFilePath);
+            // console.log(`file Url: ${fileUrl}`);
 
             
             let setLogoDto: SetAgentLogoDto = {
-                logoPath: newFilePath,
+                logoUrl: fileUrl,
                 logoMime: logoDoc.mimetype
             }
 
-            console.log('logodto: ', setLogoDto)
+            // console.log('logodto: ', setLogoDto)
 
-            const downloadUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/logo`;
-            const previewUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/preview-logo`;
-            // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
+            // const downloadUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/logo`;
+            // const previewUrl = `https://${req.headers.host}/agent-api/agents/${agentId}/preview-logo`;
+            // // const downloadUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
 
-            console.log('du: ', downloadUrl)
-            console.log('prv: ', previewUrl)
+            // console.log('du: ', downloadUrl)
+            // console.log('prv: ', previewUrl)
             // Save the merchant identification data to the database
             await this.agentService.setAgentLogo(agentId, setLogoDto);
 
@@ -136,159 +123,156 @@ export class MediaController {
             // Return the download URL to the client
             return {
                 message: "Agent Logo Set Successfully",
-                downloadUrl,
-                previewUrl
+                previewUrl: fileUrl
             };
         } catch (error) {
             console.log('set Logo error: ', error);
-            // Delete the uploaded file if there is an error
-            // unlinkSync(logoDoc.path);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
     }
 
 
-    @Get(':agentId/logo')
-    async getAgentLogo(
-        @Param('agentId') agentId: string,
-        @Res() res: Response,
-    ) {
-        try {
+    // @Get(':agentId/logo')
+    // async getAgentLogo(
+    //     @Param('agentId') agentId: string,
+    //     @Res() res: Response,
+    // ) {
+    //     try {
 
-            // console.log("id: ", agentId)
-            const fileData = await this.agentService.getAgentLogo(agentId);
+    //         // console.log("id: ", agentId)
+    //         const fileData = await this.agentService.getAgentLogo(agentId);
 
-            if (!fileData) {
-                throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
-            }
-
-
-            // console.log("Filepath: ", fileData)
-
-            res.attachment(fileData.fileName);
-            res.setHeader('Content-Type', fileData.contentType);
-
-            res.sendFile(fileData.filePath);
-        } catch (error) {
-            console.error('Error in getAgentLogo:', error);
-            res.status(error.getStatus()).json({ message: error.message });
-            // } else {
-            //     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            //         message: 'Internal server error',
-            //     });
-            // }
-        }
-    }
+    //         if (!fileData) {
+    //             throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
+    //         }
 
 
-    @Get(':agentId/preview-logo')
-    async getAgentLogoPreview(
-        @Param('agentId') agentId: string,
-        @Res() res: Response,
-    ) {
-        try {
-            const fileData = await this.agentService.getAgentLogo(agentId);
+    //         // console.log("Filepath: ", fileData)
 
-            if (!fileData) {
-                throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
-            }
+    //         res.attachment(fileData.fileName);
+    //         res.setHeader('Content-Type', fileData.contentType);
 
-            // console.log("Filepath: ", fileData)
-
-            const fileStream = fs.createReadStream(fileData.filePath);
-
-            res.setHeader('Content-Type', fileData.contentType);
-
-            fileStream.pipe(res);
-
-            fileStream.on('error', (error) => {
-                console.error('Error streaming the file:', error);
-                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
-            });
-        } catch (error) {
-            console.error('Error in get Merchant Logo Preview:', error);
-            if (error instanceof HttpException) {
-                res.status(error.getStatus()).json({ message: error.message });
-            } else if (error instanceof HttpException) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                    message: 'Internal server error',
-                });
-            }
-        }
-    }
+    //         res.sendFile(fileData.filePath);
+    //     } catch (error) {
+    //         console.error('Error in getAgentLogo:', error);
+    //         res.status(error.getStatus()).json({ message: error.message });
+    //         // } else {
+    //         //     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    //         //         message: 'Internal server error',
+    //         //     });
+    //         // }
+    //     }
+    // }
 
 
+    // @Get(':agentId/preview-logo')
+    // async getAgentLogoPreview(
+    //     @Param('agentId') agentId: string,
+    //     @Res() res: Response,
+    // ) {
+    //     try {
+    //         const fileData = await this.agentService.getAgentLogo(agentId);
 
-    @Get(':agentId/id-card/mm/:mime1/:mime2/:name')
-    async getAgentIdentification(
-        @Param('agentId') agentId: string,
-        @Res() res: Response,
-    ) {
-        try {
-            const fileData = await this.agentService.getAgentIdentification(
-                agentId,
-            );
+    //         if (!fileData) {
+    //             throw new HttpException('Logo not found', HttpStatus.NOT_FOUND);
+    //         }
 
-            if (!fileData) {
-                throw new HttpException('File not found', HttpStatus.NOT_FOUND);
-            }
+    //         // console.log("Filepath: ", fileData)
 
-            const fileStream = fs.createReadStream(fileData.filePath);
+    //         const fileStream = fs.createReadStream(fileData.filePath);
 
-            res.setHeader('Content-Type', fileData.contentType);
+    //         res.setHeader('Content-Type', fileData.contentType);
 
-            fileStream.pipe(res);
+    //         fileStream.pipe(res);
 
-            fileStream.on('error', (error) => {
-                console.error('Error streaming the file:', error);
-                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
-            });
-        } catch (error) {
-            console.error('Error in getAgentIdentificationPreview:', error);
-            if (error instanceof HttpException) {
-                res.status(error.getStatus()).json({ message: error.message });
-            } else if (error instanceof HttpException) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                    message: 'Internal server error',
-                });
-            }
-        }
-    }
+    //         fileStream.on('error', (error) => {
+    //             console.error('Error streaming the file:', error);
+    //             throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+    //         });
+    //     } catch (error) {
+    //         console.error('Error in get Merchant Logo Preview:', error);
+    //         if (error instanceof HttpException) {
+    //             res.status(error.getStatus()).json({ message: error.message });
+    //         } else if (error instanceof HttpException) {
+    //             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    //                 message: 'Internal server error',
+    //             });
+    //         }
+    //     }
+    // }
 
-    @Get(':agentId/id-card-preview/mm/:mime1/:mime2/:name')
-    async getAgentIdentificationPreview(
-        @Param('agentId') agentId: string,
-        @Res() res: Response,
-    ) {
-        try {
-            const fileData = await this.agentService.getAgentIdentification(
-                agentId,
-            );
 
-            if (!fileData) {
-                throw new HttpException('File not found', HttpStatus.NOT_FOUND);
-            }
 
-            const fileStream = fs.createReadStream(fileData.filePath);
+    // @Get(':agentId/id-card/mm/:mime1/:mime2/:name')
+    // async getAgentIdentification(
+    //     @Param('agentId') agentId: string,
+    //     @Res() res: Response,
+    // ) {
+    //     try {
+    //         const fileData = await this.agentService.getAgentIdentification(
+    //             agentId,
+    //         );
 
-            res.setHeader('Content-Type', fileData.contentType);
+    //         if (!fileData) {
+    //             throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+    //         }
 
-            fileStream.pipe(res);
+    //         const fileStream = fs.createReadStream(fileData.filePath);
 
-            fileStream.on('error', (error) => {
-                console.error('Error streaming the file:', error);
-                throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
-            });
-        } catch (error) {
-            console.error('Error in getAgentIdentificationPreview:', error);
-            if (error instanceof HttpException) {
-                res.status(error.getStatus()).json({ message: error.message });
-            } else if (error instanceof HttpException) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                    message: 'Internal server error',
-                });
-            }
-        }
-    }
+    //         res.setHeader('Content-Type', fileData.contentType);
+
+    //         fileStream.pipe(res);
+
+    //         fileStream.on('error', (error) => {
+    //             console.error('Error streaming the file:', error);
+    //             throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+    //         });
+    //     } catch (error) {
+    //         console.error('Error in getAgentIdentificationPreview:', error);
+    //         if (error instanceof HttpException) {
+    //             res.status(error.getStatus()).json({ message: error.message });
+    //         } else if (error instanceof HttpException) {
+    //             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    //                 message: 'Internal server error',
+    //             });
+    //         }
+    //     }
+    // }
+
+    // @Get(':agentId/id-card-preview/mm/:mime1/:mime2/:name')
+    // async getAgentIdentificationPreview(
+    //     @Param('agentId') agentId: string,
+    //     @Res() res: Response,
+    // ) {
+    //     try {
+    //         const fileData = await this.agentService.getAgentIdentification(
+    //             agentId,
+    //         );
+
+    //         if (!fileData) {
+    //             throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+    //         }
+
+    //         const fileStream = fs.createReadStream(fileData.filePath);
+
+    //         res.setHeader('Content-Type', fileData.contentType);
+
+    //         fileStream.pipe(res);
+
+    //         fileStream.on('error', (error) => {
+    //             console.error('Error streaming the file:', error);
+    //             throw new HttpException('Error streaming the file', HttpStatus.INTERNAL_SERVER_ERROR);
+    //         });
+    //     } catch (error) {
+    //         console.error('Error in getAgentIdentificationPreview:', error);
+    //         if (error instanceof HttpException) {
+    //             res.status(error.getStatus()).json({ message: error.message });
+    //         } else if (error instanceof HttpException) {
+    //             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    //                 message: 'Internal server error',
+    //             });
+    //         }
+    //     }
+    // }
 
 }

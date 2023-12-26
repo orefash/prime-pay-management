@@ -27,11 +27,11 @@ export class MerchantPayoutService {
         return await this.payoutRepository.find();
     }
 
-    async getPayoutListByMerchant(mid: number): Promise<MerchantPayout[]> {
+    async getPayoutListByMerchant(mid: string): Promise<MerchantPayout[]> {
         return await this.payoutRepository.find({
             where: {
                 merchant: {
-                    systemId: mid
+                    id: mid
                 }
             }
         });
@@ -97,7 +97,7 @@ export class MerchantPayoutService {
             channel: PayoutChannels.PAYSTACK,
             isWithdraw: true,
             currency: 'NGN',
-            mid: merchant.systemId,
+            mid: merchant.id,
             accountNo: merchant.accountNo
         };
 
@@ -108,7 +108,7 @@ export class MerchantPayoutService {
     async addTransactionToList(transactionData: CreatePayoutDto): Promise<MerchantPayout> {
         const merchant = await this.merchantRepository.findOne({
             where: {
-                systemId: transactionData.mid
+                id: transactionData.mid
             }
         });
 
@@ -135,7 +135,18 @@ export class MerchantPayoutService {
 
         // }
 
-        const newTransaction = await this.payoutRepository.create(transactionData);
+        // delete transactionData.mid;
+
+
+        const newTransaction = await this.payoutRepository.create({
+            merchant,
+            amount: transactionData.amount,
+            isWithdraw: transactionData.isWithdraw,
+            status: transactionData.status,
+            channel: transactionData.channel,
+            channelId: transactionData.channelId,
+            accountNo: transactionData.accountNo,
+        });
 
         return this.payoutRepository.save(newTransaction);
 

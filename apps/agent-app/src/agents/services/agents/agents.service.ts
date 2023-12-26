@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { CreateAgentDto } from '../../../dto/CreateAgent.dto';
 import { encodePassword } from '@app/utils/utils/bcrypt';
-import { TokenPayload } from '../../../auth/types/tokenPayload.interface';
+// import { TokenPayload } from '../../../auth/types/tokenPayload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ResetToken } from '../../../typeorm/ResetToken';
 import { ConfirmEmail } from '@app/db-lib/types/confirm_email.type';
@@ -19,6 +19,7 @@ import { Address } from '@app/db-lib/types/address.interface';
 import { Cache } from 'cache-manager';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { TokenPayload } from '@app/db-lib/types/tokenPayload.interface';
 
 @Injectable()
 export class AgentsService {
@@ -119,7 +120,8 @@ export class AgentsService {
         let createdAgent = await this.agentRepository.save(newAgent);
 
         const payload: TokenPayload = {
-            uid: createdAgent.id
+            uid: createdAgent.id,
+            role: "agent"
         };
 
         const customExpirationTime = 3600; // 1 hour

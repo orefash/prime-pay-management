@@ -48,122 +48,122 @@ export class MediaService {
         return filePath;
     }
 
-        async setAgentLogo(id: string, setLogo: SetAgentLogoDto) {
-            await this.agentRepository.update(id, setLogo);
-            const updatedAgent = await this.agentRepository.findOne({
-                where: {
-                    id: id
-                }
-            });
-    
-            if (updatedAgent) {
-                const { password, ...agent } = updatedAgent;
-                return {
-                    id: agent.id,
-                    message: "Agent Logo Set"
-                };
-            }
-    
-            throw new HttpException('Agent not found', HttpStatus.NOT_FOUND);
-        }
-
-
-        async getAgentLogo(agentId: string) {
-            const docs = await this.agentRepository.findOne({
-                where: {
-                    id: agentId
-                },
-                select: ['id', 'logoUrl', 'logoMime', 'logoPath'],
-    
-            });
-
-            console.log("dic: ", docs)
-    
-            if (docs?.logoPath) {
-    
-                const fileName = path.basename(docs.logoPath);
-                console.log('fn: ', fileName)
-                const filePath = await this.fetchUploadPath(fileName);
-    
-                const contentType = docs.logoMime;
-                return { fileName, contentType, filePath: filePath }
-            }
-    
-            throw new HttpException('Agent Logo not found', HttpStatus.NOT_FOUND);
-    
-        }
-        
-    
-        async setAgentIdentification(id: string, editAgentID: SetAgentIdentificationDto) {
-    
-            await this.agentRepository.update(id, editAgentID);
-            const updatedAgent = await this.agentRepository.findOne({
-                where: {
-                    id: id
-                }
-            });
-    
-            if (updatedAgent) {
-                const { password, ...agent } = updatedAgent;
-                return {
-                    id: updatedAgent.id,
-                    idType: updatedAgent.IdType,
-                    message: "AGent Identification Set"
-                };
-            }
-    
-            throw new HttpException('Agent not found', HttpStatus.NOT_FOUND);
-        }
-
-
-
-    async getAgentIdentification(agentId: string) {
-        const docs = await this.agentRepository.findOne({
+    async setAgentLogo(id: string, setLogo: SetAgentLogoDto) {
+        await this.agentRepository.update(id, setLogo);
+        const updatedAgent = await this.agentRepository.findOne({
             where: {
-                id: agentId
-            },
-            select: ['id', 'agentCode', 'IdType', 'agentId', 'IdMime'],
+                id: id
+            }
         });
 
-        // console.log('pID: ', docs);
-        if (docs?.agentId) {
-
-            const fileName = path.basename(docs.agentId);
-
-            const contentType = docs.IdMime;
-
-            const filePath = await this.fetchUploadPath(fileName);
-            return { fileName, contentType, filePath: filePath, idType: docs.IdType }
+        if (updatedAgent) {
+            const { password, ...agent } = updatedAgent;
+            return {
+                id: agent.id,
+                message: "Agent Logo Set"
+            };
         }
 
-
-        throw new HttpException('Agent ID Card not found', HttpStatus.NOT_FOUND);
+        throw new HttpException('Agent not found', HttpStatus.NOT_FOUND);
     }
 
 
-    async getAgentIdentificationURL(agentId: string) {
-        const docs = await this.agentRepository.findOne({
+    // async getAgentLogo(agentId: string) {
+    //     const docs = await this.agentRepository.findOne({
+    //         where: {
+    //             id: agentId
+    //         },
+    //         select: ['id', 'logoUrl', 'logoMime', '],
+
+    //     });
+
+    //     console.log("dic: ", docs)
+
+    //     if (docs?.logoPath) {
+
+    //         const fileName = path.basename(docs.logoPath);
+    //         console.log('fn: ', fileName)
+    //         const filePath = await this.fetchUploadPath(fileName);
+
+    //         const contentType = docs.logoMime;
+    //         return { fileName, contentType, filePath: filePath }
+    //     }
+
+    //     throw new HttpException('Agent Logo not found', HttpStatus.NOT_FOUND);
+
+    // }
+
+
+    async setAgentIdentification(id: string, editAgentID: SetAgentIdentificationDto) {
+
+        await this.agentRepository.update(id, editAgentID);
+        const updatedAgent = await this.agentRepository.findOne({
             where: {
-                id: agentId
-            },
-            select: ['id', 'agentCode', 'IdType', 'agentId', 'IdMime'],
+                id: id
+            }
         });
 
-        console.log('pID: ', docs);
-
-        if (docs.agentId) {
-
-            const fileName = path.basename(docs.agentId);
-
-            const contentType = docs.IdMime;
-
-            const filePath = await this.fetchUploadPath(fileName);
-            console.log('fp: ', fileName)
-            return { fileName, contentType, filePath: filePath }
+        if (updatedAgent) {
+            const { password, ...agent } = updatedAgent;
+            return {
+                id: updatedAgent.id,
+                idType: updatedAgent.IdType,
+                message: "AGent Identification Set"
+            };
         }
 
-
-        throw new HttpException('Agent ID Card not found', HttpStatus.NOT_FOUND);
+        throw new HttpException('Agent not found', HttpStatus.NOT_FOUND);
     }
-    
+
+
+
+    // async getAgentIdentification(agentId: string) {
+    //     const docs = await this.agentRepository.findOne({
+    //         where: {
+    //             id: agentId
+    //         },
+    //         select: ['id', 'agentCode', 'IdType', 'agentId', 'IdMime'],
+    //     });
+
+    //     // console.log('pID: ', docs);
+    //     if (docs?.agentId) {
+
+    //         const fileName = path.basename(docs.agentId);
+
+    //         const contentType = docs.IdMime;
+
+    //         const filePath = await this.fetchUploadPath(fileName);
+    //         return { fileName, contentType, filePath: filePath, idType: docs.IdType }
+    //     }
+
+
+    //     throw new HttpException('Agent ID Card not found', HttpStatus.NOT_FOUND);
+    // }
+
+
+    // async getAgentIdentificationURL(agentId: string) {
+    //     const docs = await this.agentRepository.findOne({
+    //         where: {
+    //             id: agentId
+    //         },
+    //         select: ['id', 'agentCode', 'IdType', 'agentId', 'IdMime'],
+    //     });
+
+    //     console.log('pID: ', docs);
+
+    //     if (docs.agentId) {
+
+    //         const fileName = path.basename(docs.agentId);
+
+    //         const contentType = docs.IdMime;
+
+    //         const filePath = await this.fetchUploadPath(fileName);
+    //         console.log('fp: ', fileName)
+    //         return { fileName, contentType, filePath: filePath }
+    //     }
+
+
+    //     throw new HttpException('Agent ID Card not found', HttpStatus.NOT_FOUND);
+    // }
+
 }

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-import { Merchant } from './Merchant';
-import { MerchantProduct } from './MerchantProducts';
+import { Merchant } from '../../../../libs/db-lib/src/models/Merchant';
+import { MerchantProduct } from '../../../../libs/db-lib/src/models/MerchantProducts';
 
 @Entity()
 export class MerchantProductImage {

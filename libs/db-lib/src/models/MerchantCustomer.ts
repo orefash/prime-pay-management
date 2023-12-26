@@ -46,7 +46,7 @@ export class MerchantCustomer {
     orderDate: Date;
 
 
-    @OneToMany( type => MerchantTransaction , transaction => transaction.mid)
+    @OneToMany( type => MerchantTransaction , transaction => transaction.customer)
     transactions: MerchantTransaction[];
     
 }

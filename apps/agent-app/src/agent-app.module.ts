@@ -15,6 +15,7 @@ import { BullModule } from '@nestjs/bull';
 import { QueuesModule } from './queues/queues.module';
 import { PayoutsModule } from './payouts/payouts.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
+import { DigitalOceanModule } from './digital-ocean/digital-ocean.module';
 @Module({
   imports: [
     AgentsModule,
@@ -56,6 +57,7 @@ import { ExternalApisModule } from './external-apis/external-apis.module';
     QueuesModule,
     PayoutsModule,
     ExternalApisModule,
+    DigitalOceanModule,
   ],
   controllers: [AgentAppController],
   providers: [AgentAppService],

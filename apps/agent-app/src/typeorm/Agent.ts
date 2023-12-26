@@ -38,11 +38,6 @@ export class Agent {
     logoUrl: string;
 
 
-    @Column({
-        nullable: true,
-        name: 'logo_doc'
-    })
-    logoPath: string;
 
     
     @Column({
@@ -131,10 +126,10 @@ export class Agent {
     })
     IdUrl: string;
 
-    @Column({
-        nullable: true,
-    })
-    agentId: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // agentId: string;
 
     @Column({
         nullable: true,

@@ -156,11 +156,11 @@ export class MerchantKeyCreatorService {
 
         if (IS_TEST !== "true") {
             console.log("In Acc valid check: ",)
-            let isAccountValid = await this.paystackService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
+            // let isAccountValid = await this.paystackService.validateBankAccount(createMerchantDto.accountNo, createMerchantDto.bankCode);
 
-            // console.log("Acc valid: ", isAccountValid)
-            if (!isAccountValid)
-                throw new Error("Invalid Bank Details!!")
+            // // console.log("Acc valid: ", isAccountValid)
+            // if (!isAccountValid)
+            //     throw new Error("Invalid Bank Details!!")
         }
 
 

@@ -19,7 +19,9 @@ export class MerchantPayoutController {
 
     @Get('merchant/:id')
     @UseGuards(JwtAuthenticationGuard)
-    getPayoutDataByMerchant(@Param('mid') mid: number) {
+    getPayoutDataByMerchant(@Param('id') mid: string) {
+
+        console.log("In get by Merchat: ", mid)
 
         return this.payoutService.getPayoutListByMerchant(mid);
     }

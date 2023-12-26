@@ -17,4 +17,8 @@ export class SetMerchantIdDTO {
     @IsOptional()
     promoterIdMime?:string;
 
+    @IsString()
+    @IsOptional()
+    promoterIdUrl?:string;
+
 }

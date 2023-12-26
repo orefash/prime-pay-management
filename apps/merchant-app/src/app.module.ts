@@ -45,6 +45,7 @@ import { AuthLibModule } from '@app/auth';
 
 
 // import { CacheModule as CacheModule_ } from "@nestjs/cache-manager";
+import { DigitalOceanModule } from './digital-ocean/digital-ocean.module';
 
 
 
@@ -81,43 +82,6 @@ import { AuthLibModule } from '@app/auth';
       }),
       inject: [ConfigService]
     }),
-
-    // BullModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: async (configService: ConfigService) => {
-
-
-    //     // console.log("in redis config");
-    //     const isLocal = parseInt(configService.get('IS_LOCAL'));
-    //     // console.log("isLocal: ", isLocal);
-    //     const redis_password: string = configService.get<string>('REDIS_PASSWORD')
-
-
-    //     // console.log("redis pass: ", redis_password);
-
-    //     const isProduction = isLocal === 0 ? true : false;
-
-    //     // console.log("in prod: ", isProduction);
-    //     const redisConfig: any = {
-    //       host: configService.get<string>('REDIS_HOST'),
-    //       port: Number(configService.get<number>('REDIS_PORT')),
-    //     };
-
-    //     console.log("in bull: ", redisConfig)
-
-    //     if (isProduction) {
-    //       console.log('in prod, bull')
-    //       // Add the 'password' property to the Redis configuration only in production
-    //       redisConfig.password = redis_password;
-    //     }
-
-    //     return {
-    //       redis: redisConfig,
-    //     };
-    //   },
-    //   inject: [ConfigService],
-    // }),
-
     MerchantsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -147,6 +111,7 @@ import { AuthLibModule } from '@app/auth';
     ImagesModule,
     // MailerModule,
     MailModule,
+    DigitalOceanModule,
 
   ],
   providers: [

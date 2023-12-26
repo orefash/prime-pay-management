@@ -1,11 +1,12 @@
-// import { TransactionStatus } from "src/merchant-transaction/dto/CreateTransaction.dto";
+
+import { PTransactionStatus } from "@app/db-lib/dto/CreatePayoutTransaction.dto";
+import { PayoutChannels } from "@app/db-lib/statics/PayoutChannels";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Merchant } from "./Merchant";
-import { PayoutChannels } from "../merchant-payout/statics/PayoutChannels";
-import { PTransactionStatus } from "../merchant-payout/dto/CreatePayoutTransaction.dto";
+import { Agent } from "./Agent";
+
 
 @Entity()
-export class MerchantPayout {
+export class AgentPayout {
 
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -56,8 +57,8 @@ export class MerchantPayout {
     })
     accountNo: string;
 
-    @ManyToOne(type => Merchant, merchant => merchant.id)
-    merchant: Merchant;
+    @ManyToOne(type => Agent, agent => agent.id)
+    agent: Agent;
    
     // @Column({
     //     nullable: false,

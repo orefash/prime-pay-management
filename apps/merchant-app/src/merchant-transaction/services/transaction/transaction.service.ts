@@ -8,11 +8,11 @@ import { PayoutChannels } from '../../../merchant-payout/statics/PayoutChannels'
 // import { CreateTransactionDto, TransactionStatus } from '../../dto/CreateTransaction.dto';
 import { FindTransactionData } from '../../types/TransactionTypes';
 import { ThirdPartyDataService } from '../../../third-party-data/services/third-party-data/third-party-data.service';
-import { MerchantTransaction as TransactionEntity } from '../../../typeorm';
+import { Merchant, MerchantTransaction as TransactionEntity } from '../../../typeorm';
 import { mCustomer } from '../../../types/mCustomer.interface';
 import { mTransaction } from '../../../types/mTransaction.interface';
 import { Repository } from 'typeorm';
-import { CreateTransactionDto, TransactionStatus } from '@app/db-lib/dto/CreateTransaction.dto';
+import { CreateTransactionDto, TransactionStatus, TransactionType } from '@app/db-lib/dto/CreateTransaction.dto';
 
 @Injectable()
 export class TransactionService {
@@ -20,6 +20,8 @@ export class TransactionService {
         (
             @InjectRepository(TransactionEntity)
             private readonly transactionRepository: Repository<TransactionEntity>,
+            @InjectRepository(Merchant)
+            private readonly merchantRepository: Repository<Merchant>,
             @Inject(CustomerService)
             private readonly customerService: CustomerService,
             @Inject(MerchantPayoutService)
@@ -32,19 +34,38 @@ export class TransactionService {
 
     async createTransaction(createTransactionDto: CreateTransactionDto) {
 
+
+        let merchant = null;
+
+        if (createTransactionDto.transactionType === TransactionType.PAY_MERCHANT) {
+            merchant = await this.merchantRepository.findOne({
+                where: {
+                    systemId: createTransactionDto.mid
+                },
+                select: ['id', 'name']
+            });
+
+            if (!merchant) {
+                throw new Error("Invalid Merchant ID!!");
+            }
+        }
+
         let PPAY_STATUS = this.configService.get<number>('PPAY');
 
         console.log("in ct service - pp", PPAY_STATUS);
 
 
 
+        if (createTransactionDto.transactionType === TransactionType.PAY_MERCHANT) {
+            if (PPAY_STATUS == 0) {
+                let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
 
-        if (PPAY_STATUS == 0) {
-            let payMerchantResponse = await this.thirdPartyService.payMerchant(createTransactionDto)
+                if (!payMerchantResponse)
+                    throw new Error('Not eligible for Loan')
+            }
 
-            if (!payMerchantResponse)
-                throw new Error('Not eligible for Loan')
         }
+
 
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
@@ -63,7 +84,8 @@ export class TransactionService {
             amount: createTransactionDto.amount,
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
-            mid: createTransactionDto.mid,
+            merchant: merchant,
+            transactionType: createTransactionDto.transactionType,
             customer: savedCustomer,
             loanTenor: createTransactionDto.loanTenor,
             agentCode: createTransactionDto.agentCode
@@ -76,6 +98,21 @@ export class TransactionService {
     }
 
     async createDemoTransaction(createTransactionDto: CreateTransactionDto) {
+
+        let merchant = null;
+
+        if (createTransactionDto.transactionType === TransactionType.PAY_MERCHANT) {
+            merchant = await this.merchantRepository.findOne({
+                where: {
+                    systemId: createTransactionDto.mid
+                },
+                select: ['id', 'name']
+            });
+
+            if (!merchant) {
+                throw new Error("Invalid Merchant ID!!");
+            }
+        }
 
         const customerData: mCustomer = {
             name: createTransactionDto.customerName,
@@ -92,8 +129,9 @@ export class TransactionService {
             amount: createTransactionDto.amount,
             orderChannel: createTransactionDto.orderChannel,
             description: createTransactionDto.description,
-            mid: createTransactionDto.mid,
+            merchant: merchant,
             isTest: createTransactionDto.isTest,
+            transactionType: createTransactionDto.transactionType,
             customer: savedCustomer,
             loanTenor: createTransactionDto.loanTenor,
             agentCode: createTransactionDto.agentCode
@@ -126,7 +164,7 @@ export class TransactionService {
         itemLimit: number, startDate: string, endDate: string
         // orderBy: Record<string, 'ASC' | 'DESC'>,
     ): Promise<FindTransactionData> {
- 
+
         const queryBuilder = this.transactionRepository.createQueryBuilder('merchant_transaction')
             .leftJoinAndSelect('merchant_transaction.customer', 'customer');
 
@@ -195,7 +233,7 @@ export class TransactionService {
 
         let queryResponse =
             await queryBuilder.getMany();
-        
+
         const data: FindTransactionData = {
             data: queryResponse,
             totalPageNo: totalPages
@@ -221,7 +259,9 @@ export class TransactionService {
     async getMerchantTransactions(mid: number): Promise<TransactionEntity[]> {
         return this.transactionRepository.find({
             where: {
-                mid: mid
+                merchant: {
+                    systemId: mid
+                }
             },
             relations: {
                 customer: true
@@ -280,7 +320,18 @@ export class TransactionService {
             }
         });
 
+        // const 
+
         if (updatedTransaction && !updatedTransaction.isTest) {
+
+            let merchant = await this.merchantRepository.findOne({
+                where: {
+                    systemId: updatedTransaction.merchant.systemId
+                }
+            })
+
+            if (!merchant)
+                throw new Error("Invalid Merchant SystemID");
 
             let payout: CreatePayoutDto = {
                 amount: updatedTransaction.amount,
@@ -288,8 +339,10 @@ export class TransactionService {
                 channel: PayoutChannels.INFLOW,
                 isWithdraw: false,
                 currency: 'NGN',
-                mid: updatedTransaction.mid
+                mid: merchant.id
             }
+
+            console.log("in transaction confirmed: payout - ", payout);
 
             try {
                 //add to payout list

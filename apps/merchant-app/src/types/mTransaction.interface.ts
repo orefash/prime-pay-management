@@ -7,9 +7,12 @@ export interface mTransaction {
 
     orderChannel: string;
 
+
+    transactionType?: string;
+
     description: string;
 
-    mid: number;
+    merchant?: any;
 
     customer: any;
 

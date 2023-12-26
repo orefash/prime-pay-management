@@ -13,9 +13,11 @@ import { MediaController } from './controllers/media/media.controller';
 import { AdminController } from './controllers/admin/admin.controller';
 import { BullModule } from '@nestjs/bull';
 import { MailModule } from '../mail/mail.module';
+import { DigitalOceanModule } from '../digital-ocean/digital-ocean.module';
 
 @Module({
   imports: [
+    DigitalOceanModule,
     BullModule.registerQueue({
       name: 'send_mail',
     }),

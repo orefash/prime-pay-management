@@ -175,7 +175,7 @@ export class PaystackService {
             console.log("transferRecipient error: ", error.message)
             return {
                 status: false,
-                message: error.message
+                message: error.message + ""
             };
         }
     }

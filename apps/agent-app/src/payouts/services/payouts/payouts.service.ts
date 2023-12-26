@@ -40,12 +40,12 @@ export class PayoutsService {
     async addTransactionToList(transactionData: CreatePayoutDto): Promise<AgentPayout> {
         const agent = await this.agentRepository.findOne({
             where: {
-                id: transactionData.id
+                id: transactionData.agentId
             }
         });
 
         if (!agent) {
-            throw new NotFoundException(`Agent with id ${transactionData.id} not found`);
+            throw new NotFoundException(`Agent with id ${transactionData.agentId} not found`);
         }
 
         let newAvailableBalance = agent.availableBalance;
@@ -64,9 +64,18 @@ export class PayoutsService {
             availableBalance: newAvailableBalance,
         });
 
-        const newTransaction = await this.payoutRepository.create(transactionData);
 
-        return this.payoutRepository.save(newTransaction);
+        const newTransaction = await this.payoutRepository.create({
+            amount: transactionData.amount,
+            isWithdraw: transactionData.isWithdraw,
+            status: transactionData.status,
+            channel: transactionData.channel,
+            channelId: transactionData.channelId,
+            accountNo: transactionData.accountNo,
+            agent
+        });
+
+        return await this.payoutRepository.save(newTransaction);
 
     }
 
@@ -89,7 +98,7 @@ export class PayoutsService {
             throw new NotFoundException(`Agent with id ${mid} not found`);
         }
 
-        console.log("Agent: ", agent)
+        // console.log("Agent: ", agent)
 
         if (agent.availableBalance < withdrawDto.amount){
             throw new Error(`Insufficient Available Balance for Withdrawal`);
@@ -132,7 +141,7 @@ export class PayoutsService {
             channel: PayoutChannels.PAYSTACK,
             isWithdraw: true,
             currency: 'NGN',
-            id: agent.id,
+            agentId: agent.id,
             accountNo: agent.accountNo
         };
 

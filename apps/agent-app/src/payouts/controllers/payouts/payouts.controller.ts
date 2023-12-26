@@ -19,7 +19,7 @@ export class PayoutsController {
 
     @Get('agent/:id')
     @UseGuards(JwtAuthenticationGuard)
-    getPayoutDataByMerchant(@Param('id') id: string) {
+    getPayoutDataByAgent(@Param('id') id: string) {
 
         return this.payoutService.getPayoutListByAgent(id);
     }

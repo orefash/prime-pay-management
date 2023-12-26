@@ -179,7 +179,7 @@ export class MerchantsService {
         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     }
 
-    async setMerchantCACDocs(setCACDocs: updateMerchantCACDocDTO, baseUrl: string) {
+    async setMerchantCACDocs(setCACDocs: updateMerchantCACDocDTO) {
 
         // await this.merchantRepository.update(id, setCAC);
         const merchant = await this.merchantRepository.findOne({
@@ -204,13 +204,13 @@ export class MerchantsService {
 
         merchant.cacDocuments = setCACDocs.docs;
 
-        const updatedCACDocuments = merchant.cacDocuments.map((doc) => ({
-            ...doc,
-            docUrl: doc.docUrl.includes('http') ? doc.docUrl : baseUrl + doc.docUrl,
-            previewUrl: doc.previewUrl.includes('http') ? doc.previewUrl : baseUrl + doc.previewUrl,
-        }));
+        // const updatedCACDocuments = merchant.cacDocuments.map((doc) => ({
+        //     ...doc,
+        //     docUrl: doc.docUrl.includes('http') ? doc.docUrl : baseUrl + doc.docUrl,
+        //     previewUrl: doc.previewUrl.includes('http') ? doc.previewUrl : baseUrl + doc.previewUrl,
+        // }));
 
-        merchant.cacDocuments = updatedCACDocuments;
+        // merchant.cacDocuments = updatedCACDocuments;
 
         let updatedMerchant = await this.merchantRepository.save(merchant);
 

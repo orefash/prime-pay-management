@@ -41,7 +41,7 @@ export class CreatePayoutDto {
 
     @IsString()
     @IsNotEmpty()
-    mid: number;
+    mid: string;
 
     // @IsNumber()
     // @IsOptional()

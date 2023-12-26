@@ -2,7 +2,8 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 // import { Merchant } from "./Merchant";
 import { MerchantCustomer } from "./MerchantCustomer";
-import { TransactionStatus } from "../dto/CreateTransaction.dto";
+import { TransactionStatus, TransactionType } from "../dto/CreateTransaction.dto";
+import { Merchant } from "apps/agent-app/src/typeorm";
 
 @Entity()
 export class MerchantTransaction {
@@ -20,10 +21,25 @@ export class MerchantTransaction {
     amount: number;
 
     @Column({
+        nullable: true,
+        name: 'agent_fee',
+        type: 'decimal', 
+        precision: 10, 
+        scale: 2
+    })
+    agent_fee: number;
+
+    @Column({
         nullable: false,
         default: TransactionStatus.PENDING
     })
     status: string;
+
+    @Column({
+        nullable: false,
+        default: TransactionType.PAY_MERCHANT
+    })
+    transactionType: string;
 
     @Column({
         nullable: false,
@@ -62,18 +78,21 @@ export class MerchantTransaction {
     })
     description: string;
 
-    // @ManyToOne(type => Merchant, merchant => merchant.systemId)
+    @ManyToOne(type => Merchant, merchant => merchant.transactions, { nullable: true })
     // merchant: Merchant;
-    @Column({
-        nullable: false,
-    })
-    mid: number;
+    // @Column({
+    //     nullable: true,
+    // })
+    merchant: Merchant;
 
-    
-    @Column({
-        nullable: true,
-    })
-    merchantId: string;
+
+    @ManyToOne(type => MerchantCustomer, customer => customer.transactions)
+    customer: MerchantCustomer;
+
+    // @Column({
+    //     nullable: true,
+    // })
+    // merchantId: string;
 
 
     @Column({
@@ -81,8 +100,6 @@ export class MerchantTransaction {
     })
     loanTenor: number;
 
-    @ManyToOne(type => MerchantCustomer, customer => customer.transactions)
-    customer: MerchantCustomer;
     
 
     @CreateDateColumn({

@@ -4,8 +4,9 @@ import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { TokenPayload } from '../types/tokenPayload.interface';
+// import { TokenPayload } from '../types/tokenPayload.interface';
 import { AgentsService } from '../../agents/services/agents/agents.service';
+import { TokenPayload } from '@app/db-lib/types/tokenPayload.interface';
 // import { MerchantsService } from '../../merchants/services/merchants/merchants.service';
  
 @Injectable()

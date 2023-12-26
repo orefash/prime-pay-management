@@ -8,22 +8,29 @@ import { RegisterMerchantDto } from '../../dto/RegisterMerchant.dto';
 
 @Injectable()
 export class ThirdPartyDataService {
+
+    private ppay_url = process.env.PPAY_URL;
+    private ppay_key = process.env.PPAY_KEY;
+
+
     constructor(
         private http: HttpService,
         private configService: ConfigService
-    ) { }
+    ) {
+        // console.log(`In 3d: ${this.ppay_url} && ${this.ppay_key}`)
+     }
 
 
     async registerMerchant(registerMerchantDto: RegisterMerchantDto) {
         const { data } = await lastValueFrom(
             this.http
                 .post(
-                    'https://prime-pay.africa/cba/webservices/merch.php',
+                    this.ppay_url,
                     {
                         "vser": [
                             {
                                 "merchID": "vendor",
-                                "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
+                                "key": this.ppay_key,
                                 "reqType": "reg_merch",
                                 "Name": registerMerchantDto.name,
                                 "acctNo": registerMerchantDto.accountNo,
@@ -54,12 +61,12 @@ export class ThirdPartyDataService {
         const { data } = await lastValueFrom(
             this.http
                 .post(
-                    'https://prime-pay.africa/cba/webservices/merch.php',
+                    this.ppay_url,
                     {
                         "vser": [
                             {
                                 "merchID": "vendor",
-                                "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
+                                "key": this.ppay_key,
                                 "reqType": "book_ippis",
                                 "ippis": payMerchantDto.ippis,
                                 "amount": payMerchantDto.amount,
@@ -100,12 +107,12 @@ export class ThirdPartyDataService {
         const bankResponse = await lastValueFrom(
             this.http
                 .post(
-                    'https://prime-pay.africa/cba/webservices/merch.php',
+                    this.ppay_url,
                     {
                         "vser": [
                             {
                                 "merchID": "vendor",
-                                "key": "QduC2*54Wx2MXJVUKLIy4)D*yZ$h6TTjA#6vMzBB%)(4Bm4mX#*dfyY@qT",
+                                "key": this.ppay_key,
                                 "reqType": "get_bank"
                             }
                         ]

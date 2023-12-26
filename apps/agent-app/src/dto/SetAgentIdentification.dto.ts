@@ -12,7 +12,7 @@ export class SetAgentIdentificationDto {
     // @IsNotEmpty()
     @IsString()
     @IsOptional()
-    agentId?: string;
+    IdUrl?: string;
 
     @IsString()
     @IsOptional()

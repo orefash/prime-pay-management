@@ -58,6 +58,7 @@ export class TransactionsController {
             const transactions = await this.transactionService.findEntities(agentCode, whereConditions, searchQuery, pageNo, itemLimit, startDate, endDate);
             return { success: true, ...transactions}
         } catch (error) {
+            console.log("Error: ", error)
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

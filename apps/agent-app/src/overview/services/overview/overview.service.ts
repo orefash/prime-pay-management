@@ -27,7 +27,7 @@ export class OverviewService {
         try {
             let transactionData = await this.transactionRepository
                 .createQueryBuilder('merchant_transaction')
-                .where("merchant_transaction.agentCode= :agentCode", { agentCode: agentCode })
+                // .where("merchant_transaction.agentCode= :agentCode", { agentCode: agentCode })
                 .andWhere("merchant_transaction.isTest= :isTest", { isTest: false })
                 // .andWhere("merchant_transaction.isTest= :isTest", { isTest: false })
                 .select('SUM(merchant_transaction.amount)', 'totalAmount')

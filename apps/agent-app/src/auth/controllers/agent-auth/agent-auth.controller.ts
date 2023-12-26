@@ -53,7 +53,7 @@ export class AgentAuthController {
         // const { merchant } = request;
         const agent = request.user;
         // console.log('mc: ', request)
-        const token = this.agentAuthService.getJwtToken(agent.id);
+        const token = this.agentAuthService.getJwtToken(agent.id, "agent");
         agent.password = undefined;
 
         // if(merchant.logoUrl){

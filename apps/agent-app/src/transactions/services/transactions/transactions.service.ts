@@ -3,6 +3,7 @@ import { FindTransactionData } from '@app/db-lib/types/TransactionTypes';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Merchant } from 'apps/agent-app/src/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,6 +12,8 @@ export class TransactionsService {
     (
         @InjectRepository(MerchantTransaction)
         private readonly transactionRepository: Repository<MerchantTransaction>,
+        @InjectRepository(Merchant)
+        private readonly merchantRepository: Repository<Merchant>,
         // @Inject(CustomerService)
         // private readonly customerService: CustomerService,
         // @Inject(MerchantPayoutService)
@@ -22,14 +25,28 @@ export class TransactionsService {
     ) { }
 
     async getTransactionById(tid: string): Promise<MerchantTransaction> {
-        const transaction = await this.transactionRepository.findOne({
-            where: {
-                id: tid
-            },
-            relations: {
-                customer: true
-            },
-        });
+        // const transaction = await this.transactionRepository.findOne({
+        //     where: {
+        //         id: tid
+        //     },
+        //     relations: ['merchant', 'customer'],
+        // });
+
+        // const transaction = await this.transactionRepository.findOne({
+        //         where: {
+        //             id: tid
+        //         },
+        //         relations: {
+        //             merchant: true,
+        //             customer: true
+        //         },
+        //     });
+
+        const transaction = await this.transactionRepository.createQueryBuilder('transaction')
+        .leftJoinAndSelect('transaction.customer', 'customer')
+        .leftJoinAndSelect('transaction.merchant', 'merchant')
+        .where('transaction.id = :id', { id: tid })
+        .getOne();
 
         if (transaction) return transaction;
 
@@ -48,6 +65,8 @@ export class TransactionsService {
         const queryBuilder = this.transactionRepository.createQueryBuilder('merchant_transaction')
             .leftJoinAndSelect('merchant_transaction.customer', 'customer');
 
+            queryBuilder.innerJoinAndSelect("merchant_transaction.merchant", "merchant")
+        // queryBuilder.leftJoinAndSelect(Merchant, "merchant", "merchant.id = transaction.mid")
         //transaction is live
         queryBuilder.andWhere(`merchant_transaction.isTest = :isTest`, { isTest: false });
         //filter by agentcode

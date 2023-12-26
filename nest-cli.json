@@ -66,6 +66,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/paystack-lib/tsconfig.lib.json"
       }
+    },
+    "admin": {
+      "type": "application",
+      "root": "apps/admin",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin/tsconfig.app.json"
+      }
+    },
+    "admin-app": {
+      "type": "application",
+      "root": "apps/admin-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin-app/tsconfig.app.json"
+      }
     }
   }
 }
