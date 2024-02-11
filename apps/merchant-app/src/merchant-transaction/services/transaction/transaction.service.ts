@@ -40,7 +40,7 @@ export class TransactionService {
         if (createTransactionDto.transactionType === TransactionType.PAY_MERCHANT) {
             merchant = await this.merchantRepository.findOne({
                 where: {
-                    systemId: createTransactionDto.mid
+                    id: createTransactionDto.mid
                 },
                 select: ['id', 'name']
             });
@@ -104,7 +104,7 @@ export class TransactionService {
         if (createTransactionDto.transactionType === TransactionType.PAY_MERCHANT) {
             merchant = await this.merchantRepository.findOne({
                 where: {
-                    systemId: createTransactionDto.mid
+                    id: createTransactionDto.mid
                 },
                 select: ['id', 'name']
             });

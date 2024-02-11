@@ -133,7 +133,7 @@ export class TransactionController {
 
 
         let whereConditions = {
-            mid: mid
+            merchantId: mid
         };
 
         let pageNo: number = null;
@@ -181,6 +181,7 @@ export class TransactionController {
         try {
             return await this.transactionService.findEntities(whereConditions, searchQuery, pageNo, itemLimit, startDate, endDate);
         } catch (error) {
+            console.log("Eror: ", error)
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

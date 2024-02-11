@@ -58,9 +58,9 @@ export class CreateTransactionDto {
     @IsNotEmpty()
     ippis: string;
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    mid: number;
+    mid: string;
 
     @IsNumber()
     @IsOptional()

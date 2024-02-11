@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { count } from 'console';
-import { MerchantTransaction as TransactionEntity, MerchantCustomer } from '../../../typeorm';
+import { MerchantTransaction as TransactionEntity, MerchantCustomer, Merchant } from '../../../typeorm';
 import { MerchantOverview } from '../../../types/merchant-overview.interface';
 import { Repository } from 'typeorm';
 
@@ -11,7 +11,9 @@ export class OverviewService {
         @InjectRepository(TransactionEntity)
         private readonly transactionRepository: Repository<TransactionEntity>,
         @InjectRepository(MerchantCustomer)
-        private readonly customerRepository: Repository<MerchantCustomer>
+        private readonly customerRepository: Repository<MerchantCustomer>,
+        @InjectRepository(Merchant)
+        private readonly merchantRepository: Repository<Merchant>
 
     ) { }
 
@@ -25,9 +27,21 @@ export class OverviewService {
         };
 
         try {
+
+            // let merchant = await this.merchantRepository.findOne({
+            //     where: {
+            //         id: mid
+            //     }
+            // });
+
+            // if(!merchant)
+            //     throw new Error("Merchant not Found")
+
+            // console.log("SysId: ", merchant.systemId);
+
             let transactionData = await this.transactionRepository
                 .createQueryBuilder('merchant_transaction')
-                .where("merchant_transaction.mid= :mid", { mid: mid })
+                .where("merchant_transaction.merchantId= :mid", { mid: mid })
                 .andWhere("merchant_transaction.isTest= :isTest", { isTest: isTest })
                 .select('SUM(merchant_transaction.amount)', 'totalAmount')
                 .addSelect('COUNT(*)', 'count')
@@ -45,6 +59,7 @@ export class OverviewService {
             return overviewdata;
 
         } catch (error) {
+            console.log("error: ", error)
             throw new HttpException('Merchant Overview Error', HttpStatus.BAD_REQUEST);
         }
 

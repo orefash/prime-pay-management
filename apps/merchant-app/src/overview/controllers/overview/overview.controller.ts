@@ -14,6 +14,10 @@ export class OverviewController {
         try {
             let isTest = null;
 
+
+
+            console.log("in overview: ", mid)
+
             if(queryParams.isTest){
                isTest = queryParams.isTest;
             }else{
