@@ -103,6 +103,8 @@ export class MerchantsService {
             }
         });
 
+        console.log("UM: ", updatedMerchant)
+
         if (updatedMerchant) {
             const { password, ...merchant } = updatedMerchant;
             return {
@@ -350,7 +352,7 @@ export class MerchantsService {
             where: {
                 id: merchantId
             },
-            select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
+            // select: ['id', 'systemId', 'email', 'name', 'logoUrl', 'promoterFname', 'promoterLname', 'bvn', 'businessType', 'isRegistered', 'isActive', 'promoterIdType', 'websiteUrl', 'phone', 'address', 'avgMonthlySales', 'accountNo', 'bankCode', 'bankName', 'socials', 'regDate', 'modifiedDate'], // Select all fields except 'password'
 
         });
     }

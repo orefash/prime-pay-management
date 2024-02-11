@@ -106,12 +106,10 @@ export class MerchantsController {
         @Req() req) {
         let merchant = await this.merchantService.getMerchantById(merchantId);
 
-        const logoUrl = `${req.protocol}://${req.headers.host}/api/merchants/${merchantId}/logo`;
         // console.log(`req: ${logoUrl}`)
 
         let data = {
             ...merchant,
-            logoUrl: logoUrl,
         };
 
         return data;

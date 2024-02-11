@@ -44,7 +44,8 @@ export class MerchantProductService {
         const merchant = await this.merchantRepository.findOne({
             where: {
                 id: createMerchantProductDto.merchantId
-            }
+            },
+            select: ['id', 'name']
         });
 
         if (!merchant) {
@@ -52,8 +53,6 @@ export class MerchantProductService {
         }
 
 
-
-        merchant.password = null;
 
         const merchantProduct = new MerchantProduct();
         merchantProduct.item = createMerchantProductDto.item;
@@ -147,6 +146,7 @@ export class MerchantProductService {
 
         return updatedProducts;
     }
+    
 
     async findByMerchantIdWithinRange(mid: string, baseUrl: string, amount: number): Promise<MerchantProduct[]> {
         let products = await this.merchantProductRepository.find({
