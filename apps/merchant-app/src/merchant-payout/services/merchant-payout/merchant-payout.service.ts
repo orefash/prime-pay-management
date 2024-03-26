@@ -105,11 +105,13 @@ export class MerchantPayoutService {
     }
 
 
+
     async addTransactionToList(transactionData: CreatePayoutDto): Promise<MerchantPayout> {
         const merchant = await this.merchantRepository.findOne({
             where: {
                 id: transactionData.mid
-            }
+            },
+            select: ['id', 'actualBalance', 'availableBalance', 'email',]
         });
 
         if (!merchant) {

@@ -35,7 +35,7 @@ export class CustomerController {
 
     @Get('/merchant/:mid')
     @UseGuards(JwtAuthenticationGuard)
-    async getAllCustomersByMid(@Param('mid') mid: number, @Query() queryParams: any) {
+    async getAllCustomersByMid(@Param('mid') mid: string, @Query() queryParams: any) {
         try {
             let isTest = null;
             let searchQuery = null;

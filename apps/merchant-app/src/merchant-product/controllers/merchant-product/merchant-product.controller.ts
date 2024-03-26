@@ -1,28 +1,27 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage, diskStorage } from 'multer';
 // import { CreateMerchantProductsDto } from 'src/merchant-product/dto/CreateProducts.dto';
 import { UpdateMerchantProductDto } from '../../dto/UpdateProduct.dto';
 import { ProductImageDto } from '../../dto/Upload.dto';
 import { MerchantProductService } from '../../services/merchant-product/merchant-product.service';
 import { MerchantProduct } from '../../../typeorm';
 import { CreateMerchantProductsDto } from '../../dto/CreateProducts.dto';
+import { generateUniqueFilename } from '@app/utils/utils/file-upload';
+import { SpacesService } from 'apps/merchant-app/src/digital-ocean/services/spaces/spaces.service';
 
 @Controller('merchant-product')
 export class MerchantProductController {
-  constructor(private readonly merchantProductService: MerchantProductService) { }
+  constructor(
+    private readonly merchantProductService: MerchantProductService,
+    private readonly doSpacesService: SpacesService
+    ) { }
 
   @Post('upload')
   @UseInterceptors(
     FilesInterceptor('files', 5, {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const extension = file.mimetype.split('/')[1];
-          callback(null, file.fieldname + '-' + uniqueSuffix + '.' + extension);
-        },
-      }),
+      
+      storage: memoryStorage(),
       fileFilter: (req, file, callback) => {
         // Validate the file type
         const allowedTypes = ['image/jpeg', 'image/png'];
@@ -45,13 +44,22 @@ export class MerchantProductController {
 
       for (const file of files) {
         const path = file.path;
-        const name = file.filename;
+        // const name = file.filename;
+        const name = await generateUniqueFilename("STO", file.originalname);
+
+
+        let spaceFilename = `merchant-id/${name}`;
+
+
+        let fileUrl = await this.doSpacesService.uploadFile(file.buffer, spaceFilename);
+
+
         const mimeType = file.mimetype;
         // Process the file or save it to the database
         // console.log('Uploaded file:', filePath);
         // console.log('Uploaded file:', fileName);
         fileList.push({
-          name, path, mimeType
+          name, path, mimeType, imgUrl: fileUrl
         })
       }
 
@@ -70,9 +78,9 @@ export class MerchantProductController {
   async findAll(@Req() req): Promise<MerchantProduct[]> {
 
     try {
-      const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
+      // const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
-      return await this.merchantProductService.findAll(baseUrl);
+      return await this.merchantProductService.findAll();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -87,7 +95,7 @@ export class MerchantProductController {
     try {
       const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
-      const products = await this.merchantProductService.findByMerchantId(id, baseUrl);
+      const products = await this.merchantProductService.findByMerchantId(id);
 
       if (products.length === 0) {
         throw new NotFoundException(`No products found for merchant with id ${id}`);
@@ -112,7 +120,7 @@ export class MerchantProductController {
       const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
 
-      const products = await this.merchantProductService.findByMerchantIdWithinRange(id, baseUrl, amount);
+      const products = await this.merchantProductService.findByMerchantIdWithinRange(id, amount);
 
       if (products.length === 0) {
         throw new NotFoundException(`No products found for merchant with id ${id} within price range of ${amount}`);
@@ -133,7 +141,7 @@ export class MerchantProductController {
     try {
       const baseUrl = `${req.protocol}://${req.headers.host}/api/images/`;
 
-      const product = await this.merchantProductService.findOne(id, baseUrl);
+      const product = await this.merchantProductService.findOne(id);
 
       if (!product) {
         throw new NotFoundException(`Product with id ${id} not found`);

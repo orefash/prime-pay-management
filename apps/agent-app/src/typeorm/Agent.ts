@@ -71,13 +71,20 @@ export class Agent {
 
 
     @Column({
+        nullable: true,
+        name: 'agent_mname'
+    })
+    agentMname: string;
+
+
+    @Column({
         nullable: false,
         name: 'agent_lname'
     })
     agentLname: string;
 
     @Column({
-        nullable: false,
+        nullable: true,
         name: 'bvn',
         length: 11
     })
@@ -190,7 +197,7 @@ export class Agent {
     marketSector: string;
 
     @Column({
-        nullable: false,
+        nullable: true,
     })
     stateOfOrigin: string;
 

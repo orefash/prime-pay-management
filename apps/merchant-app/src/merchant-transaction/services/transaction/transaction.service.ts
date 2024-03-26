@@ -91,7 +91,7 @@ export class TransactionService {
             agentCode: createTransactionDto.agentCode
         }
 
-        // console.log('ts: ', transactionData)
+        console.log('transaction data - - : ', transactionData)
 
         const newTransaction = await this.transactionRepository.create(transactionData);
         return this.transactionRepository.save(newTransaction);
@@ -100,6 +100,8 @@ export class TransactionService {
     async createDemoTransaction(createTransactionDto: CreateTransactionDto) {
 
         let merchant = null;
+
+        console.log("Tr create: ", createTransactionDto)
 
         if (createTransactionDto.transactionType === TransactionType.PAY_MERCHANT) {
             merchant = await this.merchantRepository.findOne({
@@ -137,7 +139,7 @@ export class TransactionService {
             agentCode: createTransactionDto.agentCode
         }
 
-        // console.log('ts: ', transactionData)
+        console.log('transaction data - - : ', transactionData)
 
         const newTransaction = this.transactionRepository.create(transactionData);
         return await this.transactionRepository.save(newTransaction);
@@ -310,28 +312,70 @@ export class TransactionService {
 
     async toggleTransactionConfirmed(tid: string) {
 
+        const nTransaction = await this.transactionRepository.findOne({
+            where: {
+                id: tid
+            },
+            select: {
+                merchant: {
+                    id: true,
+                    availableBalance: true,
+                    promoterFname: true
+                }
+            },
+            relations: {
+                merchant: true
+            }
+        });
+
+        if(nTransaction.status === TransactionStatus.CONFIRMED)
+            throw new Error("Transaction Already COnfirmed");
+
+
         await this.transactionRepository.update(tid, {
             status: TransactionStatus.CONFIRMED
         });
 
+
         const updatedTransaction = await this.transactionRepository.findOne({
             where: {
                 id: tid
+            },
+            select: {
+                merchant: {
+                    id: true,
+                    availableBalance: true,
+                    promoterFname: true
+                }
+            },
+            relations: {
+                merchant: true
             }
         });
 
-        // const 
+
+        console.log("tr: ", updatedTransaction)
+
+
+        // console.log("trm: ", updatedTransaction.merchant)
+
 
         if (updatedTransaction && !updatedTransaction.isTest) {
 
             let merchant = await this.merchantRepository.findOne({
                 where: {
-                    systemId: updatedTransaction.merchant.systemId
+                    id: updatedTransaction.merchant.id
                 }
             })
 
+        
+
             if (!merchant)
-                throw new Error("Invalid Merchant SystemID");
+                throw new Error("Invalid Merchant ID");
+
+            if(typeof updatedTransaction.amount === "string"){
+                updatedTransaction.amount = parseFloat(updatedTransaction.amount);
+            }
 
             let payout: CreatePayoutDto = {
                 amount: updatedTransaction.amount,
@@ -346,12 +390,16 @@ export class TransactionService {
 
             try {
                 //add to payout list
-                await this.payoutService.addTransactionToList(payout);
+                let npayout = await this.payoutService.addTransactionToList(payout);
+                return {
+                    npayout,
+                    // updatedTransaction
+                }
             } catch (error) {
-                console.log('Not added to Payout');
+                console.log('Not added to Payout: ', error);
             }
 
-            return updatedTransaction
+            // return updatedTransaction
         }
 
         throw new HttpException('Transaction not found', HttpStatus.NOT_FOUND);

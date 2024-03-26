@@ -93,31 +93,31 @@ export class MerchantProductService {
 
     }
 
-    async findAll(baseUrl: string): Promise<GetProductDto[]> {
+    async findAll(): Promise<GetProductDto[]> {
         let products = await this.merchantProductRepository.find();
 
         if (!products)
             throw new Error("No Products to Show")
 
-        const updatedProducts = products.map((product) => {
-            const newProduct = { ...product };
+        // const updatedProducts = products.map((product) => {
+        //     const newProduct = { ...product };
 
-            if (newProduct.pImages && newProduct.pImages.length > 0) {
-                const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+        //     if (newProduct.pImages && newProduct.pImages.length > 0) {
+        //         const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
 
-                const npImages = updatedProductImages;
+        //         const npImages = updatedProductImages;
 
-                newProduct.pImages = npImages;
-            }
+        //         newProduct.pImages = npImages;
+        //     }
 
-            return newProduct;
-        })
+        //     return newProduct;
+        // })
 
 
-        return updatedProducts;
+        return products;
     }
 
-    async findByMerchantId(mid: string, baseUrl: string): Promise<MerchantProduct[]> {
+    async findByMerchantId(mid: string): Promise<MerchantProduct[]> {
         let products = await this.merchantProductRepository.find({
             where: {
                 merchant: {
@@ -129,26 +129,26 @@ export class MerchantProductService {
         if (!products)
             throw new Error("No Products to Show")
 
-        const updatedProducts = products.map((product) => {
-            const newProduct = { ...product };
+        // const updatedProducts = products.map((product) => {
+        //     const newProduct = { ...product };
 
-            if (newProduct.pImages && newProduct.pImages.length > 0) {
-                const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+        //     if (newProduct.pImages && newProduct.pImages.length > 0) {
+        //         const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
 
-                const npImages = updatedProductImages;
+        //         const npImages = updatedProductImages;
 
-                newProduct.pImages = npImages;
-            }
+        //         newProduct.pImages = npImages;
+        //     }
 
-            return newProduct;
-        })
+        //     return newProduct;
+        // })
 
 
-        return updatedProducts;
+        return products;
     }
     
 
-    async findByMerchantIdWithinRange(mid: string, baseUrl: string, amount: number): Promise<MerchantProduct[]> {
+    async findByMerchantIdWithinRange(mid: string, amount: number): Promise<MerchantProduct[]> {
         let products = await this.merchantProductRepository.find({
             where: {
                 merchant: {
@@ -161,26 +161,26 @@ export class MerchantProductService {
         if (!products)
             throw new Error("No Products to Show")
 
-        const updatedProducts = await products.map((product) => {
-            const newProduct = { ...product };
+        // const updatedProducts = await products.map((product) => {
+        //     const newProduct = { ...product };
 
-            if (newProduct.pImages && newProduct.pImages.length > 0) {
-                const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+        //     if (newProduct.pImages && newProduct.pImages.length > 0) {
+        //         const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
 
-                const npImages = updatedProductImages;
+        //         const npImages = updatedProductImages;
 
-                newProduct.pImages = npImages;
-            }
+        //         newProduct.pImages = npImages;
+        //     }
 
-            return newProduct;
-        })
+        //     return newProduct;
+        // })
 
 
-        return updatedProducts;
+        return products;
 
     }
 
-    async findOne(id: number, baseUrl: string): Promise<MerchantProduct> {
+    async findOne(id: number): Promise<MerchantProduct> {
         let product = await this.merchantProductRepository.findOne({
             where: { id: id }
         });
@@ -188,14 +188,14 @@ export class MerchantProductService {
         if (!product)
             throw new Error("No Product with ID: " + id);
 
-        if (product.pImages && product.pImages.length > 0) {
+        // if (product.pImages && product.pImages.length > 0) {
 
-            const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
+        //     const updatedProductImages = this.appendProductUrl(product.pImages, baseUrl);
 
-            const npImages = updatedProductImages;
+        //     const npImages = updatedProductImages;
 
-            product.pImages = npImages;
-        }
+        //     product.pImages = npImages;
+        // }
 
         return product;
     }

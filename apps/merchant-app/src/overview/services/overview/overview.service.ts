@@ -17,6 +17,10 @@ export class OverviewService {
 
     ) { }
 
+    async intOrFloatToFloatString(amount: number, decimalPlaces = 2) {
+        return amount.toFixed(decimalPlaces);
+    }
+
     async getOverviewData(mid: string, isTest: boolean): Promise<MerchantOverview> {
 
         let overviewdata: MerchantOverview = {
@@ -28,16 +32,18 @@ export class OverviewService {
 
         try {
 
-            // let merchant = await this.merchantRepository.findOne({
-            //     where: {
-            //         id: mid
-            //     }
-            // });
+            let merchant = await this.merchantRepository.findOne({
+                where: {
+                    id: mid
+                }
+            });
 
-            // if(!merchant)
-            //     throw new Error("Merchant not Found")
+            if (!merchant)
+                throw new Error("Merchant not Found")
 
-            // console.log("SysId: ", merchant.systemId);
+
+
+            // console.log("balance: ", merchant.availableBalance);
 
             let transactionData = await this.transactionRepository
                 .createQueryBuilder('merchant_transaction')
@@ -52,8 +58,8 @@ export class OverviewService {
 
 
             overviewdata.salesCount = transactionData.count;
-            overviewdata.transactionValue = transactionData.totalAmount == null ? 'NGN 0.00' : 'NGN '+transactionData.totalAmount;
-            overviewdata.payoutBalance = 'NGN 0.00';
+            overviewdata.transactionValue = transactionData.totalAmount == null ? 'NGN 0.00' : 'NGN ' + transactionData.totalAmount;
+            overviewdata.payoutBalance = merchant.availableBalance > 0? 'NGN '+(await this.intOrFloatToFloatString(merchant.availableBalance)) : 'NGN 0.00';
             overviewdata.customers = transactionData.customerCount;
 
             return overviewdata;

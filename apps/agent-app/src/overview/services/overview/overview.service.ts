@@ -4,6 +4,7 @@ import { BaseOverview } from '@app/db-lib/types/overview.interface';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { AgentOverview } from '../../types/overview.interface';
 
 @Injectable()
 export class OverviewService {
@@ -15,33 +16,33 @@ export class OverviewService {
 
     ) { }
 
-    async getOverviewData(agentCode: string): Promise<BaseOverview> {
+    async getOverviewData(agentCode: string): Promise<AgentOverview> {
 
-        let overviewdata: BaseOverview = {
-            salesCount: 0,
-            transactionValue: 'NGN 0.00',
+        let overviewdata: AgentOverview = {
+            loanSales: 0,
+            salesValue: 'NGN 0.00',
             payoutBalance: 'NGN 0.00',
-            customers: 0
+            merchantSales: 0
         };
 
         try {
-            let transactionData = await this.transactionRepository
-                .createQueryBuilder('merchant_transaction')
-                // .where("merchant_transaction.agentCode= :agentCode", { agentCode: agentCode })
-                .andWhere("merchant_transaction.isTest= :isTest", { isTest: false })
-                // .andWhere("merchant_transaction.isTest= :isTest", { isTest: false })
-                .select('SUM(merchant_transaction.amount)', 'totalAmount')
-                .addSelect('COUNT(*)', 'count')
-                .addSelect('COUNT(DISTINCT(merchant_transaction.customer))', 'customerCount')
-                .getRawOne();
+            // let transactionData = await this.transactionRepository
+            //     .createQueryBuilder('merchant_transaction')
+            //     // .where("merchant_transaction.agentCode= :agentCode", { agentCode: agentCode })
+            //     .andWhere("merchant_transaction.isTest= :isTest", { isTest: false })
+            //     // .andWhere("merchant_transaction.isTest= :isTest", { isTest: false })
+            //     .select('SUM(merchant_transaction.amount)', 'totalAmount')
+            //     .addSelect('COUNT(*)', 'count')
+            //     .addSelect('COUNT(DISTINCT(merchant_transaction.customer))', 'customerCount')
+            //     .getRawOne();
 
-            // console.log('trd: ', transactionData);
+            // // console.log('trd: ', transactionData);
 
 
-            overviewdata.salesCount = transactionData.count;
-            overviewdata.transactionValue = transactionData.totalAmount == null ? 'NGN 0.00' : 'NGN '+transactionData.totalAmount;
-            overviewdata.payoutBalance = 'NGN 0.00';
-            overviewdata.customers = transactionData.customerCount;
+            // overviewdata.salesCount = transactionData.count;
+            // overviewdata.transactionValue = transactionData.totalAmount == null ? 'NGN 0.00' : 'NGN '+transactionData.totalAmount;
+            // overviewdata.payoutBalance = 'NGN 0.00';
+            // overviewdata.customers = transactionData.customerCount;
 
             return overviewdata;
 

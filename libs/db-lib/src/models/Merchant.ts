@@ -6,6 +6,7 @@ import { MerchantPayout } from "./MerchantPayout";
 import { MerchantKey } from "./Keys";
 import { CACDocType } from "../../../../apps/merchant-app/src/merchants/dto/SetCAC.dto";
 import { MerchantTransaction } from "./MerchantTransaction";
+import { IDDocType } from "apps/merchant-app/src/merchants/dto/SetMerchantIdentification.dto";
 
 @Entity()
 @Unique(['email', 'accountNo',])
@@ -112,6 +113,13 @@ export class Merchant {
     })
     isRegistered: boolean;
 
+
+    @Column({
+        nullable: false,
+        default: false
+    })
+    payoutPending: boolean;
+
     @Column({
         nullable: false,
         name: 'is_confirmed',
@@ -135,25 +143,25 @@ export class Merchant {
     })
     isVerified: boolean;
 
-    @Column({
-        nullable: true,
-    })
-    promoterIdType: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // promoterIdType: string;
 
-    @Column({
-        nullable: true,
-    })
-    promoterIdUrl: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // promoterIdUrl: string;
 
-    @Column({
-        nullable: true,
-    })
-    promoterId: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // promoterId: string;
 
-    @Column({
-        nullable: true,
-    })
-    promoterIdMime: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // promoterIdMime: string;
 
     @Column({
         nullable: true,
@@ -161,19 +169,23 @@ export class Merchant {
     websiteUrl: string;
 
 
-    @Column({
-        nullable: true,
-    })
-    cacUrl: string;
+    // @Column({
+    //     nullable: true,
+    // })
+    // cacUrl: string;
 
-    @Column("text", {
-        nullable: true,
-        array: true
-    })
-    cacDocs: string[];
+    // @Column("text", {
+    //     nullable: true,
+    //     array: true
+    // })
+    // cacDocs: string[];
 
     @Column('jsonb', { nullable: true })
     cacDocuments: CACDocType[];
+
+
+    @Column('jsonb', { nullable: true })
+    idDocuments: IDDocType[];
 
     @Index({ unique: true })
     @Column({

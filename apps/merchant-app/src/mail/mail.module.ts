@@ -34,7 +34,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             },
           },
           defaults: {
-            from: '"Primepay" <ofaseru@prime-pay.africa>',
+            from: '"Primepay" <info@prime-pay.africa>',
           },
 
           template: {

@@ -33,7 +33,7 @@ export class CustomerService {
     };
 
 
-    async getAllCustomersByMid(mid: number, isTest: boolean, searchQuery: string, pageNo: number, itemLimit: number, startDate: string, endDate: string): Promise<MerchantCustomer[]> {
+    async getAllCustomersByMid(mid: string, isTest: boolean, searchQuery: string, pageNo: number, itemLimit: number, startDate: string, endDate: string): Promise<MerchantCustomer[]> {
 
         let customerData = this.transactionRepository
             .createQueryBuilder('merchant_transaction')
@@ -42,7 +42,7 @@ export class CustomerService {
             .addSelect('merchant_customer.email', 'email')
             .addSelect('merchant_customer.phone', 'phone')
             .addSelect('merchant_customer.orderDate', 'orderDate')
-            .where("merchant_transaction.mid = :mid", { mid: mid })
+            .where("merchant_transaction.merchantId = :mid", { mid: mid })
             .andWhere("merchant_transaction.isTest = :isTest", { isTest: isTest })
             .leftJoin("merchant_transaction.customer", "merchant_customer");
 

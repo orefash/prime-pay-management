@@ -10,6 +10,7 @@ export class MailService {
   async sendUserConfirmation(user: Merchant, token: string) {
     const url = `example.com/auth/confirm?token=${token}`;
 
+    
     await this.mailerService.sendMail({
       to: 'orefaseru@gmail.com',
     //   to: user.email,

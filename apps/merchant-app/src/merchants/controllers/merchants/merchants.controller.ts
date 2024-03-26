@@ -5,7 +5,7 @@ import { MerchantsService } from '../../services/merchants/merchants.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { renameSync, unlinkSync } from 'fs';
-import { SetMerchantIdDTO } from '../../dto/SetMerchantIdentification.dto copy';
+// import { SetMerchantIdDTO } from '../../dto/SetMerchantIdentification.dto';
 import { SetMerchantLogoDto } from '../../dto/SetMerchantLogo.dto';
 import { CACDocType, updateMerchantCACDocDTO } from '../../dto/SetCAC.dto';
 // import CustomFileInterceptor from 'src/interceptors/file-upload.interceptor';

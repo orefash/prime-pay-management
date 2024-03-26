@@ -16,15 +16,20 @@ export class CreateAgentDto {
     @IsNotEmpty()
     agentFname: string;
 
+
+    @IsString()
+    @IsOptional()
+    agentMname?: string;
+
     @IsString()
     @IsNotEmpty()
     agentLname: string;
 
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     // @IsIn(SERVICETYPES)
-    marketSector: string;
+    marketSector?: string;
 
     // @IsBoolean()
     // @IsNotEmpty()
@@ -35,7 +40,7 @@ export class CreateAgentDto {
     @Length(11)
     @MaxLength(11)
     @MinLength(11)
-    @IsNotEmpty()
+    @IsOptional()
     bvn?: string;
 
     // @IsNotEmpty()
@@ -91,17 +96,17 @@ export class CreateAgentDto {
     // @IsString()
     // landmark: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    stateOfOrigin: string;
+    stateOfOrigin?: string;
 
     // @IsNotEmpty()
     // @IsString()
     // lga: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    country: string;
+    country?: string;
 
     
     // @IsNumber()
@@ -113,18 +118,18 @@ export class CreateAgentDto {
     // systemId: number;
 
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumberString()
     @Length(10)
-    accountNo: string;
-
-    @IsNotEmpty()
-    @IsString()
-    @MinLength(2)
-    bankCode: string;
+    accountNo?: string;
 
     @IsOptional()
     @IsString()
-    bankName: string;
+    @MinLength(2)
+    bankCode?: string;
+
+    @IsOptional()
+    @IsString()
+    bankName?: string;
 
 }

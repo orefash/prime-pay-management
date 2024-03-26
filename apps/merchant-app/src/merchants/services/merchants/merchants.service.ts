@@ -10,10 +10,11 @@ import { UpdateBankDto } from '../../../../../../libs/db-lib/src/dto/UpdateBankD
 import { Socials } from '../../../types/socials.interface';
 import { Address } from '../../../types/address.interface';
 import * as path from 'path';
-import { SetMerchantIdDTO } from '../../dto/SetMerchantIdentification.dto copy';
+// import { SetMerchantIdDTO } from '../../dto/SetMerchantIdentification.dto copy';
 import { SetMerchantLogoDto } from '../../dto/SetMerchantLogo.dto';
 import { CACDocType, updateMerchantCACDocDTO } from '../../dto/SetCAC.dto';
 import { PaystackService } from '../../../third-party-data/services/paystack-service/paystack-service.service';
+import { IDDocType, updateMerchantIDDocDTO } from '../../dto/SetMerchantIdentification.dto';
 
 @Injectable()
 export class MerchantsService {
@@ -94,52 +95,31 @@ export class MerchantsService {
 
 
 
-    async setMerchantIdentification(id: string, editMerchantID: SetMerchantIdDTO) {
+    // async setMerchantIdentification(id: string, editMerchantID: EditMerchantDto) {
 
-        await this.merchantRepository.update(id, editMerchantID);
-        const updatedMerchant = await this.merchantRepository.findOne({
-            where: {
-                id: id
-            }
-        });
-
-        console.log("UM: ", updatedMerchant)
-
-        if (updatedMerchant) {
-            const { password, ...merchant } = updatedMerchant;
-            return {
-                id: merchant.id,
-                idType: merchant.promoterIdType,
-                message: "Merchant Identification Set"
-            };
-        }
-
-        throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
-    }
-
-
-
-    // async setMerchantConfirmed(id: string) {
-
-    //     await this.merchantRepository.update(id, {
-    //         isConfirmed: true
-    //     });
+    //     await this.merchantRepository.update(id, editMerchantID);
     //     const updatedMerchant = await this.merchantRepository.findOne({
     //         where: {
     //             id: id
     //         }
     //     });
 
+    //     console.log("UM: ", updatedMerchant)
+
     //     if (updatedMerchant) {
     //         const { password, ...merchant } = updatedMerchant;
     //         return {
     //             id: merchant.id,
-    //             message: "Merchant Confirmed"
+    //             idType: merchant.promoterIdType,
+    //             message: "Merchant Identification Set"
     //         };
     //     }
 
     //     throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
     // }
+
+
+
 
 
     async setMerchantLogo(id: string, setLogo: SetMerchantLogoDto) {
@@ -149,6 +129,8 @@ export class MerchantsService {
                 id: id
             }
         });
+
+        // console.log("upd: ", updatedMerchant)
 
         if (updatedMerchant) {
             const { password, ...merchant } = updatedMerchant;
@@ -222,6 +204,53 @@ export class MerchantsService {
         }
     }
 
+
+    async setMerchantIDDocs(setIDDocs: updateMerchantIDDocDTO) {
+
+        // console.log("sd: ", setIDDocs)
+
+
+
+        // await this.merchantRepository.update(id, setCAC);
+        const merchant = await this.merchantRepository.findOne({
+            where: {
+                id: setIDDocs.merchantID
+            }
+        });
+
+        if (!merchant)
+            throw new Error(`Merchant with id ${setIDDocs.merchantID} not found!!`);
+
+
+        if (setIDDocs.existingDocString && merchant.idDocuments && merchant.idDocuments.length > 0) {
+            let exsitingDocs: IDDocType[] = JSON.parse(setIDDocs.existingDocString);
+
+            merchant.idDocuments = merchant.idDocuments.filter((object) =>
+                exsitingDocs.some((otherObject) => otherObject.name === object.name)
+            );
+
+            setIDDocs.docs = merchant.idDocuments.concat(setIDDocs.docs);
+        }
+
+        merchant.idDocuments = setIDDocs.docs;
+
+        // consoloe
+        // const updatedCACDocuments = merchant.cacDocuments.map((doc) => ({
+        //     ...doc,
+        //     docUrl: doc.docUrl.includes('http') ? doc.docUrl : baseUrl + doc.docUrl,
+        //     previewUrl: doc.previewUrl.includes('http') ? doc.previewUrl : baseUrl + doc.previewUrl,
+        // }));
+
+        // merchant.cacDocuments = updatedCACDocuments;
+
+        let updatedMerchant = await this.merchantRepository.save(merchant);
+
+        return {
+            id: updatedMerchant.id,
+            idDocuments: updatedMerchant.idDocuments
+        }
+    }
+
     async updateMerchantBank(id: string, editMerchantBankDto: UpdateBankDto): Promise<Partial<MerchantEntity>> {
         try {
             // Validate the bank account using thirdPartDataService.
@@ -237,7 +266,7 @@ export class MerchantsService {
 
 
             // Perform the update in the database.
-            await this.merchantRepository.update(id, editMerchantBankDto);
+            await this.merchantRepository.update(id, {...editMerchantBankDto, payoutPending: true});
 
             // Fetch the updated merchant record from the database.
             const updatedMerchant = await this.merchantRepository.findOne({
@@ -378,121 +407,121 @@ export class MerchantsService {
         return filePath;
     }
 
-    async getMerchantIdentification(merchantId: string) {
-        const docs = await this.merchantRepository.findOne({
-            where: {
-                id: merchantId
-            },
-            select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
-        });
+    // async getMerchantIdentification(merchantId: string) {
+    //     const docs = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: merchantId
+    //         },
+    //         select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
+    //     });
 
-        // console.log('pID: ', docs);
-        if (docs?.promoterId) {
+    //     // console.log('pID: ', docs);
+    //     if (docs?.promoterId) {
 
-            const fileName = path.basename(docs.promoterId);
+    //         const fileName = path.basename(docs.promoterId);
 
-            const contentType = docs.promoterIdMime;
+    //         const contentType = docs.promoterIdMime;
 
-            const filePath = await this.fetchUploadPath(fileName);
-            return { fileName, contentType, filePath: filePath, idType: docs.promoterIdType }
-        }
-
-
-        throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
-    }
+    //         const filePath = await this.fetchUploadPath(fileName);
+    //         return { fileName, contentType, filePath: filePath, idType: docs.promoterIdType }
+    //     }
 
 
-    async getMerchantIdentificationURL(merchantId: string) {
-        const docs = await this.merchantRepository.findOne({
-            where: {
-                id: merchantId
-            },
-            select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
-        });
-
-        console.log('pID: ', docs);
-
-        if (docs.promoterId) {
-
-            const fileName = path.basename(docs.promoterId);
-
-            const contentType = docs.promoterIdMime;
-
-            const filePath = await this.fetchUploadPath(fileName);
-            console.log('fp: ', fileName)
-            return { fileName, contentType, filePath: filePath }
-        }
+    //     throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
+    // }
 
 
-        throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
-    }
+    // async getMerchantIdentificationURL(merchantId: string) {
+    //     const docs = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: merchantId
+    //         },
+    //         select: ['id', 'systemId', 'promoterIdType', 'promoterId', 'promoterIdMime'],
+    //     });
 
-    async getMerchantLogo(merchantId: string) {
-        const docs = await this.merchantRepository.findOne({
-            where: {
-                id: merchantId
-            },
-            select: ['id', 'logoUrl', 'logoMime', 'logoPath'],
+    //     console.log('pID: ', docs);
 
-        });
+    //     if (docs.promoterId) {
 
-        if (docs?.logoPath) {
+    //         const fileName = path.basename(docs.promoterId);
 
-            const fileName = path.basename(docs.logoPath);
-            console.log('fn: ', fileName)
-            const filePath = await this.fetchUploadPath(fileName);
+    //         const contentType = docs.promoterIdMime;
 
-            const contentType = docs.logoMime;
-            return { fileName, contentType, filePath: filePath }
-        }
-
-
-        throw new HttpException('Merchant Logo not found', HttpStatus.NOT_FOUND);
-
-    }
-
-    async getMerchantCACDocs(merchantId: string, baseUrl: string) {
-
-        const docs = await this.merchantRepository.findOne({
-            where: {
-                id: merchantId
-            },
-            select: ['id', 'cacDocuments'],
-
-        });
-
-        if(!docs){
-            throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
-        }
-
-        return docs;
-
-    }
+    //         const filePath = await this.fetchUploadPath(fileName);
+    //         console.log('fp: ', fileName)
+    //         return { fileName, contentType, filePath: filePath }
+    //     }
 
 
-    async getMerchantCACDocument(merchantId: string, docName: string, mimeType: string) {
+    //     throw new HttpException('Merchant ID Card not found', HttpStatus.NOT_FOUND);
+    // }
 
-        const docs = await this.merchantRepository.findOne({
-            where: {
-                id: merchantId
-            },
-            select: ['id', 'cacDocuments'],
-        });
+    // async getMerchantLogo(merchantId: string) {
+    //     const docs = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: merchantId
+    //         },
+    //         select: ['id', 'logoUrl', 'logoMime', 'logoPath'],
 
-        if (!docs) {
-            throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
-        }
+    //     });
 
-        const filePath = await this.fetchUploadPath(docName);
+    //     if (docs?.logoPath) {
 
-        return { fileName: docName, contentType: mimeType, filePath: filePath };
-    }
+    //         const fileName = path.basename(docs.logoPath);
+    //         console.log('fn: ', fileName)
+    //         const filePath = await this.fetchUploadPath(fileName);
+
+    //         const contentType = docs.logoMime;
+    //         return { fileName, contentType, filePath: filePath }
+    //     }
+
+
+    //     throw new HttpException('Merchant Logo not found', HttpStatus.NOT_FOUND);
+
+    // }
+
+    // async getMerchantCACDocs(merchantId: string, baseUrl: string) {
+
+    //     const docs = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: merchantId
+    //         },
+    //         select: ['id', 'cacDocuments'],
+
+    //     });
+
+    //     if(!docs){
+    //         throw new HttpException('Merchant CAC not found', HttpStatus.NOT_FOUND);
+    //     }
+
+    //     return docs;
+
+    // }
+
+
+    // async getMerchantCACDocument(merchantId: string, docName: string, mimeType: string) {
+
+    //     const docs = await this.merchantRepository.findOne({
+    //         where: {
+    //             id: merchantId
+    //         },
+    //         select: ['id', 'cacDocuments'],
+    //     });
+
+    //     if (!docs) {
+    //         throw new HttpException('Merchant not found', HttpStatus.NOT_FOUND);
+    //     }
+
+    //     const filePath = await this.fetchUploadPath(docName);
+
+    //     return { fileName: docName, contentType: mimeType, filePath: filePath };
+    // }
 
 
     async getMerchantByEmail(email: string): Promise<MerchantEntity> {
 
         let merchants = await this.merchantRepository.createQueryBuilder('m')
-            .select(['m.id', 'm.systemId', 'm.email', 'm.name', 'm.logoUrl', 'm.promoterFname', 'm.promoterLname', 'm.bvn', 'm.businessType', 'm.isRegistered', 'm.isActive', 'm.isVerified',  'm.isConfirmed', 'm.promoterIdType', 'm.websiteUrl', 'm.phone', 'm.address', 'm.avgMonthlySales', 'm.accountNo', 'm.bankCode', 'm.bankName', 'm.socials', 'm.regDate', 'm.modifiedDate', 'm.availableBalance', 'm.password'])
+            .select(['m.id', 'm.systemId', 'm.email', 'm.name', 'm.logoUrl', 'm.promoterFname', 'm.promoterLname', 'm.bvn', 'm.businessType', 'm.isRegistered', 'm.isActive', 'm.isVerified',  'm.isConfirmed', 'm.idDocuments', 'm.cacDocuments', 'm.websiteUrl', 'm.phone', 'm.address', 'm.avgMonthlySales', 'm.accountNo', 'm.bankCode', 'm.bankName', 'm.socials', 'm.regDate', 'm.modifiedDate', 'm.availableBalance', 'm.password'])
             .where("LOWER(email) = LOWER(:email)", { email })
             .getOne();
 

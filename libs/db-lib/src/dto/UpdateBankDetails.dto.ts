@@ -1,5 +1,5 @@
 
-import { IsNotEmpty, IsString, Length, MinLength } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsString, Length, MinLength } from "class-validator";
 
 export class UpdateBankDto {
 
@@ -16,5 +16,8 @@ export class UpdateBankDto {
     @IsString()
     @IsNotEmpty()
     bankName: string;
+    
+    @IsBoolean() // Add validation for boolean type
+    payoutPending: boolean = true;
     
 }
