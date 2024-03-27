@@ -1,0 +1,23 @@
+# Building layer
+FROM --platform=linux/amd64 node:16-alpine
+
+# Create a directory to hold the application files
+WORKDIR /app
+
+# Copy the pre-built files into the container
+COPY ./dist/apps/merchant-app /app
+
+# Copy necessary package.json and other configuration files
+COPY package*.json ./
+
+# Install production dependencies (without dev dependencies)
+RUN npm ci --only=production
+
+# Copy any additional configuration files or assets if needed
+# COPY ./path/to/your/local/app/somefile.json ./
+
+# Expose necessary ports
+EXPOSE 3500
+
+# Start your NestJS application
+CMD ["node", "main.js"]

@@ -1,12 +1,89 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/merchant-app/src",
   "compilerOptions": {
-    "webpack": false,
+    "webpack": true,
     "assets": [
       "**/*.hbs"
     ],
-    "watchAssets": true
+    "watchAssets": true,
+    "tsConfigPath": "apps/merchant-app/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/merchant-app",
+  "projects": {
+    "merchant-app": {
+      "type": "application",
+      "root": "apps/merchant-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/merchant-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/merchant-app/tsconfig.app.json"
+      }
+    },
+    "agent-app": {
+      "type": "application",
+      "root": "apps/agent-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/agent-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/agent-app/tsconfig.app.json"
+      }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
+    "db-lib": {
+      "type": "library",
+      "root": "libs/db-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/db-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/db-lib/tsconfig.lib.json"
+      }
+    },
+    "utils": {
+      "type": "library",
+      "root": "libs/utils",
+      "entryFile": "index",
+      "sourceRoot": "libs/utils/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/utils/tsconfig.lib.json"
+      }
+    },
+    "paystack-lib": {
+      "type": "library",
+      "root": "libs/paystack-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/paystack-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/paystack-lib/tsconfig.lib.json"
+      }
+    },
+    "admin": {
+      "type": "application",
+      "root": "apps/admin",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin/tsconfig.app.json"
+      }
+    },
+    "admin-app": {
+      "type": "application",
+      "root": "apps/admin-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin-app/tsconfig.app.json"
+      }
+    }
   }
 }

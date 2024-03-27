@@ -7,17 +7,17 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/apps/merchant-app/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./apps/prime-payment-app/test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.9.1",
@@ -34,6 +34,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "@types/cookie-parser": "^1.4.3",
     "@types/passport-jwt": "^3.0.8",
+    "aws-sdk": "^2.1499.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "bull": "^4.10.4",
@@ -50,6 +51,7 @@
     "ioredis": "^5.3.2",
     "mime-types": "^2.1.35",
     "multer": "^1.4.5-lts.1",
+    "multer-s3": "^2.10.0",
     "mysql2": "^3.3.0",
     "nodemailer": "^6.9.4",
     "passport": "^0.6.0",
@@ -60,7 +62,12 @@
     "rxjs": "^7.8.1",
     "stream-to-string": "^1.2.1",
     "typeorm": "^0.3.15",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "winston-mongodb": "^5.1.1",
+    "winston-slack-webhook-transport": "^2.3.2",
+    "winston-transport": "^4.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.4.2",
@@ -77,6 +84,7 @@
     "@types/nodemailer": "^6.4.9",
     "@types/passport-local": "^1.0.35",
     "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
     "eslint": "^8.40.0",
@@ -98,7 +106,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -106,7 +114,17 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
+      "^@app/db-lib(|/.*)$": "<rootDir>/libs/db-lib/src/$1",
+      "^@app/utils(|/.*)$": "<rootDir>/libs/utils/src/$1",
+      "^@app/paystack-lib(|/.*)$": "<rootDir>/libs/paystack-lib/src/$1"
+    }
   }
 }
