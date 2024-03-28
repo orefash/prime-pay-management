@@ -19,20 +19,23 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'agent-local') {
     }
 
     async validate(email: string, password: string): Promise<any> {
-        const agent = await this.authService.validateAgent(email, password);
 
+        try {
 
-        if(!agent){
-            // throw new UnauthorizedException();
+            const agent = await this.authService.validateAgent(email, password);
+
+            if (!agent) {
+                // throw new UnauthorizedException();
+                throw new HttpException("Incorrect Email or Password", HttpStatus.UNAUTHORIZED);
+            }
+
+            return agent;
+
+        } catch (error) {
             throw new HttpException("Incorrect Email or Password", HttpStatus.UNAUTHORIZED);
+
         }
 
-        
-        // if(!agent.isConfirmed){
-        //     // throw new UnauthorizedException();
-        //     throw new HttpException("Email not confirmed, Please reset password", HttpStatus.UNAUTHORIZED);
-        // }
-        return agent;
     }
 
 }
